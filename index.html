@@ -1,3 +1,4 @@
+HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,7 +38,7 @@
         .navbar { display: flex; justify-content: space-between; background: var(--primary); padding: 10px 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--accent); }
         .navbar button { width: auto; background: transparent; color: white; margin: 0 5px; }
         .navbar button:hover { background: rgba(255,255,255,0.1); color: var(--accent); }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         
         .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; }
         .badge-active { background: var(--secondary); }
@@ -66,10 +67,46 @@
         .ui-error { background: #f8d7da; border-color: #dc3545; color: #721c24; }
         .ui-info { background: #e2f0d9; border-color: var(--accent); color: var(--primary); }
         
-        /* Modal Window Styles */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 25px; border-radius: 8px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .close-modal { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; font-weight: bold; color: var(--danger); }
+        /* MODAL WINDOW SYSTEM (FIXED FOCUS LOCKS) */
+        .modal { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.7); 
+            backdrop-filter: blur(3px);
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 99999 !important; 
+        }
+        .modal-content { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            max-width: 600px; 
+            width: 90%; 
+            max-height: 85vh; 
+            overflow-y: auto; 
+            position: relative; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            border-top: 6px solid var(--accent);
+        }
+        .close-modal { 
+            position: absolute; 
+            top: 15px; 
+            right: 20px; 
+            font-size: 32px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            color: #7f8c8d; 
+            transition: color 0.2s;
+            user-select: none;
+        }
+        .close-modal:hover {
+            color: var(--danger);
+        }
     </style>
 </head>
 <body>
@@ -124,7 +161,7 @@
             <input type="text" id="checkInCode" placeholder="Enter 5-Digit Customer Gym ID">
             <button onclick="loadCheckInIdentity()" class="secondary">Verify Identity & Load Account</button>
             
-            <!-- Real-time Verification Workstation (Replaces alert popups) -->
+            <!-- Real-time Verification Workstation -->
             <div id="checkInVerifyConsole" class="hidden" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 6px; border: 2px solid #ddd;"></div>
         </div>
 
@@ -349,19 +386,19 @@
     </div>
 </div>
 
-<!-- AUDIT LOG PROFILE MODAL WINDOW -->
-<div id="profileModal" class="modal hidden">
-    <div class="modal-content">
+<!-- AUDIT LOG PROFILE MODAL WINDOW (FIXED BACKGROUND LIFTCARDS) -->
+<div id="profileModal" class="modal hidden" onclick="handleModalOutsideClick(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
         <span class="close-modal" onclick="closeProfileModal()">&times;</span>
-        <h2 id="modalTitle" style="border-bottom: 2px solid var(--accent); padding-bottom: 5px;">Member Profile File</h2>
+        <h2 id="modalTitle" style="border-bottom: 2px solid var(--accent); padding-bottom: 5px; margin-top:0;">Member Profile File</h2>
         <div id="modalMeta" style="margin-bottom: 15px; font-size: 14px; line-height: 1.6;"></div>
         <h3>📜 Historical Subscription Ledger & Security Audits</h3>
-        <div id="modalLogsContainer" style="background: #f1f2f6; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 12px; max-height: 250px; overflow-y: auto;"></div>
+        <div id="modalLogsContainer" style="background: #f1f2f6; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 12px; max-height: 250px; overflow-y: auto; border: 1px solid #ddd;"></div>
     </div>
 </div>
 
 <script>
-    // --- INTENTIONAL STORAGE ENGINE ENGINE ---
+    // --- STORAGE HYDRATION ---
     function initDatabase(forceReset = false) {
         if(forceReset) localStorage.clear();
         if(!localStorage.getItem('gymOptions')) {
@@ -380,7 +417,18 @@
 
     let currentUser = null, userRole = null;
 
-    // --- HTML SCREEN NOTIFICATIONS (Replaces native alerts) ---
+    // --- ESCAPE KEY BINDING FOR MODALS ---
+    window.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' || event.key === 'Esc') {
+            closeProfileModal();
+        }
+    });
+
+    function handleModalOutsideClick(event) {
+        closeProfileModal();
+    }
+
+    // --- HTML SCREEN NOTIFICATIONS ---
     function printNotification(message, statusType = 'info') {
         const target = document.getElementById('globalNotificationBar');
         target.innerHTML = `<div class="ui-notification ui-${statusType}">${message}</div>`;
@@ -434,7 +482,7 @@
         showScreen('loginScreen');
     }
 
-    // --- RECALCULATION & RENEWAL CORE ---
+    // --- PRICING RECALCULATIONS ---
     function updatePricePreview() {
         const subId = document.getElementById('custSubChoice').value;
         const discPercent = parseFloat(document.getElementById('custDiscount').value) || 0;
@@ -477,7 +525,7 @@
         updatePricePreview();
     }
 
-    // --- PROFILE SEARCH & INSPECTION UTILITIES ---
+    // --- SEARCH INSPECTION TERMINALS ---
     function inspectProfile(role) {
         const code = document.getElementById(`${role}InspectInput`).value.trim();
         const dest = document.getElementById(`${role}InspectResult`);
@@ -532,9 +580,11 @@
         document.getElementById('modalLogsContainer').innerHTML = logsHtml;
         document.getElementById('profileModal').classList.remove('hidden');
     }
-    function closeProfileModal() { document.getElementById('profileModal').classList.add('hidden'); }
+    function closeProfileModal() { 
+        document.getElementById('profileModal').classList.add('hidden'); 
+    }
 
-    // --- PACKAGES & STAFF MANAGERS ---
+    // --- PACKAGES & STAFF MANAGEMENT ---
     function addGymOption() {
         const name = document.getElementById('optName').value, price = parseFloat(document.getElementById('optPrice').value), type = document.getElementById('optType').value;
         if(!name || !price) return printNotification("Validation Failed.", "error");
@@ -562,7 +612,7 @@
         printNotification("Staff Clearance Revoked.", "info");
     }
 
-    // --- ON-SCREEN REGISTRATION WORKFLOWS ---
+    // --- REGISTRATION PIPELINES ---
     function submitCustomerRegistration() {
         const first = document.getElementById('custFirst').value, last = document.getElementById('custLast').value, dob = document.getElementById('custDOB').value;
         const subId = document.getElementById('custSubChoice').value, discount = parseFloat(document.getElementById('custDiscount').value) || 0, reason = document.getElementById('custDiscountReason').value.trim();
@@ -579,9 +629,9 @@
         let q = { id: Date.now(), isRenewal: !!existingCode, code, first, last, dob, opt, discount, finalPrice, status: "Pending", empReason: reason, mgrNote: "" };
 
         if(discount === 0) {
-            // Embed inline interactive payment acceptance confirmation box
             const confirmationDiv = document.getElementById('renewalContextBox');
             confirmationDiv.className = "ui-notification ui-info";
+            confirmationDiv.classList.remove('hidden');
             confirmationDiv.innerHTML = `
                 <p>💸 <b>Immediate Direct Payment Checkout Required:</b> Collect <b>${finalPrice} JOD</b> from ${first} ${last}.</p>
                 <button class="secondary" style="width:auto; margin-right:10px;" id="execDirectPayBtn">Confirm Cash Received & Activate</button>
@@ -629,7 +679,7 @@
         localStorage.setItem('customers', JSON.stringify(customers));
     }
 
-    // --- DYNAMIC INTERACTIVE NO-ALERT CHECK-IN TERMINAL ---
+    // --- IN-SCREEN ACCESS CONTROLS ---
     function loadCheckInIdentity() {
         const code = document.getElementById('checkInCode').value.trim();
         const consoleDest = document.getElementById('checkInVerifyConsole');
@@ -641,21 +691,20 @@
 
         if(!cust) {
             consoleDest.className = "ui-notification ui-error";
-            consoleDest.innerHTML = "❌ <b>Access Interrupted:</b> Gym ID code not found in active local storage registers.";
+            consoleDest.innerHTML = "❌ <b>Access Interrupted:</b> Gym ID code not found in active registers.";
             consoleDest.classList.remove('hidden');
             return;
         }
         
-        // Block all inactive states immediately
         if(cust.status === "Suspended") {
             consoleDest.className = "ui-notification ui-error";
-            consoleDest.innerHTML = "❌ <b>ENTRY DENIED:</b> This membership is frozen due to policy violations or misconduct.";
+            consoleDest.innerHTML = "❌ <b>ENTRY DENIED:</b> This membership is frozen due to policy violations.";
             consoleDest.classList.remove('hidden');
             return;
         }
         if(cust.status === "Refunded") {
             consoleDest.className = "ui-notification ui-error";
-            consoleDest.innerHTML = "❌ <b>ENTRY DENIED:</b> The capital balance for this pass has been completely refunded.";
+            consoleDest.innerHTML = "❌ <b>ENTRY DENIED:</b> Capital balance for this pass has been completely refunded.";
             consoleDest.classList.remove('hidden');
             return;
         }
@@ -666,17 +715,15 @@
             return;
         }
 
-        // Hard Preventative Block for Zero/Negative Values
         if(cust.opt.type === 'entry' && cust.entriesLeft !== null && cust.entriesLeft <= 0) {
             cust.status = "Depleted";
             localStorage.setItem('customers', JSON.stringify(customers));
             consoleDest.className = "ui-notification ui-error";
-            consoleDest.innerHTML = "❌ <b>ENTRY DENIED:</b> 0 Entries remaining. Entry Gate blocked until a renewal transaction is completed.";
+            consoleDest.innerHTML = "❌ <b>ENTRY DENIED:</b> 0 Entries remaining. Entry Gate blocked.";
             consoleDest.classList.remove('hidden');
             return;
         }
 
-        // Render verification identity profile snapshot dynamically on screen
         consoleDest.className = "card";
         consoleDest.classList.remove('hidden');
 
@@ -696,9 +743,7 @@
             <button class="danger" style="width:auto;" onclick="document.getElementById('checkInVerifyConsole').classList.add('hidden')">Cancel</button>
         `;
 
-        // Interactive validation binding without system alert loops
         consoleDest.querySelector('#executeGateCheckInBtn').onclick = function() {
-            // Re-read inside click context to guard against concurrent adjustments
             let latestCustomers = JSON.parse(localStorage.getItem('customers'));
             let active = latestCustomers.find(c => c.code === cust.code);
             let timestamp = new Date().toLocaleString();
@@ -711,7 +756,7 @@
                 } else {
                     active.logs.push(`Check-In Approved: ${timestamp}`); active.totalCheckIns++;
                     consoleDest.className = "ui-notification ui-success";
-                    consoleDest.innerHTML = `✅ <b>Entry Authorized!</b> Welcome back, ${active.first}. total visits recorded: ${active.totalCheckIns}.`;
+                    consoleDest.innerHTML = `✅ <b>Entry Authorized!</b> Welcome back, ${active.first}. Total visits: ${active.totalCheckIns}.`;
                     document.getElementById('checkInCode').value = "";
                 }
             } else {
@@ -739,11 +784,10 @@
         };
     }
 
-    // --- EMPLOYEE MANUAL COUNTER DESK ACTION ---
     function acceptCounter(id) {
         let quotations = JSON.parse(localStorage.getItem('quotations')), q = quotations.find(x => x.id === id);
         
-        const confirmationDiv = document.getElementById('registrationSuccessAlert') || document.getElementById('globalNotificationBar');
+        const confirmationDiv = document.getElementById('globalNotificationBar');
         confirmationDiv.className = "ui-notification ui-info";
         confirmationDiv.innerHTML = `
             <p>🤝 <b>Process Counter-Offer Terms:</b> Confirm client paid exactly <b>${q.finalPrice} JOD</b>?</p>
@@ -753,14 +797,14 @@
 
         confirmationDiv.querySelector('#confirmCounterBtn').onclick = function() {
             activateCustomer(q);
-            printNotification(`🎉 Active Membership Confirmed via Counter-Offer Agreement. GYM ID: ${q.code}`, "success");
+            printNotification(`🎉 Active Membership Confirmed! GYM ID: ${q.code}`, "success");
             quotations = quotations.filter(x => x.id !== id); 
             localStorage.setItem('quotations', JSON.stringify(quotations)); 
             renderEmployeeData();
         };
     }
 
-    // --- MANAGER CONTROL SUITE INTERFACES ---
+    // --- MANAGER CONTROLS ---
     function processQuotation(id, action, counterVal = null) {
         let quotations = JSON.parse(localStorage.getItem('quotations')), q = quotations.find(x => x.id === id);
         let memo = prompt("Send a note to the employee:") || "Processed by Management.";
@@ -779,18 +823,17 @@
     }
     function processRefund(code) {
         let customers = JSON.parse(localStorage.getItem('customers')), cust = customers.find(c => c.code === code);
-        cust.logs.push(`[Financial Audit] Processed full refund of ${cust.paid} JOD on ${new Date().toLocaleDateString()}. Access terminated.`);
+        cust.logs.push(`[Financial Audit] Processed full refund of ${cust.paid} JOD on ${new Date().toLocaleDateString()}.`);
         cust.status = "Refunded"; cust.paid = 0;
         localStorage.setItem('customers', JSON.stringify(customers)); renderManagerData();
         printNotification(`Capital asset balance refunded. Account disabled.`, "warning");
     }
 
-    // --- SECURE PROMPTS WITH ON-SCREEN UI CONTROLS ---
     function promptFactoryReset() {
         const container = document.getElementById('mgrPromptContainer');
         container.innerHTML = `
             <div class="ui-notification ui-error" style="border:2px solid var(--danger);">
-                <p>🚨 <b>CRITICAL SYSTEM SECURITY OVERRIDE TRIGGERED:</b> Are you absolutely sure you want to drop all data structures?</p>
+                <p>🚨 <b>CRITICAL SYSTEM RESET:</b> Are you absolutely sure you want to drop all data structures?</p>
                 <button class="danger" style="width:auto; margin-right:10px;" onclick="triggerFactoryReset()">Yes, Wipe Everything</button>
                 <button class="secondary" style="width:auto;" onclick="document.getElementById('mgrPromptContainer').innerHTML=''">Cancel</button>
             </div>
