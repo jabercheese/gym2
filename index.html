@@ -538,6 +538,10 @@
         const minutes = String(simulatedDate.getMinutes()).padStart(2, '0');
         
         document.getElementById('systemLiveClock').innerText = `${day}/${month}/${year} ${hours}:${minutes}`;
+        
+        // Dynamic proactive check inside tick loop for rendering states accurately against wrapped simulated hours
+        verifyAllCustomersExpiryStateOnTick();
+        
         setTimeout(runClockEngineTick, 1000);
     }
 
@@ -548,6 +552,29 @@
         const targetDateTime = new Date(val);
         systemClockOffsetMilliseconds = targetDateTime.getTime() - Date.now();
         printNotification(`🕒 System clock advanced to customized time structure execution point.`, "success");
+        manualRefresh();
+    }
+
+    // Proactive internal query evaluation tool that automatically transitions memberships based on the custom matrix time parameter
+    function verifyAllCustomersExpiryStateOnTick() {
+        let customers = JSON.parse(localStorage.getItem('customers')) || [];
+        let updated = false;
+        const currentSimulatedTime = getSystemSimulatedTime();
+
+        customers.forEach(cust => {
+            if (cust.status === "Active" && cust.opt.type === 'time' && cust.expiryDate) {
+                if (new Date(cust.expiryDate + "T23:59:59") < currentSimulatedTime) {
+                    cust.status = "Expired";
+                    cust.logs.push(`[System Lifespan Check] Automated trigger marked subscription as Expired at time point: ${currentSimulatedTime.toLocaleString()}`);
+                    updated = true;
+                }
+            }
+        });
+
+        if (updated) {
+            localStorage.setItem('customers', JSON.stringify(customers));
+            if (userRole === 'manager') renderManagerData();
+        }
     }
 
     // --- DATABASE HYDRATION ---
@@ -634,6 +661,7 @@
         document.getElementById(tabId).classList.remove('hidden');
     }
     function manualRefresh() {
+        verifyAllCustomersExpiryStateOnTick();
         if (userRole === 'manager') renderManagerData();
         else if (userRole === 'employee') renderEmployeeData();
         else if (userRole === 'cafeteria') renderCafeteriaData();
@@ -754,6 +782,7 @@
         const dest = document.getElementById(`${role}InspectResult`);
         if(!code) return printNotification("Input a valid execution query ID.", "error");
         
+        verifyAllCustomersExpiryStateOnTick(); // Force-align balance timelines first
         const customers = JSON.parse(localStorage.getItem('customers'));
         const cust = customers.find(c => c.code === code);
         
@@ -787,6 +816,7 @@
     }
 
     function launchProfileModal(code) {
+        verifyAllCustomersExpiryStateOnTick();
         const customers = JSON.parse(localStorage.getItem('customers'));
         const cust = customers.find(c => c.code === code);
         if(!cust) return;
@@ -875,13 +905,15 @@
     function activateCustomer(q) {
         let customers = JSON.parse(localStorage.getItem('customers'));
         let targetCust = customers.find(c => c.code === q.code);
+        
+        // MOVED TO simulated timezone tracking 
         let timestampStr = getSystemSimulatedTime().toLocaleDateString();
 
         if(targetCust) {
             targetCust.opt = q.opt;
             targetCust.paid += q.finalPrice;
             targetCust.status = "Active";
-            targetCust.logs.push(`[Renewal] Active Sub: "${q.opt.name}" processed for ${q.finalPrice} JOD on ${timestampStr}.`);
+            targetCust.logs.push(`[Renewal] Active Sub: "${q.opt.name}" processed for ${q.finalPrice} JOD on ${getSystemSimulatedTime().toLocaleString()}.`);
             if(q.opt.type === 'time') {
                 let exp = getSystemSimulatedTime(); exp.setDate(exp.getDate() + q.opt.days);
                 targetCust.expiryDate = exp.toISOString().split('T')[0]; targetCust.entriesLeft = null;
@@ -891,7 +923,7 @@
             }
         } else {
             let newCustomer = {
-                code: q.code, first: q.first, last: q.last, dob: q.dob, opt: q.opt, paid: q.finalPrice, status: "Active", cafeteriaBalance: 0.00, logs: [`Profile Created. Selected Base: "${q.opt.name}" on ${timestampStr}`], totalCheckIns: 0
+                code: q.code, first: q.first, last: q.last, dob: q.dob, opt: q.opt, paid: q.finalPrice, status: "Active", cafeteriaBalance: 0.00, logs: [`Profile Created. Selected Base: "${q.opt.name}" on ${getSystemSimulatedTime().toLocaleString()}`], totalCheckIns: 0
             };
             if(q.opt.type === 'time') {
                 let exp = getSystemSimulatedTime(); exp.setDate(exp.getDate() + q.opt.days); newCustomer.expiryDate = exp.toISOString().split('T')[0];
@@ -915,10 +947,12 @@
             consoleDest.classList.remove('hidden'); return;
         }
         
+        // SAFE DATE CONVERSION: Rooted tightly on custom time config
         const currentSimulatedTime = getSystemSimulatedTime();
         if(cust.opt.type === 'time' && cust.expiryDate) {
             if(new Date(cust.expiryDate + "T23:59:59") < currentSimulatedTime && cust.status === "Active") {
                 cust.status = "Expired";
+                cust.logs.push(`[Lifespan Check] Flagged Expired upon Gate Query scan: ${currentSimulatedTime.toLocaleString()}`);
                 localStorage.setItem('customers', JSON.stringify(customers));
             }
         }
@@ -953,6 +987,8 @@
         consoleDest.querySelector('#executeGateCheckInBtn').onclick = function() {
             let latestCustomers = JSON.parse(localStorage.getItem('customers'));
             let active = latestCustomers.find(c => c.code === cust.code);
+            
+            // MOVED TO simulated time machine parameters
             let timestamp = getSystemSimulatedTime().toLocaleString();
 
             if(active.opt.type === 'time') {
@@ -1003,6 +1039,7 @@
         const id = document.getElementById('walletGymIdSearch').value.trim();
         if(!id) return alert("Enter a valid lookup ID code.");
         
+        verifyAllCustomersExpiryStateOnTick();
         const customers = JSON.parse(localStorage.getItem('customers')) || [];
         const client = customers.find(c => c.code === id);
         const wrapper = document.getElementById('walletConsoleWrapper');
@@ -1032,13 +1069,14 @@
         
         if(client.cafeteriaBalance === undefined) client.cafeteriaBalance = 0.00;
         let ledger = JSON.parse(localStorage.getItem('foodSales')) || [];
+        
+        // FIXED DATE LINK: Tracked to warp matrix parameters
         let stamp = getSystemSimulatedTime().toLocaleString();
         
         if(direction === 'add') {
             client.cafeteriaBalance += amount;
             client.logs.push(`[Cafeteria Wallet] Deposited +${amount.toFixed(2)} JOD on ${stamp}.`);
             
-            // Count directly as profits in sales history log tracking
             ledger.push({
                 timestamp: stamp,
                 products: `Prepaid Balance Deposit [Gym ID: ${client.code}]`,
@@ -1046,13 +1084,11 @@
                 discount: "0%",
                 net: amount
             });
-            printNotification(`Successfully loaded +${amount.toFixed(2)} JOD to customer balance account., "success"`);
+            printNotification(`Successfully loaded +${amount.toFixed(2)} JOD to customer balance account.`, "success");
         } else {
-            // Safety deduction check (can drop below zero if correcting major ledger errors manually)
             client.cafeteriaBalance -= amount;
             client.logs.push(`[Cafeteria Wallet] Correction/Deduction of -${amount.toFixed(2)} JOD on ${stamp}.`);
             
-            // Adjust profits accurately by logging a negative balancing counter entry
             ledger.push({
                 timestamp: stamp,
                 products: `Balance Correction Entry [Gym ID: ${client.code}]`,
@@ -1190,6 +1226,7 @@
             return;
         }
         
+        verifyAllCustomersExpiryStateOnTick();
         const customers = JSON.parse(localStorage.getItem('customers')) || [];
         const match = customers.find(c => c.code === id);
         
@@ -1205,7 +1242,6 @@
         calculatePOSChange();
     }
 
-    // --- REVENUE CALCULATION LOGIC PREVENTING CREDIT DOUBLE-COUNTING ---
     function calculatePOSChange() {
         const totalDue = parseFloat(document.getElementById('cartTotalDisplay').innerText);
         let walletDeduction = 0.00;
@@ -1245,6 +1281,8 @@
             if(cashHanded < cashRequired) return printNotification("Insufficient cash handed to cover the order statement balance.", "error");
             
             let latestCustomers = JSON.parse(localStorage.getItem('customers')) || [];
+            
+            // TIMELINE ALIGNMENT: Anchored on custom time
             let stamp = getSystemSimulatedTime().toLocaleString();
             let itemSummaryString = posActiveCart.map(c => `${c.name} (x${c.qty})`).join(', ');
             
@@ -1265,8 +1303,6 @@
                 paymentMethodSummary = cashRequired > 0 ? `Wallet (-${walletDeduction.toFixed(2)} JOD) + Cash` : `Wallet Deduct [ID: ${activeCheckoutWalletUser.code}]`;
             }
 
-            // --- ZERO-PROFIT EXEMPTION FOR WALLET CREDITS ---
-            // Only cashRequired brings in net-new revenue. Wallet points were tracked during their cash deposit phase.
             salesLedger.push({
                 timestamp: stamp,
                 products: `${itemSummaryString} [Method: ${paymentMethodSummary}]`,
@@ -1306,7 +1342,7 @@
     }
     function processRefund(code) {
         let customers = JSON.parse(localStorage.getItem('customers')), cust = customers.find(c => c.code === code);
-        cust.logs.push(`[Financial Audit] Processed full refund of ${cust.paid} JOD on ${getSystemSimulatedTime().toLocaleDateString()}.`);
+        cust.logs.push(`[Financial Audit] Processed full refund of ${cust.paid} JOD on ${getSystemSimulatedTime().toLocaleString()}.`);
         cust.status = "Refunded"; cust.paid = 0; localStorage.setItem('customers', JSON.stringify(customers)); renderManagerData();
         printNotification("Balance refunded. Account disabled.", "warning");
     }
@@ -1398,6 +1434,7 @@
         });
         document.getElementById('mgrApprovalsTable').innerHTML = appHtml;
 
+        verifyAllCustomersExpiryStateOnTick();
         const allCusts = JSON.parse(localStorage.getItem('customers')) || [];
         const gymFeesRevenue = allCusts.reduce((acc, curr) => acc + curr.paid, 0);
         
