@@ -92,6 +92,7 @@
 
 <div class="container">
     
+    <!-- MUSCLE POWER GYM LOGO -->
     <div class="gym-logo-container">
         <div class="gym-logo">
             <div class="gym-icon">💪</div>
@@ -99,6 +100,7 @@
         </div>
     </div>
 
+    <!-- Auth Status Bar -->
     <div class="navbar">
         <span id="userStatus" style="color: white; font-weight: bold;">Logged Out</span>
         <span>🕒 System Time: <b id="systemLiveClock" style="color: var(--accent);">--/--/---- --:--</b></span>
@@ -109,18 +111,22 @@
         </div>
     </div>
 
+    <!-- GLOBAL IN-SCREEN NOTIFICATION SYSTEM -->
     <div id="globalNotificationBar"></div>
 
+    <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="card screen">
         <h2>System Portal Login</h2>
         <label>Select User Handle Profile</label>
         <select id="loginUserSelect">
-            </select>
+            <!-- Dynamically populated via javascript runtime below -->
+        </select>
         <label>System Security Password</label>
         <input type="password" id="loginPass" placeholder="Enter password">
         <button onclick="handleLogin()" style="background: var(--accent); color: var(--primary);">Secure Login</button>
     </div>
 
+    <!-- CAFETERIA POS DASHBOARD -->
     <div id="cafeteriaDashboard" class="screen hidden">
         <h2>🍔 Cafeteria Management Terminal & POS Workstation</h2>
         
@@ -138,15 +144,19 @@
             <button onclick="showCafSubTab('cafBalancesTab')">💳 Manage Account Balances</button>
         </div>
 
+        <!-- CAFETERIA REGISTER TAB -->
         <div id="cafPosTab" class="cafTab">
             <div class="card">
                 <h3>🛒 Point of Sale Terminal Engine</h3>
                 <div class="pos-grid">
+                    <!-- Left Side: Interactive Items -->
                     <div>
                         <h4>Select Items to Sell</h4>
                         <div id="posMenuGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:12px; max-height:400px; overflow-y:auto; padding:5px;">
-                            </div>
+                            <!-- Items rendered dynamic -->
+                        </div>
                     </div>
+                    <!-- Right Side: Cart Workspace -->
                     <div class="cart-pane">
                         <div>
                             <h4>Active Order Summary Table</h4>
@@ -168,6 +178,7 @@
                             
                             <button onclick="initiatePOSCheckout()" class="secondary" style="margin-top:15px; padding:12px;">Process Payment Receipt</button>
                             
+                            <!-- Cash Handling / Change / Wallet calculator interactive panel -->
                             <div id="posCheckoutPanel" class="hidden" style="margin-top:15px; padding:12px; background:#fff; border:1px solid #ccc; border-radius:4px;">
                                 <div style="background: #eef2f3; padding: 10px; border-radius: 4px; margin-bottom: 12px; border-left: 4px solid var(--secondary);">
                                     <label style="margin: 0; font-weight: bold; font-size: 13px;">🔗 Link Member Wallet (Optional GYM ID):</label>
@@ -192,10 +203,12 @@
                     </div>
                 </div>
                 
+                <!-- SECURED ACCESS WORD EXTENSION LINK -->
                 <span class="modify-link" onclick="challengeModifyAccess()">modify</span>
             </div>
         </div>
 
+        <!-- CAFETERIA MEMBER WALLET BALANCE TAB -->
         <div id="cafBalancesTab" class="cafTab hidden card">
             <h3>💳 Customer Prepaid Cafeteria Wallet System</h3>
             <p>Search a member by their 5-digit Gym ID to load funds or issue corrections. All transactions are added to register totals.</p>
@@ -240,6 +253,7 @@
         </div>
     </div>
 
+    <!-- SEPARATE SECURED CAFETERIA INVENTORY MANAGEMENT PAGE -->
     <div id="cafeteriaInventoryScreen" class="screen hidden">
         <div class="navbar" style="background: var(--dark)">
             <span style="color: white; font-weight: bold;">🔒 Secured Cafeteria Stock Config Portal</span>
@@ -269,13 +283,15 @@
                             </tr>
                         </thead>
                         <tbody id="inventoryConfigTableBody">
-                            </tbody>
+                            <!-- Populated Dynamically -->
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- EMPLOYEE DASHBOARD -->
     <div id="employeeDashboard" class="screen hidden">
         <h2>Employee Dashboard</h2>
         <div class="navbar" style="background: var(--dark)">
@@ -286,6 +302,7 @@
             <button onclick="showEmpSubTab('empInspectTab')" style="color: var(--accent);">📊 Check-Up Station (Search Pass)</button>
         </div>
 
+        <!-- Check-In Tab -->
         <div id="checkInTab" class="empTab card">
             <h3>Customer Check-In Entry Gate</h3>
             <input type="text" id="checkInCode" placeholder="Enter 5-Digit Customer Gym ID">
@@ -293,6 +310,7 @@
             <div id="checkInVerifyConsole" class="hidden" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 6px; border: 2px solid #ddd;"></div>
         </div>
 
+        <!-- Inspection Tab -->
         <div id="empInspectTab" class="empTab card hidden">
             <h3>📊 Pass Inspector Terminal</h3>
             <p>Input a Gym ID below to check expiry dates, verify remaining entry balances, or view complete logs.</p>
@@ -301,6 +319,7 @@
             <div id="empInspectResult" style="margin-top: 15px;"></div>
         </div>
 
+        <!-- Add/Renew Customer Tab -->
         <div id="newCustTab" class="empTab card hidden">
             <h3>Membership Registration & Renewal Desk</h3>
             <div id="renewalContextBox" class="hidden"></div>
@@ -322,12 +341,14 @@
                     <input type="text" id="custLast" placeholder="Last Name">
                     <label>Date of Birth</label>
                     <input type="date" id="custDOB">
+                    <label>Future Membership Activation Date (Optional)</label>
+                    <input type="date" id="custStartDate">
                 </div>
                 <div>
                     <h4>2. Subscription Package Configuration</h4>
                     <select id="custSubChoice" onchange="updatePricePreview()"></select>
-                    <label>Requested Discount %</label>
-                    <input type="number" id="custDiscount" value="0" min="0" max="100" oninput="updatePricePreview()">
+                    <label>Requested Discount Value (JOD)</label>
+                    <input type="number" id="custDiscountJOD" value="0" min="0" step="0.25" oninput="updatePricePreview()">
                     <div id="discountReasonWrapper" class="hidden">
                         <label style="color: var(--danger); font-weight: bold;">Reason for requesting discount *</label>
                         <textarea id="custDiscountReason" rows="2" placeholder="Explain why this discount is required..."></textarea>
@@ -342,16 +363,18 @@
             </div>
         </div>
 
+        <!-- Quotation Status Tab -->
         <div id="empQuotationsTab" class="empTab card hidden">
             <h3>Submitted Quotations & Notes Tracker</h3>
             <div style="overflow-x: auto;">
                 <table>
-                    <thead><tr><th>Gym ID</th><th>Customer</th><th>Option</th><th>Original Price</th><th>Requested Disc %</th><th>Proposed Final</th><th>Your Stated Reason</th><th>Status</th><th>Manager Memo</th><th>Action</th></tr></thead>
+                    <thead><tr><th>Gym ID</th><th>Customer</th><th>Option</th><th>Original Price</th><th>Requested Disc</th><th>Proposed Final</th><th>Your Stated Reason</th><th>Status</th><th>Manager Memo</th><th>Action</th></tr></thead>
                     <tbody id="empQuotationsTable"></tbody>
                 </table>
             </div>
         </div>
 
+        <!-- Forgotten Gym ID Lookup Tab -->
         <div id="lookupTab" class="empTab card hidden">
             <h3>🔍 Forgotten Gym ID Emergency Lookup</h3>
             <div class="grid">
@@ -370,6 +393,7 @@
         </div>
     </div>
 
+    <!-- MANAGER DASHBOARD -->
     <div id="managerDashboard" class="screen hidden">
         <h2>Manager Control Panel</h2>
         
@@ -389,6 +413,7 @@
             <button onclick="showMgrSubTab('mgrSystemTab')" style="color: #ff9f9f;">⚙️ System Tools</button>
         </div>
 
+        <!-- Manager Inspection Station -->
         <div id="mgrInspectTab" class="mgrTab card hidden">
             <h3>📊 Manager Pass Inspector</h3>
             <p>Instantly inspect account metrics, validation state, and history logs by inputting a Gym ID.</p>
@@ -397,6 +422,7 @@
             <div id="mgrInspectResult" style="margin-top: 15px;"></div>
         </div>
 
+        <!-- Gym Options Tab -->
         <div id="mgrSubOptionsTab" class="mgrTab card">
             <h3>Gym Subscription Packages</h3>
             <div class="grid">
@@ -430,6 +456,7 @@
             </div>
         </div>
 
+        <!-- Staff Tab -->
         <div id="mgrStaffTab" class="mgrTab card hidden">
             <h3>Staff Deployment Access Keys</h3>
             <div class="grid">
@@ -451,16 +478,18 @@
             </div>
         </div>
 
+        <!-- Approvals Tab -->
         <div id="mgrApprovalsTab" class="mgrTab card hidden">
             <h3>Pending Discount Approvals Queue</h3>
             <div style="overflow-x: auto;">
                 <table>
-                    <thead><tr><th>Gym ID Mode</th><th>Customer</th><th>Subscription Target</th><th>Staff Requested %</th><th>Target Price</th><th>Employee Reason</th><th>Counter %</th><th>Action Rules Panel</th></tr></thead>
+                    <thead><tr><th>Gym ID Mode</th><th>Customer</th><th>Subscription Target</th><th>Staff Requested Cut</th><th>Target Price</th><th>Employee Reason</th><th>Counter Cut (JOD)</th><th>Action Rules Panel</th></tr></thead>
                     <tbody id="mgrApprovalsTable"></tbody>
                 </table>
             </div>
         </div>
 
+        <!-- Membership Control & Logs Tab -->
         <div id="mgrRefundsTab" class="mgrTab card hidden">
             <h3>Membership Master Control Panel & Access History Logs</h3>
             <p style="font-size:12px; color:var(--accent);">💡 <i>Click anywhere on a row to review the member's complete structural profile and historical log archives.</i></p>
@@ -472,19 +501,23 @@
             </div>
         </div>
 
+        <!-- System Settings Tools Tab -->
         <div id="mgrSystemTab" class="mgrTab card hidden">
             <h3>⚙️ System Administration Tools</h3>
             
+            <!-- MANAGER CONTROL PANEL SYSTEM CLOCK SIMULATOR -->
             <div class="card" style="border-left: 4px solid var(--secondary); margin-bottom: 25px;">
                 <h4>🕒 System Time-Machine Warp Controller</h4>
-                <p style="font-size: 13px; color: #555;">Adjust global dates dynamically to verify membership lifespan terminations or audit records tracking calculations.</p>
+                <p style="font-size: 13px; color: #555;">Adjust global dates dynamically to verify membership lifespan terminations. Changes instantly apply to all open tabs.</p>
                 <div class="time-control-panel">
                     <span>Target Date-Time Setting:</span>
                     <input type="datetime-local" id="systemTimeWarpInput">
                     <button onclick="warpSystemTime()" style="background:var(--secondary); font-size:13px; padding:6px 12px; width:auto; margin:0;">Commit Time Adjustment</button>
+                    <button onclick="resetWarpedTime()" style="background:var(--danger); font-size:13px; padding:6px 12px; width:auto; margin:0;">Restore Live Time</button>
                 </div>
             </div>
 
+            <!-- PASSWORD SETTING MECHANISMS -->
             <div class="card" style="border-left: 4px solid var(--accent); margin-bottom: 25px;">
                 <h4>🔐 Cafeteria Security Configuration Management</h4>
                 <div class="grid">
@@ -511,6 +544,7 @@
     </div>
 </div>
 
+<!-- AUDIT LOG PROFILE MODAL WINDOW -->
 <div id="profileModal" class="modal hidden" onclick="handleModalOutsideClick(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
         <span class="close-modal" onclick="closeProfileModal()">&times;</span>
@@ -522,9 +556,31 @@
 </div>
 
 <script>
-    // --- CONTINUOUS TIME MACHINE SIMULATOR ENGINE ---
+    // --- CONTINUOUS GLOBAL TAB-SYNCHRONIZED TIME MACHINE ---
     let systemClockOffsetMilliseconds = 0; 
     
+    function updateClockOffsetFromStorage() {
+        const storedTarget = localStorage.getItem('simulatedTimeTarget');
+        if (storedTarget) {
+            const targetTimestamp = parseInt(storedTarget, 10);
+            const recordedAnchor = parseInt(localStorage.getItem('simulatedTimeAnchor') || Date.now(), 10);
+            const timePassedSinceAnchor = Date.now() - recordedAnchor;
+            const updatedTargetTime = targetTimestamp + timePassedSinceAnchor;
+            systemClockOffsetMilliseconds = updatedTargetTime - Date.now();
+        } else {
+            systemClockOffsetMilliseconds = 0; 
+        }
+    }
+
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'simulatedTimeTarget' || e.key === 'simulatedTimeAnchor') {
+            updateClockOffsetFromStorage();
+            if (userRole === 'manager') renderManagerData();
+            else if (userRole === 'employee') renderEmployeeData();
+            else if (userRole === 'cafeteria') renderCafeteriaData();
+        }
+    });
+
     function getSystemSimulatedTime() {
         return new Date(Date.now() + systemClockOffsetMilliseconds);
     }
@@ -539,9 +595,7 @@
         
         document.getElementById('systemLiveClock').innerText = `${day}/${month}/${year} ${hours}:${minutes}`;
         
-        // Dynamic proactive check inside tick loop for rendering states accurately against wrapped simulated hours
         verifyAllCustomersExpiryStateOnTick();
-        
         setTimeout(runClockEngineTick, 1000);
     }
 
@@ -550,12 +604,25 @@
         if(!val) return printNotification("Select a valid destination date & time value.", "error");
         
         const targetDateTime = new Date(val);
-        systemClockOffsetMilliseconds = targetDateTime.getTime() - Date.now();
-        printNotification(`🕒 System clock advanced to customized time structure execution point.`, "success");
+        const currentRealTimestamp = Date.now();
+        
+        localStorage.setItem('simulatedTimeTarget', targetDateTime.getTime().toString());
+        localStorage.setItem('simulatedTimeAnchor', currentRealTimestamp.toString());
+        
+        updateClockOffsetFromStorage();
+        printNotification(`🕒 System clock advanced globally across all tabs.`, "success");
         manualRefresh();
     }
 
-    // Proactive internal query evaluation tool that automatically transitions memberships based on the custom matrix time parameter
+    function resetWarpedTime() {
+        localStorage.removeItem('simulatedTimeTarget');
+        localStorage.removeItem('simulatedTimeAnchor');
+        updateClockOffsetFromStorage();
+        document.getElementById('systemTimeWarpInput').value = "";
+        printNotification(`🕒 Restored real standard real-world time synchronization.`, "info");
+        manualRefresh();
+    }
+
     function verifyAllCustomersExpiryStateOnTick() {
         let customers = JSON.parse(localStorage.getItem('customers')) || [];
         let updated = false;
@@ -579,7 +646,10 @@
 
     // --- DATABASE HYDRATION ---
     function initDatabase(forceReset = false) {
-        if(forceReset) localStorage.clear();
+        if(forceReset) {
+            localStorage.clear();
+            systemClockOffsetMilliseconds = 0;
+        }
         if(!localStorage.getItem('gymOptions')) {
             localStorage.setItem('gymOptions', JSON.stringify([
                 { id: 1, name: "1 Month Unlimited", price: 50, type: "time", days: 30 },
@@ -597,17 +667,13 @@
             ]));
         }
         
-        // Dynamic Variable Passcode Guards Initialization
-        if(!localStorage.getItem('cafLoginPassword')) {
-            localStorage.setItem('cafLoginPassword', '1234');
-        }
-        if(!localStorage.getItem('cafModifyPassword')) {
-            localStorage.setItem('cafModifyPassword', '1234');
-        }
-
+        if(!localStorage.getItem('cafLoginPassword')) { localStorage.setItem('cafLoginPassword', '1234'); }
+        if(!localStorage.getItem('cafModifyPassword')) { localStorage.setItem('cafModifyPassword', '1234'); }
         if(!localStorage.getItem('foodSales')) { localStorage.setItem('foodSales', JSON.stringify([])); }
         if(!localStorage.getItem('customers')) { localStorage.setItem('customers', JSON.stringify([])); }
         if(!localStorage.getItem('quotations')) { localStorage.setItem('quotations', JSON.stringify([])); }
+        
+        updateClockOffsetFromStorage();
     }
 
     function rebuildLoginUserDropdown() {
@@ -627,7 +693,7 @@
 
     let currentUser = null, userRole = null;
     let posActiveCart = [];
-    let activeCheckoutWalletUser = null; // Caches validated checkout wallets
+    let activeCheckoutWalletUser = null;
 
     window.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') closeProfileModal();
@@ -641,6 +707,7 @@
         setTimeout(() => { target.innerHTML = ""; }, 7000);
     }
 
+    // --- INTERFACE MANAGEMENT VIEWS ---
     function showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
         document.getElementById(screenId).classList.remove('hidden');
@@ -672,7 +739,6 @@
     function handleLogin() {
         const selectedUser = document.getElementById('loginUserSelect').value;
         const p = document.getElementById('loginPass').value;
-        
         const runtimeCafLoginPass = localStorage.getItem('cafLoginPassword') || '1234';
         
         if(selectedUser === 'admin' && p === 'admin') {
@@ -734,12 +800,13 @@
     // --- REGISTERED WORKFLOW CALCULATORS ---
     function updatePricePreview() {
         const subId = document.getElementById('custSubChoice').value;
-        const discPercent = parseFloat(document.getElementById('custDiscount').value) || 0;
-        document.getElementById('discountReasonWrapper').classList.toggle('hidden', discPercent <= 0);
+        const discountJOD = parseFloat(document.getElementById('custDiscountJOD').value) || 0;
+        document.getElementById('discountReasonWrapper').classList.toggle('hidden', discountJOD <= 0);
         const options = JSON.parse(localStorage.getItem('gymOptions'));
         const opt = options.find(o => o.id == subId);
         if(opt) {
-            document.getElementById('pricePreview').innerText = `${Math.round(opt.price * (1 - (discPercent / 100)))} JOD`;
+            let finalPrice = Math.max(0, opt.price - discountJOD);
+            document.getElementById('pricePreview').innerText = `${Math.round(finalPrice)} JOD`;
         }
     }
     function toggleOptFields() {
@@ -769,7 +836,8 @@
     function clearRegistrationForm() {
         document.getElementById('custExistingCode').value = "";
         document.getElementById('custFirst').value = ""; document.getElementById('custLast').value = ""; document.getElementById('custDOB').value = "";
-        document.getElementById('custDiscount').value = "0"; document.getElementById('custDiscountReason').value = "";
+        document.getElementById('custStartDate').value = "";
+        document.getElementById('custDiscountJOD').value = "0"; document.getElementById('custDiscountReason').value = "";
         document.getElementById('searchMemberInput').value = ""; document.getElementById('searchProfileResult').innerHTML = "";
         document.getElementById('custFirst').disabled = false; document.getElementById('custLast').disabled = false; document.getElementById('custDOB').disabled = false;
         document.getElementById('renewalContextBox').classList.add('hidden');
@@ -782,7 +850,7 @@
         const dest = document.getElementById(`${role}InspectResult`);
         if(!code) return printNotification("Input a valid execution query ID.", "error");
         
-        verifyAllCustomersExpiryStateOnTick(); // Force-align balance timelines first
+        verifyAllCustomersExpiryStateOnTick();
         const customers = JSON.parse(localStorage.getItem('customers'));
         const cust = customers.find(c => c.code === code);
         
@@ -792,6 +860,10 @@
         }
         
         let subMetric = cust.opt.type === 'time' ? `<b>Expiration Date:</b> ${cust.expiryDate || 'Lapsed'}` : `<b>Entries Remaining:</b> ${cust.entriesLeft !== null ? cust.entriesLeft : '0'}`;
+        if (cust.startDate && new Date(cust.startDate) > getSystemSimulatedTime()) {
+            subMetric += ` <span style="color:var(--danger); font-weight:bold;">(Starts: ${cust.startDate})</span>`;
+        }
+        
         dest.innerHTML = `
             <div class="card" style="border-left: 5px solid var(--accent); background: #fafafa;">
                 <h4>👤 Profile Status: ${cust.first} ${cust.last} (ID: ${cust.code})</h4>
@@ -825,6 +897,7 @@
         document.getElementById('modalMeta').innerHTML = `
             <b>Gym ID Access Key:</b> ${cust.code}<br>
             <b>Date of Birth:</b> ${cust.dob}<br>
+            <b>Start Date Tracked:</b> ${cust.startDate || 'Immediate'}<br>
             <b>Cafeteria Prepaid Wallet:</b> ${(cust.cafeteriaBalance || 0).toFixed(2)} JOD<br>
             <b>Financial Balance Contributed (Gym Package Fees):</b> ${cust.paid} JOD<br>
             <b>Current Membership Status:</b> <span class="badge badge-${cust.status.toLowerCase()}">${cust.status}</span>
@@ -867,20 +940,21 @@
     // --- GYM MEMBERSHIP PIPELINES ---
     function submitCustomerRegistration() {
         const first = document.getElementById('custFirst').value, last = document.getElementById('custLast').value, dob = document.getElementById('custDOB').value;
-        const subId = document.getElementById('custSubChoice').value, discount = parseFloat(document.getElementById('custDiscount').value) || 0, reason = document.getElementById('custDiscountReason').value.trim();
+        const subId = document.getElementById('custSubChoice').value, discountJOD = parseFloat(document.getElementById('custDiscountJOD').value) || 0, reason = document.getElementById('custDiscountReason').value.trim();
         const existingCode = document.getElementById('custExistingCode').value;
+        const startDate = document.getElementById('custStartDate').value;
 
         if(!first || !last || !dob) return printNotification("Fill core parameters.", "error");
-        if(discount > 0 && !reason) return printNotification("A discount justification text statement is mandatory.", "error");
+        if(discountJOD > 0 && !reason) return printNotification("A discount justification text statement is mandatory.", "error");
 
         const options = JSON.parse(localStorage.getItem('gymOptions'));
         const opt = options.find(o => o.id == subId);
-        let finalPrice = Math.round(opt.price * (1 - (discount / 100)));
+        let finalPrice = Math.max(0, opt.price - discountJOD);
         const code = existingCode ? existingCode : Math.floor(10000 + Math.random() * 90000).toString();
 
-        let q = { id: Date.now(), isRenewal: !!existingCode, code, first, last, dob, opt, discount, finalPrice, status: "Pending", empReason: reason, mgrNote: "" };
+        let q = { id: Date.now(), isRenewal: !!existingCode, code, first, last, dob, startDate, opt, discountJOD, finalPrice, status: "Pending", empReason: reason, mgrNote: "" };
 
-        if(discount === 0) {
+        if(discountJOD === 0) {
             const confirmationDiv = document.getElementById('renewalContextBox');
             confirmationDiv.className = "ui-notification ui-info";
             confirmationDiv.classList.remove('hidden');
@@ -906,16 +980,18 @@
         let customers = JSON.parse(localStorage.getItem('customers'));
         let targetCust = customers.find(c => c.code === q.code);
         
-        // MOVED TO simulated timezone tracking 
-        let timestampStr = getSystemSimulatedTime().toLocaleDateString();
+        let baseDate = q.startDate ? new Date(q.startDate) : getSystemSimulatedTime();
+        if (isNaN(baseDate.getTime())) baseDate = getSystemSimulatedTime();
 
         if(targetCust) {
             targetCust.opt = q.opt;
             targetCust.paid += q.finalPrice;
+            targetCust.lastSubscriptionAmount = q.finalPrice; // track for potential clean targeted return processing
             targetCust.status = "Active";
+            targetCust.startDate = q.startDate || "";
             targetCust.logs.push(`[Renewal] Active Sub: "${q.opt.name}" processed for ${q.finalPrice} JOD on ${getSystemSimulatedTime().toLocaleString()}.`);
             if(q.opt.type === 'time') {
-                let exp = getSystemSimulatedTime(); exp.setDate(exp.getDate() + q.opt.days);
+                let exp = new Date(baseDate.getTime()); exp.setDate(exp.getDate() + q.opt.days);
                 targetCust.expiryDate = exp.toISOString().split('T')[0]; targetCust.entriesLeft = null;
             } else {
                 targetCust.entriesLeft = (targetCust.entriesLeft || 0) + q.opt.entries; targetCust.expiryDate = null;
@@ -923,10 +999,10 @@
             }
         } else {
             let newCustomer = {
-                code: q.code, first: q.first, last: q.last, dob: q.dob, opt: q.opt, paid: q.finalPrice, status: "Active", cafeteriaBalance: 0.00, logs: [`Profile Created. Selected Base: "${q.opt.name}" on ${getSystemSimulatedTime().toLocaleString()}`], totalCheckIns: 0
+                code: q.code, first: q.first, last: q.last, dob: q.dob, opt: q.opt, paid: q.finalPrice, lastSubscriptionAmount: q.finalPrice, status: "Active", startDate: q.startDate || "", cafeteriaBalance: 0.00, logs: [`Profile Created. Selected Base: "${q.opt.name}" on ${getSystemSimulatedTime().toLocaleString()}`], totalCheckIns: 0
             };
             if(q.opt.type === 'time') {
-                let exp = getSystemSimulatedTime(); exp.setDate(exp.getDate() + q.opt.days); newCustomer.expiryDate = exp.toISOString().split('T')[0];
+                let exp = new Date(baseDate.getTime()); exp.setDate(exp.getDate() + q.opt.days); newCustomer.expiryDate = exp.toISOString().split('T')[0];
             } else { newCustomer.entriesLeft = q.opt.entries; newCustomer.expiryDaysRule = q.opt.expiryDays; newCustomer.expiryDate = null; }
             customers.push(newCustomer);
         }
@@ -947,8 +1023,18 @@
             consoleDest.classList.remove('hidden'); return;
         }
         
-        // SAFE DATE CONVERSION: Rooted tightly on custom time config
         const currentSimulatedTime = getSystemSimulatedTime();
+        
+        // FUTURE START DATE GATE LOCK VERIFICATION
+        if (cust.startDate) {
+            const parsedStart = new Date(cust.startDate + "T00:00:00");
+            if (parsedStart > currentSimulatedTime) {
+                consoleDest.className = "ui-notification ui-error";
+                consoleDest.innerHTML = `❌ <b>ENTRY DENIED:</b> Subscription didn't start yet. <br><b>Start Date:</b> ${cust.startDate}`;
+                consoleDest.classList.remove('hidden'); return;
+            }
+        }
+
         if(cust.opt.type === 'time' && cust.expiryDate) {
             if(new Date(cust.expiryDate + "T23:59:59") < currentSimulatedTime && cust.status === "Active") {
                 cust.status = "Expired";
@@ -987,8 +1073,6 @@
         consoleDest.querySelector('#executeGateCheckInBtn').onclick = function() {
             let latestCustomers = JSON.parse(localStorage.getItem('customers'));
             let active = latestCustomers.find(c => c.code === cust.code);
-            
-            // MOVED TO simulated time machine parameters
             let timestamp = getSystemSimulatedTime().toLocaleString();
 
             if(active.opt.type === 'time') {
@@ -1069,8 +1153,6 @@
         
         if(client.cafeteriaBalance === undefined) client.cafeteriaBalance = 0.00;
         let ledger = JSON.parse(localStorage.getItem('foodSales')) || [];
-        
-        // FIXED DATE LINK: Tracked to warp matrix parameters
         let stamp = getSystemSimulatedTime().toLocaleString();
         
         if(direction === 'add') {
@@ -1281,8 +1363,6 @@
             if(cashHanded < cashRequired) return printNotification("Insufficient cash handed to cover the order statement balance.", "error");
             
             let latestCustomers = JSON.parse(localStorage.getItem('customers')) || [];
-            
-            // TIMELINE ALIGNMENT: Anchored on custom time
             let stamp = getSystemSimulatedTime().toLocaleString();
             let itemSummaryString = posActiveCart.map(c => `${c.name} (x${c.qty})`).join(', ');
             
@@ -1325,12 +1405,16 @@
     }
 
     // --- MANAGER COMMAND STRUCTURES ---
-    function processQuotation(id, action, counterVal = null) {
+    function processQuotation(id, action, counterValJOD = null) {
         let quotations = JSON.parse(localStorage.getItem('quotations')), q = quotations.find(x => x.id === id);
         let memo = prompt("Send a note to the employee:") || "Processed by Management."; q.mgrNote = memo;
         if(action === 'approve') { q.status = "Approved"; activateCustomer(q); }
         else if(action === 'reject') q.status = "Rejected";
-        else if(action === 'partial') { q.status = "Counter-Offered"; q.discount = parseFloat(counterVal); q.finalPrice = Math.round(q.opt.price * (1 - (q.discount / 100))); }
+        else if(action === 'partial') { 
+            q.status = "Counter-Offered"; 
+            q.discountJOD = parseFloat(counterValJOD); 
+            q.finalPrice = Math.max(0, q.opt.price - q.discountJOD); 
+        }
         localStorage.setItem('quotations', JSON.stringify(quotations)); renderManagerData();
         printNotification(`Quotation request updated to state: ${q.status}`, "info");
     }
@@ -1342,9 +1426,15 @@
     }
     function processRefund(code) {
         let customers = JSON.parse(localStorage.getItem('customers')), cust = customers.find(c => c.code === code);
-        cust.logs.push(`[Financial Audit] Processed full refund of ${cust.paid} JOD on ${getSystemSimulatedTime().toLocaleString()}.`);
-        cust.status = "Refunded"; cust.paid = 0; localStorage.setItem('customers', JSON.stringify(customers)); renderManagerData();
-        printNotification("Balance refunded. Account disabled.", "warning");
+        let returnValue = cust.lastSubscriptionAmount !== undefined ? cust.lastSubscriptionAmount : cust.paid;
+        
+        cust.paid = Math.max(0, cust.paid - returnValue);
+        cust.logs.push(`[Financial Audit] Targeted refund of most recent package subscription (${returnValue} JOD) issued on ${getSystemSimulatedTime().toLocaleString()}.`);
+        cust.status = "Refunded"; 
+        cust.lastSubscriptionAmount = 0;
+        
+        localStorage.setItem('customers', JSON.stringify(customers)); renderManagerData();
+        printNotification(`Most recent subscription checkout statement of ${returnValue} JOD safely reversed.`, "warning");
     }
     function promptFactoryReset() {
         const container = document.getElementById('mgrPromptContainer');
@@ -1430,14 +1520,13 @@
 
         const quots = JSON.parse(localStorage.getItem('quotations')).filter(q => q.status === "Pending");
         let appHtml = ''; quots.forEach(q => {
-            appHtml += `<tr><td>${q.isRenewal?'<span class="badge badge-suspended">Renewal</span>':'<span class="badge badge-active">New</span>'}<br><b>ID: ${q.code}</b></td><td>${q.first} ${q.last}</td><td>${q.opt.name}</td><td>${q.discount}%</td><td>${q.finalPrice} JOD</td><td><i style="color:#e67e22;">"${q.empReason}"</i></td><td><input type="number" id="counter-${q.id}" style="width:60px" placeholder="%"></td><td><button class="secondary" onclick="processQuotation(${q.id}, 'approve')">Approve</button> <button class="danger" onclick="processQuotation(${q.id}, 'reject')">Reject</button> <button onclick="let val=document.getElementById('counter-${q.id}').value; if(val) processQuotation(${q.id}, 'partial', val); else printNotification('Type percentage value for counter offer','error');">Counter</button></td></tr>`;
+            appHtml += `<tr><td>${q.isRenewal?'<span class="badge badge-suspended">Renewal</span>':'<span class="badge badge-active">New</span>'}<br><b>ID: ${q.code}</b></td><td>${q.first} ${q.last}</td><td>${q.opt.name}</td><td>${q.discountJOD} JOD</td><td>${q.finalPrice} JOD</td><td><i style="color:#e67e22;">"${q.empReason}"</i></td><td><input type="number" id="counter-${q.id}" style="width:70px" placeholder="JOD"></td><td><button class="secondary" onclick="processQuotation(${q.id}, 'approve')">Approve</button> <button class="danger" onclick="processQuotation(${q.id}, 'reject')">Reject</button> <button onclick="let val=document.getElementById('counter-${q.id}').value; if(val) processQuotation(${q.id}, 'partial', val); else printNotification('Type JOD value for counter offer','error');">Counter</button></td></tr>`;
         });
         document.getElementById('mgrApprovalsTable').innerHTML = appHtml;
 
         verifyAllCustomersExpiryStateOnTick();
         const allCusts = JSON.parse(localStorage.getItem('customers')) || [];
         const gymFeesRevenue = allCusts.reduce((acc, curr) => acc + curr.paid, 0);
-        
         const sales = JSON.parse(localStorage.getItem('foodSales')) || [];
         const totalFoodRev = sales.reduce((acc, curr) => acc + curr.net, 0);
         
@@ -1460,7 +1549,7 @@
         const quots = JSON.parse(localStorage.getItem('quotations')) || [];
         let qHtml = ''; quots.forEach(q => {
             let actionBtn = q.status === 'Counter-Offered' ? `<button onclick="acceptCounter(${q.id})" class="secondary">Client Agrees</button>` : (q.status === 'Approved' ? `<span>Live ID: <b>${q.code}</b></span>` : '');
-            qHtml += `<tr><td><b>${q.code}</b></td><td>${q.first} ${q.last}</td><td>${q.opt.name}</td><td>${q.opt.price} JOD</td><td>${q.discount}%</td><td>${q.finalPrice} JOD</td><td><small>"${q.empReason}"</small></td><td><span class="badge badge-${q.status.toLowerCase()}">${q.status}</span></td><td>${q.mgrNote}</td><td>${actionBtn}</td></tr>`;
+            qHtml += `<tr><td><b>${q.code}</b></td><td>${q.first} ${q.last}</td><td>${q.opt.name}</td><td>${q.opt.price} JOD</td><td>${q.discountJOD} JOD</td><td>${q.finalPrice} JOD</td><td><small>"${q.empReason}"</small></td><td><span class="badge badge-${q.status.toLowerCase()}">${q.status}</span></td><td>${q.mgrNote}</td><td>${actionBtn}</td></tr>`;
         });
         document.getElementById('empQuotationsTable').innerHTML = qHtml;
     }
