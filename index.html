@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Management System</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #18bc9c;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--light); margin: 0; padding: 20px; color: var(--dark); }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1, h2, h3 { color: var(--primary); }
+        .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        input, select, button, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: var(--primary); color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
+        button:hover { opacity: 0.9; }
+        button.secondary { background: var(--secondary); }
+        button.danger { background: var(--danger); }
+        .navbar { display: flex; justify-content: space-between; background: var(--primary); padding: 10px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .navbar button { width: auto; background: transparent; color: white; margin: 0 5px; }
+        .navbar button:hover { background: rgba(255,255,255,0.1); }
+        .hidden { display: none; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; }
+        .badge-pending { background: var(--warning); }
+        .badge-approved { background: var(--secondary); }
+        .badge-rejected { background: var(--danger); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="navbar">
+        <span id="userStatus" style="color: white; line-height: 40px; font-weight: bold;">Logged Out</span>
+        <div>
+            <button onclick="showScreen('loginScreen')">Login Screen</button>
+            <button onclick="logout()" class="danger">Logout</button>
+        </div>
+    </div>
+
+    <div id="loginScreen" class="card screen">
+        <h2>Gym System Login</h2>
+        <label>Username</label>
+        <input type="text" id="loginUser" placeholder="Enter username">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Enter password">
+        <button onclick="handleLogin()">Login</button>
+        <p style="font-size: 12px; color: #7f8c8d;">Default Manager: admin / admin<br>Default Employee: emp1 / emp1</p>
+    </div>
+
+    <div id="employeeDashboard" class="screen hidden">
+        <h2>Employee Dashboard</h2>
+        <div class="navbar" style="background: var(--dark)">
+            <button onclick="showEmpSubTab('checkInTab')">⚡ Customer Check-In</button>
+            <button onclick="showEmpSubTab('newCustTab')">➕ Add Customer & Subscription</button>
+            <button onclick="showEmpSubTab('empQuotationsTab')">📋 Quotations/Approvals Status</button>
+        </div>
+
+        <div id="checkInTab" class="empTab card">
+            <h3>Customer Check-In</h3>
+            <input type="text" id="checkInCode" placeholder="Enter 5-Digit Customer Code">
+            <button onclick="processCheckIn()" class="secondary">Verify & Check In</button>
+        </div>
+
+        <div id="newCustTab" class="empTab card hidden">
+            <h3>Add New Customer & Select Subscription</h3>
+            <div class="grid">
+                <div>
+                    <h4>1. Customer Details</h4>
+                    <input type="text" id="custFirst" placeholder="First Name">
+                    <input type="text" id="custLast" placeholder="Last Name">
+                    <label>Date of Birth</label>
+                    <input type="date" id="custDOB">
+                </div>
+                <div>
+                    <h4>2. Choose Subscription Option</h4>
+                    <select id="custSubChoice" onchange="updatePricePreview()">
+                        </select>
+                    <label>Requested Discount % (Optional)</label>
+                    <input type="number" id="custDiscount" value="0" min="0" max="100">
+                    <div id="pricePreview" style="font-weight: bold; margin: 10px 0; color: var(--secondary);">Price: 0 JOD</div>
+                    <button onclick="submitCustomerRegistration()" class="secondary">Submit / Send for Approval</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="empQuotationsTab" class="empTab card hidden">
+            <h3>Your Submitted Quotations</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr><th>Customer</th><th>Option</th><th>Original Price</th><th>Requested Disc %</th><th>Final Price</th><th>Status</th><th>Manager Note</th><th>Action</th></tr>
+                    </thead>
+                    <tbody id="empQuotationsTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="managerDashboard" class="screen hidden">
+        <h2>Manager Control Panel</h2>
+        <div class="navbar" style="background: var(--dark)">
+            <button onclick="showMgrSubTab('mgrSubOptionsTab')">🏋️ Gym Options</button>
+            <button onclick="showMgrSubTab('mgrStaffTab')">👥 Manage Staff</button>
+            <button onclick="showMgrSubTab('mgrApprovalsTab')">🔔 Discount Approvals</button>
+            <button onclick="showMgrSubTab('mgrRefundsTab')">💰 Active Subscriptions & Refunds</button>
+        </div>
+
+        <div id="mgrSubOptionsTab" class="mgrTab card">
+            <h3>Gym Subscription Options</h3>
+            <div class="grid">
+                <div>
+                    <h4>Add New Option</h4>
+                    <input type="text" id="optName" placeholder="Option Name (e.g. Premium Gym)">
+                    <input type="number" id="optPrice" placeholder="Base Price (JOD)">
+                    <label>Subscription Logic Type:</label>
+                    <select id="optType" onchange="toggleOptFields()">
+                        <option value="time">Time-Based</option>
+                        <option value="entry">Entry-Based</option>
+                    </select>
+                    
+                    <div id="timeFields">
+                        <input type="number" id="optDays" placeholder="Number of Days Validity">
+                    </div>
+                    <div id="entryFields" class="hidden">
+                        <input type="number" id="optEntries" placeholder="Number of Entries">
+                        <input type="number" id="optExpiryDays" placeholder="Expires in 'X' Days after activation">
+                    </div>
+                    <button onclick="addGymOption()">Save Gym Option</button>
+                </div>
+                <div>
+                    <h4>Current Options</h4>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead><tr><th>Name</th><th>Price</th><th>Type</th><th>Details</th><th>Action</th></tr></thead>
+                            <tbody id="gymOptionsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mgrStaffTab" class="mgrTab card hidden">
+            <h3>Manage Employees</h3>
+            <div class="grid">
+                <div>
+                    <h4>Add Employee Account</h4>
+                    <input type="text" id="empUser" placeholder="Username">
+                    <input type="password" id="empPass" placeholder="Password">
+                    <button onclick="addEmployee()">Create Employee Account</button>
+                </div>
+                <div>
+                    <h4>Current Staff</h4>
+                    <ul id="staffList"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="mgrApprovalsTab" class="mgrTab card hidden">
+            <h3>Pending Discount Approvals</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr><th>Customer</th><th>Subscription</th><th>Requested Disc %</th><th>Final Price</th><th>Manager Counter %</th><th>Manager Note</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="mgrApprovalsTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="mgrRefundsTab" class="mgrTab card hidden">
+            <h3>Active Customer Subscriptions & Refunds</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr><th>Code</th><th>Name</th><th>Subscription</th><th>Status Details</th><th>Paid Price</th><th>Action</th></tr>
+                    </thead>
+                    <tbody id="mgrRefundsTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- DATABASE SEED DATA (Stored in LocalStorage) ---
+    if(!localStorage.getItem('gymOptions')) {
+        localStorage.setItem('gymOptions', JSON.stringify([
+            { id: 1, name: "1 Month Unlimited", price: 50, type: "time", days: 30 },
+            { id: 2, name: "10 Entries Pass", price: 30, type: "entry", entries: 10, expiryDays: 60 }
+        ]));
+    }
+    if(!localStorage.getItem('staff')) {
+        localStorage.setItem('staff', JSON.stringify([{ user: "emp1", pass: "emp1" }]));
+    }
+    if(!localStorage.getItem('customers')) { localStorage.setItem('customers', JSON.stringify([])); }
+    if(!localStorage.getItem('quotations')) { localStorage.setItem('quotations', JSON.stringify([])); }
+
+    let currentUser = null;
+    let userRole = null;
+
+    // --- NAVIGATION ENGINE ---
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+        document.getElementById(screenId).classList.remove('hidden');
+    }
+    function showEmpSubTab(tabId) {
+        document.querySelectorAll('.empTab').forEach(t => t.classList.add('hidden'));
+        document.getElementById(tabId).classList.remove('hidden');
+    }
+    function showMgrSubTab(tabId) {
+        document.querySelectorAll('.mgrTab').forEach(t => t.classList.add('hidden'));
+        document.getElementById(tabId).classList.remove('hidden');
+    }
+
+    // --- AUTHENTICATION ---
+    function handleLogin() {
+        const u = document.getElementById('loginUser').value;
+        const p = document.getElementById('loginPass').value;
+
+        if(u === 'admin' && p === 'admin') {
+            currentUser = 'admin'; userRole = 'manager';
+            document.getElementById('userStatus').innerText = "Logged In: Manager (Admin)";
+            showScreen('managerDashboard');
+            renderManagerData();
+        } else {
+            const staff = JSON.parse(localStorage.getItem('staff'));
+            const found = staff.find(s => s.user === u && s.pass === p);
+            if(found) {
+                currentUser = u; userRole = 'employee';
+                document.getElementById('userStatus').innerText = `Logged In Employee: ${u}`;
+                showScreen('employeeDashboard');
+                renderEmployeeData();
+            } else {
+                alert("Invalid Credentials!");
+            }
+        }
+    }
+    function logout() {
+        currentUser = null; userRole = null;
+        document.getElementById('userStatus').innerText = "Logged Out";
+        showScreen('loginScreen');
+    }
+
+    // --- MANAGER LOGIC ---
+    function toggleOptFields() {
+        const type = document.getElementById('optType').value;
+        document.getElementById('timeFields').classList.toggle('hidden', type !== 'time');
+        document.getElementById('entryFields').classList.toggle('hidden', type !== 'entry');
+    }
+
+    function addGymOption() {
+        const name = document.getElementById('optName').value;
+        const price = parseFloat(document.getElementById('optPrice').value);
+        const type = document.getElementById('optType').value;
+        if(!name || !price) return alert("Fill in option details!");
+
+        let options = JSON.parse(localStorage.getItem('gymOptions'));
+        let newOpt = { id: Date.now(), name, price, type };
+
+        if(type === 'time') {
+            newOpt.days = parseInt(document.getElementById('optDays').value) || 30;
+        } else {
+            newOpt.entries = parseInt(document.getElementById('optEntries').value) || 10;
+            newOpt.expiryDays = parseInt(document.getElementById('optExpiryDays').value) || 30;
+        }
+
+        options.push(newOpt);
+        localStorage.setItem('gymOptions', JSON.stringify(options));
+        renderManagerData();
+        alert("Option added successfully!");
+    }
+
+    function deleteGymOption(id) {
+        let options = JSON.parse(localStorage.getItem('gymOptions'));
+        options = options.filter(o => o.id !== id);
+        localStorage.setItem('gymOptions', JSON.stringify(options));
+        renderManagerData();
+    }
+
+    function addEmployee() {
+        const user = document.getElementById('empUser').value;
+        const pass = document.getElementById('empPass').value;
+        if(!user || !pass) return alert("Fill credentials!");
+
+        let staff = JSON.parse(localStorage.getItem('staff'));
+        staff.push({ user, pass });
+        localStorage.setItem('staff', JSON.stringify(staff));
+        renderManagerData();
+        alert("Employee added!");
+    }
+
+    // --- EMPLOYEE LOGIC & DISCOUNTS ---
+    function updatePricePreview() {
+        const subId = document.getElementById('custSubChoice').value;
+        const discPercent = parseFloat(document.getElementById('custDiscount').value) || 0;
+        const options = JSON.parse(localStorage.getItem('gymOptions'));
+        const opt = options.find(o => o.id == subId);
+        if(opt) {
+            let finalPrice = Math.round(opt.price * (1 - (discPercent / 100)));
+            document.getElementById('pricePreview').innerText = `Price: ${finalPrice} JOD (Rounded)`;
+        }
+    }
+
+    function submitCustomerRegistration() {
+        const first = document.getElementById('custFirst').value;
+        const last = document.getElementById('custLast').value;
+        const dob = document.getElementById('custDOB').value;
+        const subId = document.getElementById('custSubChoice').value;
+        const discount = parseFloat(document.getElementById('custDiscount').value) || 0;
+
+        if(!first || !last || !dob) return alert("Please fill customer identity records!");
+
+        const options = JSON.parse(localStorage.getItem('gymOptions'));
+        const opt = options.find(o => o.id == subId);
+        let finalPrice = Math.round(opt.price * (1 - (discount / 100)));
+
+        const code = Math.floor(10000 + Math.random() * 90000).toString();
+
+        let quotation = {
+            id: Date.now(), code, first, last, dob, opt, discount, finalPrice, status: "Pending", mgrNote: ""
+        };
+
+        if(discount === 0) {
+            // Direct Activation with Money Collection Conf Prompt
+            if(confirm(`Collect standard ${finalPrice} JOD from customer right now?`)) {
+                activateCustomer(quotation);
+                alert(`Customer Registered! 5-Digit Access Code: ${code}`);
+            }
+        } else {
+            // Send to manager logic loop
+            let quotations = JSON.parse(localStorage.getItem('quotations'));
+            quotations.push(quotation);
+            localStorage.setItem('quotations', JSON.stringify(quotations));
+            alert("Discount requested. Sent to Manager Approval System Tab.");
+            renderEmployeeData();
+        }
+    }
+
+    function activateCustomer(q) {
+        let customers = JSON.parse(localStorage.getItem('customers'));
+        let newCustomer = {
+            code: q.code, first: q.first, last: q.last, dob: q.dob, opt: q.opt, paid: q.finalPrice, active: true
+        };
+        if(q.opt.type === 'time') {
+            let exp = new Date();
+            exp.setDate(exp.getDate() + q.opt.days);
+            newCustomer.expiryDate = exp.toISOString().split('T')[0];
+        } else {
+            newCustomer.entriesLeft = q.opt.entries;
+            newCustomer.expiryDaysRule = q.opt.expiryDays;
+            newCustomer.expiryDate = null; // Activates on 1st Check-In
+        }
+        customers.push(newCustomer);
+        localStorage.setItem('customers', JSON.stringify(customers));
+    }
+
+    // --- CHECK IN COMPONENT ---
+    function processCheckIn() {
+        const code = document.getElementById('checkInCode').value;
+        let customers = JSON.parse(localStorage.getItem('customers'));
+        let cust = customers.find(c => c.code === code && c.active);
+
+        if(!cust) return alert("Invalid active code or customer not found!");
+
+        // Security Identity Cross Verification Match Prompt
+        if(confirm(`Verify Identity Details:\nName: ${cust.first} ${cust.last}\nDOB: ${cust.dob}\n\nIs this information correct?`)) {
+            
+            // Logic Handling dynamic validation updates
+            if(cust.opt.type === 'time') {
+                if(new Date(cust.expiryDate) < new Date()) {
+                    cust.active = false; alert("Subscription expired!");
+                } else {
+                    alert(`Access Granted. Valid Until: ${cust.expiryDate}`);
+                }
+            } else {
+                // Entry Based Logic Loop
+                if(cust.expiryDate && new Date(cust.expiryDate) < new Date()) {
+                    cust.active = false; alert("Entries expired!");
+                } else {
+                    if(!cust.expiryDate) { // First initialization entry activate rule
+                        let exp = new Date();
+                        exp.setDate(exp.getDate() + cust.expiryDaysRule);
+                        cust.expiryDate = exp.toISOString().split('T')[0];
+                        alert(`First Entry! Subscription activated. Expiry Set to: ${cust.expiryDate}`);
+                    }
+                    cust.entriesLeft--;
+                    alert(`Access Granted! Entries Remaining: ${cust.entriesLeft}`);
+                    if(cust.entriesLeft <= 0) { cust.active = false; alert("All entries used! Account deactivated."); }
+                }
+            }
+            localStorage.setItem('customers', JSON.stringify(customers));
+        }
+    }
+
+    // --- APPROVAL ROUTINES ---
+    function processQuotation(id, action, counterVal = null) {
+        let quotations = JSON.parse(localStorage.getItem('quotations'));
+        let q = quotations.find(x => x.id === id);
+        const note = prompt("Type text communication message to staff/employee:");
+
+        q.mgrNote = note || "No notes left.";
+        
+        if(action === 'approve') {
+            q.status = "Approved";
+            activateCustomer(q);
+        } else if(action === 'reject') {
+            q.status = "Rejected";
+        } else if(action === 'partial') {
+            q.status = "Counter-Offered";
+            q.discount = counterVal;
+            q.finalPrice = Math.round(q.opt.price * (1 - (counterVal / 100)));
+        }
+
+        localStorage.setItem('quotations', JSON.stringify(quotations));
+        renderManagerData();
+    }
+
+    function acceptCounter(id) {
+        let quotations = JSON.parse(localStorage.getItem('quotations'));
+        let q = quotations.find(x => x.id === id);
+        if(confirm(`Confirm collection of Counter Offer amount: ${q.finalPrice} JOD from client?`)) {
+            activateCustomer(q);
+            quotations = quotations.filter(x => x.id !== id); // clear track history record item
+            localStorage.setItem('quotations', JSON.stringify(quotations));
+            renderEmployeeData();
+        }
+    }
+
+    function processRefund(code) {
+        if(confirm("Are you sure you want to completely refund and deactivate this client subscription?")) {
+            let customers = JSON.parse(localStorage.getItem('customers'));
+            let cust = customers.find(c => c.code === code);
+            alert(`Process complete. Cash Refund value return: ${cust.paid} JOD.`);
+            cust.active = false;
+            localStorage.setItem('customers', JSON.stringify(customers));
+            renderManagerData();
+        }
+    }
+
+    // --- DATA RENDERING DATA FEED ---
+    function renderManagerData() {
+        // Build Options Data Matrix
+        const opts = JSON.parse(localStorage.getItem('gymOptions'));
+        let html = '';
+        opts.forEach(o => {
+            html += `<tr><td>${o.name}</td><td>${o.price} JOD</td><td>${o.type}</td>
+            <td>${o.type==='time'? o.days+' days': o.entries+' entries (exp: '+o.expiryDays+'d)'}</td>
+            <td><button class="danger" onclick="deleteGymOption(${o.id})">Delete</button></td></tr>`;
+        });
+        document.getElementById('gymOptionsTable').innerHTML = html;
+
+        // Build Staff Elements
+        const staff = JSON.parse(localStorage.getItem('staff'));
+        let staffHtml = '';
+        staff.forEach(s => staffHtml += `<li>User: <b>${s.user}</b></li>`);
+        document.getElementById('staffList').innerHTML = staffHtml;
+
+        // Approvals Stream View Grid
+        const quots = JSON.parse(localStorage.getItem('quotations')).filter(q => q.status === "Pending");
+        let appHtml = '';
+        quots.forEach(q => {
+            appHtml += `<tr><td>${q.first} ${q.last}</td><td>${q.opt.name}</td><td>${q.discount}%</td><td>${q.finalPrice} JOD</td>
+            <td><input type="number" id="counter-${q.id}" style="width:70px" placeholder="%"></td>
+            <td>—</td>
+            <td>
+                <button class="secondary" onclick="processQuotation(${q.id}, 'approve')">Approve</button>
+                <button class="danger" onclick="processQuotation(${q.id}, 'reject')">Reject</button>
+                <button onclick="let val = document.getElementById('counter-${q.id}').value; if(val) processQuotation(${q.id}, 'partial', val); else alert('Type % value first');">Counter</button>
+            </td></tr>`;
+        });
+        document.getElementById('mgrApprovalsTable').innerHTML = appHtml;
+
+        // Active View list elements for Refund Access Controls
+        const activeCusts = JSON.parse(localStorage.getItem('customers')).filter(c => c.active);
+        let refHtml = '';
+        activeCusts.forEach(c => {
+            let details = c.opt.type === 'time' ? `Expires: ${c.expiryDate}` : `Entries Left: ${c.entriesLeft} (Exp: ${c.expiryDate || 'Not Activated'})`;
+            refHtml += `<tr><td>${c.code}</td><td>${c.first} ${c.last}</td><td>${c.opt.name}</td><td>${details}</td><td>${c.paid} JOD</td>
+            <td><button class="danger" onclick="processRefund('${c.code}')">Refund</button></td></tr>`;
+        });
+        document.getElementById('mgrRefundsTable').innerHTML = refHtml;
+    }
+
+    function renderEmployeeData() {
+        const options = JSON.parse(localStorage.getItem('gymOptions'));
+        let selectHtml = '';
+        options.forEach(o => selectHtml += `<option value="${o.id}">${o.name} (${o.price} JOD)</option>`);
+        document.getElementById('custSubChoice').innerHTML = selectHtml;
+        updatePricePreview();
+
+        const quots = JSON.parse(localStorage.getItem('quotations'));
+        let qHtml = '';
+        quots.forEach(q => {
+            let actionBtn = '';
+            if(q.status === 'Counter-Offered') {
+                actionBtn = `<button onclick="acceptCounter(${q.id})">Customer Accepted Price</button>`;
+            }
+            qHtml += `<tr><td>${q.first} ${q.last}</td><td>${q.opt.name}</td><td>${q.opt.price} JOD</td><td>${q.discount}%</td><td>${q.finalPrice} JOD</td>
+            <td><span class="badge badge-${q.status.toLowerCase()}">${q.status}</span></td><td>${q.mgrNote}</td><td>${actionBtn}</td></tr>`;
+        });
+        document.getElementById('empQuotationsTable').innerHTML = qHtml;
+    }
+</script>
+</body>
+</html>
