@@ -468,12 +468,12 @@
         if(!localStorage.getItem('foodSales')) { localStorage.setItem('foodSales', JSON.stringify([])); }
         if(!localStorage.getItem('customers')) { localStorage.setItem('customers', JSON.stringify([])); }
         if(!localStorage.getItem('quotations')) { localStorage.setItem('quotations', JSON.stringify([])); }
-        
-        rebuildLoginUserDropdown();
     }
 
     function rebuildLoginUserDropdown() {
         const select = document.getElementById('loginUserSelect');
+        if (!select) return; // Prevent runtime layout errors if element hasn't finished painting
+        
         let html = `
             <option value="admin">Admin (Executive Control Panel)</option>
             <option value="caf">Caf (Cafeteria POS Station)</option>
@@ -749,7 +749,7 @@
         localStorage.setItem('customers', JSON.stringify(customers));
     }
 
-    // --- ALERT-FREE GATE TERMINAL CHECK-IN ---
+    // --- GATE TERMINAL CHECK-IN ---
     function loadCheckInIdentity() {
         const code = document.getElementById('checkInCode').value.trim();
         const consoleDest = document.getElementById('checkInVerifyConsole');
@@ -763,7 +763,6 @@
             consoleDest.classList.remove('hidden'); return;
         }
         
-        // Evaluate Expirations contextually using Time-Machine simulated values
         const currentSimulatedTime = getSystemSimulatedTime();
         if(cust.opt.type === 'time' && cust.expiryDate) {
             if(new Date(cust.expiryDate + "T23:59:59") < currentSimulatedTime && cust.status === "Active") {
@@ -847,7 +846,7 @@
         };
     }
 
-    // --- NEW: CAFETERIA MANAGEMENT ENGINE FUNCTIONS ---
+    // --- CAFETERIA MANAGEMENT ENGINE FUNCTIONS ---
     function addFoodItemInventory() {
         const name = document.getElementById('foodItemName').value.trim();
         const price = parseFloat(document.getElementById('foodItemPrice').value);
@@ -927,7 +926,6 @@
         const display = document.getElementById('posChangeReturnDisplay');
         display.innerText = deltaChange >= 0 ? deltaChange.toFixed(2) : "0.00";
 
-        // Dynamic functional validation binding for checkout confirmation click context without alerts
         document.getElementById('posFinalConfirmBtn').onclick = function() {
             if(cashHanded < totalDue) return printNotification("Insufficient funds handled to cover receipt net total.", "error");
             
@@ -1064,7 +1062,9 @@
         document.getElementById('empQuotationsTable').innerHTML = qHtml;
     }
 
-    // Initialize clock loop
+    // --- RUN INITIAL APPLICATION ENGINE PIPELINES ---
+    initDatabase();
+    rebuildLoginUserDropdown(); // <--- Formally called here to completely fill selector elements right away!
     runClockEngineTick();
 </script>
 </body>
