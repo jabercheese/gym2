@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gym Management System</title>
+    <title>Gym Management System Pro</title>
     <style>
         :root {
             --primary: #2c3e50;
@@ -15,7 +15,7 @@
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--light); margin: 0; padding: 20px; color: var(--dark); }
         .container { max-width: 1200px; margin: 0 auto; }
-        h1, h2, h3 { color: var(--primary); }
+        h1, h2, h3, h4 { color: var(--primary); margin-top: 5px; }
         .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         input, select, button, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
@@ -23,6 +23,7 @@
         button:hover { opacity: 0.9; }
         button.secondary { background: var(--secondary); }
         button.danger { background: var(--danger); }
+        button.warning { background: var(--warning); }
         .navbar { display: flex; justify-content: space-between; background: var(--primary); padding: 10px 20px; border-radius: 8px; margin-bottom: 20px; }
         .navbar button { width: auto; background: transparent; color: white; margin: 0 5px; }
         .navbar button:hover { background: rgba(255,255,255,0.1); }
@@ -31,9 +32,11 @@
         .badge-pending { background: var(--warning); }
         .badge-approved { background: var(--secondary); }
         .badge-rejected { background: var(--danger); }
+        .badge-suspended { background: #7f8c8d; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
         th { background-color: var(--primary); color: white; }
+        .financial-metric { font-size: 24px; font-weight: bold; color: var(--secondary); background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 5px solid var(--secondary); }
     </style>
 </head>
 <body>
@@ -53,8 +56,7 @@
         <input type="text" id="loginUser" placeholder="Enter username">
         <label>Password</label>
         <input type="password" id="loginPass" placeholder="Enter password">
-        <button onclick="handleLogin()">Login</button>
-        <p style="font-size: 12px; color: #7f8c8d;">Default Manager: admin / admin<br>Default Employee: emp1 / emp1</p>
+        <button onclick="handleLogin()">Secure Login</button>
     </div>
 
     <div id="employeeDashboard" class="screen hidden">
@@ -66,39 +68,44 @@
         </div>
 
         <div id="checkInTab" class="empTab card">
-            <h3>Customer Check-In</h3>
+            <h3>Customer Check-In Entry Gate</h3>
             <input type="text" id="checkInCode" placeholder="Enter 5-Digit Customer Code">
-            <button onclick="processCheckIn()" class="secondary">Verify & Check In</button>
+            <button onclick="processCheckIn()" class="secondary">Verify Identity & Check In</button>
         </div>
 
         <div id="newCustTab" class="empTab card hidden">
             <h3>Add New Customer & Select Subscription</h3>
             <div class="grid">
                 <div>
-                    <h4>1. Customer Details</h4>
+                    <h4>1. Customer Identity Info</h4>
                     <input type="text" id="custFirst" placeholder="First Name">
                     <input type="text" id="custLast" placeholder="Last Name">
                     <label>Date of Birth</label>
                     <input type="date" id="custDOB">
                 </div>
                 <div>
-                    <h4>2. Choose Subscription Option</h4>
+                    <h4>2. Subscription Package Configuration</h4>
                     <select id="custSubChoice" onchange="updatePricePreview()">
                         </select>
-                    <label>Requested Discount % (Optional)</label>
-                    <input type="number" id="custDiscount" value="0" min="0" max="100">
-                    <div id="pricePreview" style="font-weight: bold; margin: 10px 0; color: var(--secondary);">Price: 0 JOD</div>
-                    <button onclick="submitCustomerRegistration()" class="secondary">Submit / Send for Approval</button>
+                    <label>Requested Discount % (Real-time recalculation)</label>
+                    <input type="number" id="custDiscount" value="0" min="0" max="100" oninput="updatePricePreview()">
+                    
+                    <div style="background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                        <span style="font-weight: normal; color: #555;">Calculated Value to Request:</span>
+                        <div id="pricePreview" style="font-size: 20px; font-weight: bold; color: var(--secondary);">0 JOD</div>
+                    </div>
+                    
+                    <button onclick="submitCustomerRegistration()" class="secondary">Send Proposal / Confirm</button>
                 </div>
             </div>
         </div>
 
         <div id="empQuotationsTab" class="empTab card hidden">
-            <h3>Your Submitted Quotations</h3>
+            <h3>Submitted Quotations & Notes Tracker</h3>
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
-                        <tr><th>Customer</th><th>Option</th><th>Original Price</th><th>Requested Disc %</th><th>Final Price</th><th>Status</th><th>Manager Note</th><th>Action</th></tr>
+                        <tr><th>Customer</th><th>Option</th><th>Original Price</th><th>Requested Disc %</th><th>Proposed Final</th><th>Status</th><th>Manager Memo</th><th>Action</th></tr>
                     </thead>
                     <tbody id="empQuotationsTable"></tbody>
                 </table>
@@ -108,40 +115,48 @@
 
     <div id="managerDashboard" class="screen hidden">
         <h2>Manager Control Panel</h2>
+        
+        <div class="card">
+            <h4>📈 Financial Integrity Metrics</h4>
+            <div class="financial-metric">
+                Total Net Funds Collected: <span id="totalRevenueDisplay">0</span> JOD
+            </div>
+        </div>
+
         <div class="navbar" style="background: var(--dark)">
-            <button onclick="showMgrSubTab('mgrSubOptionsTab')">🏋️ Gym Options</button>
+            <button onclick="showMgrSubTab('mgrSubOptionsTab')">🏋️ Gym Packages</button>
             <button onclick="showMgrSubTab('mgrStaffTab')">👥 Manage Staff</button>
-            <button onclick="showMgrSubTab('mgrApprovalsTab')">🔔 Discount Approvals</button>
-            <button onclick="showMgrSubTab('mgrRefundsTab')">💰 Active Subscriptions & Refunds</button>
+            <button onclick="showMgrSubTab('mgrApprovalsTab')">🔔 Discount Desk</button>
+            <button onclick="showMgrSubTab('mgrRefundsTab')">🛡️ Membership Control & Logs</button>
         </div>
 
         <div id="mgrSubOptionsTab" class="mgrTab card">
-            <h3>Gym Subscription Options</h3>
+            <h3>Gym Subscription Packages</h3>
             <div class="grid">
                 <div>
-                    <h4>Add New Option</h4>
-                    <input type="text" id="optName" placeholder="Option Name (e.g. Premium Gym)">
-                    <input type="number" id="optPrice" placeholder="Base Price (JOD)">
-                    <label>Subscription Logic Type:</label>
+                    <h4>Add Package Structure</h4>
+                    <input type="text" id="optName" placeholder="Package Description Name">
+                    <input type="number" id="optPrice" placeholder="Standard Base Price (JOD)">
+                    <label>Tracking Rules Matrix:</label>
                     <select id="optType" onchange="toggleOptFields()">
-                        <option value="time">Time-Based</option>
-                        <option value="entry">Entry-Based</option>
+                        <option value="time">Time-Based Range</option>
+                        <option value="entry">Fixed Entries Volume</option>
                     </select>
                     
                     <div id="timeFields">
-                        <input type="number" id="optDays" placeholder="Number of Days Validity">
+                        <input type="number" id="optDays" placeholder="Days of Total Active Duration">
                     </div>
                     <div id="entryFields" class="hidden">
-                        <input type="number" id="optEntries" placeholder="Number of Entries">
-                        <input type="number" id="optExpiryDays" placeholder="Expires in 'X' Days after activation">
+                        <input type="number" id="optEntries" placeholder="Quantity of Check-Ins Allowed">
+                        <input type="number" id="optExpiryDays" placeholder="Automatic Expiration Lifespan (Days)">
                     </div>
-                    <button onclick="addGymOption()">Save Gym Option</button>
+                    <button onclick="addGymOption()">Publish Gym Option</button>
                 </div>
                 <div>
-                    <h4>Current Options</h4>
+                    <h4>Available Active Pricing Configs</h4>
                     <div style="overflow-x: auto;">
                         <table>
-                            <thead><tr><th>Name</th><th>Price</th><th>Type</th><th>Details</th><th>Action</th></tr></thead>
+                            <thead><tr><th>Name</th><th>Base Cost</th><th>Logic Type</th><th>Operational Details</th><th>Action</th></tr></thead>
                             <tbody id="gymOptionsTable"></tbody>
                         </table>
                     </div>
@@ -150,27 +165,27 @@
         </div>
 
         <div id="mgrStaffTab" class="mgrTab card hidden">
-            <h3>Manage Employees</h3>
+            <h3>Staff Deployment Access Keys</h3>
             <div class="grid">
                 <div>
-                    <h4>Add Employee Account</h4>
-                    <input type="text" id="empUser" placeholder="Username">
-                    <input type="password" id="empPass" placeholder="Password">
-                    <button onclick="addEmployee()">Create Employee Account</button>
+                    <h4>Create Employee Profile</h4>
+                    <input type="text" id="empUser" placeholder="System Handle / Username">
+                    <input type="password" id="empPass" placeholder="System Security Password">
+                    <button onclick="addEmployee()">Generate Account Credentials</button>
                 </div>
                 <div>
-                    <h4>Current Staff</h4>
+                    <h4>Authorized Staff Profiles</h4>
                     <ul id="staffList"></ul>
                 </div>
             </div>
         </div>
 
         <div id="mgrApprovalsTab" class="mgrTab card hidden">
-            <h3>Pending Discount Approvals</h3>
+            <h3>Pending Discount Approvals Queue</h3>
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
-                        <tr><th>Customer</th><th>Subscription</th><th>Requested Disc %</th><th>Final Price</th><th>Manager Counter %</th><th>Manager Note</th><th>Actions</th></tr>
+                        <tr><th>Customer</th><th>Subscription Target</th><th>Staff Requested %</th><th>Target Price</th><th>Counter %</th><th>Action Rules Panel</th></tr>
                     </thead>
                     <tbody id="mgrApprovalsTable"></tbody>
                 </table>
@@ -178,11 +193,11 @@
         </div>
 
         <div id="mgrRefundsTab" class="mgrTab card hidden">
-            <h3>Active Customer Subscriptions & Refunds</h3>
+            <h3>Membership Master Control Panel & Access History Logs</h3>
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
-                        <tr><th>Code</th><th>Name</th><th>Subscription</th><th>Status Details</th><th>Paid Price</th><th>Action</th></tr>
+                        <tr><th>Access Code</th><th>Full Name</th><th>Active Status</th><th>Metric Details</th><th>Net Paid Cash</th><th>History Check-In Logs</th><th>Actions Panel</th></tr>
                     </thead>
                     <tbody id="mgrRefundsTable"></tbody>
                 </table>
@@ -192,11 +207,11 @@
 </div>
 
 <script>
-    // --- DATABASE SEED DATA (Stored in LocalStorage) ---
+    // --- STORAGE ENGINES ---
     if(!localStorage.getItem('gymOptions')) {
         localStorage.setItem('gymOptions', JSON.stringify([
             { id: 1, name: "1 Month Unlimited", price: 50, type: "time", days: 30 },
-            { id: 2, name: "10 Entries Pass", price: 30, type: "entry", entries: 10, expiryDays: 60 }
+            { id: 2, name: "12 Entries Standard Pass", price: 40, type: "entry", entries: 12, expiryDays: 45 }
         ]));
     }
     if(!localStorage.getItem('staff')) {
@@ -208,7 +223,6 @@
     let currentUser = null;
     let userRole = null;
 
-    // --- NAVIGATION ENGINE ---
     function showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
         document.getElementById(screenId).classList.remove('hidden');
@@ -222,14 +236,14 @@
         document.getElementById(tabId).classList.remove('hidden');
     }
 
-    // --- AUTHENTICATION ---
+    // --- AUTH COMPONENT ---
     function handleLogin() {
         const u = document.getElementById('loginUser').value;
         const p = document.getElementById('loginPass').value;
 
         if(u === 'admin' && p === 'admin') {
             currentUser = 'admin'; userRole = 'manager';
-            document.getElementById('userStatus').innerText = "Logged In: Manager (Admin)";
+            document.getElementById('userStatus').innerText = "Logged In: System Manager";
             showScreen('managerDashboard');
             renderManagerData();
         } else {
@@ -237,32 +251,48 @@
             const found = staff.find(s => s.user === u && s.pass === p);
             if(found) {
                 currentUser = u; userRole = 'employee';
-                document.getElementById('userStatus').innerText = `Logged In Employee: ${u}`;
+                document.getElementById('userStatus').innerText = `Logged In Operator: ${u}`;
                 showScreen('employeeDashboard');
                 renderEmployeeData();
             } else {
-                alert("Invalid Credentials!");
+                alert("Authorization Denied: Invalid Security Pair.");
             }
         }
+        // Wipe inputs cleanly
+        document.getElementById('loginUser').value = "";
+        document.getElementById('loginPass').value = "";
     }
+
     function logout() {
         currentUser = null; userRole = null;
-        document.getElementById('userStatus').innerText = "Logged Out";
+        document.getElementById('userStatus').innerText = "Logged Out Secured";
         showScreen('loginScreen');
     }
 
-    // --- MANAGER LOGIC ---
+    // --- PRICING ENGINE CALCULATOR ---
+    function updatePricePreview() {
+        const subId = document.getElementById('custSubChoice').value;
+        const discPercent = parseFloat(document.getElementById('custDiscount').value) || 0;
+        const options = JSON.parse(localStorage.getItem('gymOptions'));
+        const opt = options.find(o => o.id == subId);
+        if(opt) {
+            let finalPrice = Math.round(opt.price * (1 - (discPercent / 100)));
+            document.getElementById('pricePreview').innerText = `${finalPrice} JOD`;
+        }
+    }
+
     function toggleOptFields() {
         const type = document.getElementById('optType').value;
         document.getElementById('timeFields').classList.toggle('hidden', type !== 'time');
         document.getElementById('entryFields').classList.toggle('hidden', type !== 'entry');
     }
 
+    // --- PACKAGE/STAFF MODIFIERS ---
     function addGymOption() {
         const name = document.getElementById('optName').value;
         const price = parseFloat(document.getElementById('optPrice').value);
         const type = document.getElementById('optType').value;
-        if(!name || !price) return alert("Fill in option details!");
+        if(!name || !price) return alert("Validation Failed: Missing values.");
 
         let options = JSON.parse(localStorage.getItem('gymOptions'));
         let newOpt = { id: Date.now(), name, price, type };
@@ -277,7 +307,7 @@
         options.push(newOpt);
         localStorage.setItem('gymOptions', JSON.stringify(options));
         renderManagerData();
-        alert("Option added successfully!");
+        alert("Configuration Structure Saved.");
     }
 
     function deleteGymOption(id) {
@@ -290,27 +320,18 @@
     function addEmployee() {
         const user = document.getElementById('empUser').value;
         const pass = document.getElementById('empPass').value;
-        if(!user || !pass) return alert("Fill credentials!");
+        if(!user || !pass) return alert("Process Interrupted: Missing identity strings.");
 
         let staff = JSON.parse(localStorage.getItem('staff'));
         staff.push({ user, pass });
         localStorage.setItem('staff', JSON.stringify(staff));
         renderManagerData();
-        alert("Employee added!");
+        alert("Staff Node Initialized.");
+        document.getElementById('empUser').value = "";
+        document.getElementById('empPass').value = "";
     }
 
-    // --- EMPLOYEE LOGIC & DISCOUNTS ---
-    function updatePricePreview() {
-        const subId = document.getElementById('custSubChoice').value;
-        const discPercent = parseFloat(document.getElementById('custDiscount').value) || 0;
-        const options = JSON.parse(localStorage.getItem('gymOptions'));
-        const opt = options.find(o => o.id == subId);
-        if(opt) {
-            let finalPrice = Math.round(opt.price * (1 - (discPercent / 100)));
-            document.getElementById('pricePreview').innerText = `Price: ${finalPrice} JOD (Rounded)`;
-        }
-    }
-
+    // --- REGISTRATION EXECUTION ENGINE ---
     function submitCustomerRegistration() {
         const first = document.getElementById('custFirst').value;
         const last = document.getElementById('custLast').value;
@@ -318,7 +339,7 @@
         const subId = document.getElementById('custSubChoice').value;
         const discount = parseFloat(document.getElementById('custDiscount').value) || 0;
 
-        if(!first || !last || !dob) return alert("Please fill customer identity records!");
+        if(!first || !last || !dob) return alert("Cannot Proceed: Complete Name & Date of Birth requirements.");
 
         const options = JSON.parse(localStorage.getItem('gymOptions'));
         const opt = options.find(o => o.id == subId);
@@ -331,17 +352,17 @@
         };
 
         if(discount === 0) {
-            // Direct Activation with Money Collection Conf Prompt
-            if(confirm(`Collect standard ${finalPrice} JOD from customer right now?`)) {
+            if(confirm(`⚠️ Financial Confirmation Required:\nCollect exactly [ ${finalPrice} JOD ] cash from customer right now?`)) {
                 activateCustomer(quotation);
-                alert(`Customer Registered! 5-Digit Access Code: ${code}`);
+                alert(`Account Activated! Generated Unique Security Code: ${code}`);
+                // Clear out inputs
+                document.getElementById('custFirst').value = ""; document.getElementById('custLast').value = "";
             }
         } else {
-            // Send to manager logic loop
             let quotations = JSON.parse(localStorage.getItem('quotations'));
             quotations.push(quotation);
             localStorage.setItem('quotations', JSON.stringify(quotations));
-            alert("Discount requested. Sent to Manager Approval System Tab.");
+            alert(`Quotation locked at ${finalPrice} JOD. Sent to Manager Approval Suite.`);
             renderEmployeeData();
         }
     }
@@ -349,8 +370,10 @@
     function activateCustomer(q) {
         let customers = JSON.parse(localStorage.getItem('customers'));
         let newCustomer = {
-            code: q.code, first: q.first, last: q.last, dob: q.dob, opt: q.opt, paid: q.finalPrice, active: true
+            code: q.code, first: q.first, last: q.last, dob: q.dob, opt: q.opt, paid: q.finalPrice, 
+            status: "Active", logs: [], totalCheckIns: 0
         };
+        
         if(q.opt.type === 'time') {
             let exp = new Date();
             exp.setDate(exp.getDate() + q.opt.days);
@@ -358,57 +381,74 @@
         } else {
             newCustomer.entriesLeft = q.opt.entries;
             newCustomer.expiryDaysRule = q.opt.expiryDays;
-            newCustomer.expiryDate = null; // Activates on 1st Check-In
+            newCustomer.expiryDate = null; 
         }
         customers.push(newCustomer);
         localStorage.setItem('customers', JSON.stringify(customers));
     }
 
-    // --- CHECK IN COMPONENT ---
+    // --- SECURE GATE ENTRY VALIDATOR ---
     function processCheckIn() {
         const code = document.getElementById('checkInCode').value;
         let customers = JSON.parse(localStorage.getItem('customers'));
-        let cust = customers.find(c => c.code === code && c.active);
+        let cust = customers.find(c => c.code === code);
 
-        if(!cust) return alert("Invalid active code or customer not found!");
+        if(!cust) return alert("Authentication Blocked: Code lookup returned zero matches.");
+        
+        // Strict State Validations
+        if(cust.status === "Suspended") {
+            return alert(`❌ ENTRY DENIED: This account has been SUSPENDED by Management for policy enforcement or misconduct.`);
+        }
+        if(cust.status === "Refunded" ) {
+            return alert(`❌ ENTRY DENIED: Account deactivated via completed historical cash refund processing.`);
+        }
 
-        // Security Identity Cross Verification Match Prompt
-        if(confirm(`Verify Identity Details:\nName: ${cust.first} ${cust.last}\nDOB: ${cust.dob}\n\nIs this information correct?`)) {
+        if(confirm(`Security Screening Identity Verification Request:\nIs client identity verified?\nName: ${cust.first} ${cust.last}\nDOB: ${cust.dob}`)) {
+            let timestamp = new Date().toLocaleString();
             
-            // Logic Handling dynamic validation updates
             if(cust.opt.type === 'time') {
                 if(new Date(cust.expiryDate) < new Date()) {
-                    cust.active = false; alert("Subscription expired!");
+                    cust.status = "Expired";
+                    alert("Access Prohibited: Time window lapsed.");
                 } else {
-                    alert(`Access Granted. Valid Until: ${cust.expiryDate}`);
+                    cust.logs.push(timestamp);
+                    cust.totalCheckIns++;
+                    alert(`✅ Access Authorized. Valid expiration: ${cust.expiryDate}. Visits: ${cust.totalCheckIns}`);
                 }
             } else {
-                // Entry Based Logic Loop
                 if(cust.expiryDate && new Date(cust.expiryDate) < new Date()) {
-                    cust.active = false; alert("Entries expired!");
+                    cust.status = "Expired";
+                    alert("Access Prohibited: Fixed-day timeline lapsed since pass activation.");
                 } else {
-                    if(!cust.expiryDate) { // First initialization entry activate rule
+                    if(!cust.expiryDate) {
                         let exp = new Date();
                         exp.setDate(exp.getDate() + cust.expiryDaysRule);
                         cust.expiryDate = exp.toISOString().split('T')[0];
-                        alert(`First Entry! Subscription activated. Expiry Set to: ${cust.expiryDate}`);
+                        alert(`First Scan Protocol: Session timeline active. Expiry set to: ${cust.expiryDate}`);
                     }
                     cust.entriesLeft--;
-                    alert(`Access Granted! Entries Remaining: ${cust.entriesLeft}`);
-                    if(cust.entriesLeft <= 0) { cust.active = false; alert("All entries used! Account deactivated."); }
+                    cust.logs.push(timestamp);
+                    cust.totalCheckIns++;
+                    alert(`✅ Access Authorized. Passes remaining: ${cust.entriesLeft}. Visits: ${cust.totalCheckIns}`);
+                    
+                    if(cust.entriesLeft <= 0) {
+                        cust.status = "Depleted";
+                        alert("Notice: All purchased entry tokens completely exhausted.");
+                    }
                 }
             }
             localStorage.setItem('customers', JSON.stringify(customers));
+            document.getElementById('checkInCode').value = "";
         }
     }
 
-    // --- APPROVAL ROUTINES ---
+    // --- ADMINISTRATIVE APPROVAL INTERFACES ---
     function processQuotation(id, action, counterVal = null) {
         let quotations = JSON.parse(localStorage.getItem('quotations'));
         let q = quotations.find(x => x.id === id);
-        const note = prompt("Type text communication message to staff/employee:");
+        const note = prompt("Send a localized system communication note to the employee desk:");
 
-        q.mgrNote = note || "No notes left.";
+        q.mgrNote = note || "Processed by Management.";
         
         if(action === 'approve') {
             q.status = "Approved";
@@ -417,8 +457,8 @@
             q.status = "Rejected";
         } else if(action === 'partial') {
             q.status = "Counter-Offered";
-            q.discount = counterVal;
-            q.finalPrice = Math.round(q.opt.price * (1 - (counterVal / 100)));
+            q.discount = parseFloat(counterVal);
+            q.finalPrice = Math.round(q.opt.price * (1 - (q.discount / 100)));
         }
 
         localStorage.setItem('quotations', JSON.stringify(quotations));
@@ -428,65 +468,90 @@
     function acceptCounter(id) {
         let quotations = JSON.parse(localStorage.getItem('quotations'));
         let q = quotations.find(x => x.id === id);
-        if(confirm(`Confirm collection of Counter Offer amount: ${q.finalPrice} JOD from client?`)) {
+        if(confirm(`⚠️ Collection Prompt: Collect exactly [ ${q.finalPrice} JOD ] for counter-offer pricing update?`)) {
             activateCustomer(q);
-            quotations = quotations.filter(x => x.id !== id); // clear track history record item
+            quotations = quotations.filter(x => x.id !== id);
             localStorage.setItem('quotations', JSON.stringify(quotations));
             renderEmployeeData();
         }
     }
 
+    // --- ENFORCEMENT & SUSPENSION ENGINE ---
+    function toggleSuspension(code) {
+        let customers = JSON.parse(localStorage.getItem('customers'));
+        let cust = customers.find(c => c.code === code);
+        
+        if(cust.status === "Active") {
+            cust.status = "Suspended";
+            alert(`Account associated with ${cust.first} has been frozen successfully.`);
+        } else if(cust.status === "Suspended") {
+            cust.status = "Active";
+            alert(`Account access privileges returned online to standard status.`);
+        }
+        localStorage.setItem('customers', JSON.stringify(customers));
+        renderManagerData();
+    }
+
     function processRefund(code) {
-        if(confirm("Are you sure you want to completely refund and deactivate this client subscription?")) {
+        if(confirm("⚠️ CRITICAL OVERRIDE: Refund entire capital asset allocation for this account? Access permissions will drop instantly.")) {
             let customers = JSON.parse(localStorage.getItem('customers'));
             let cust = customers.find(c => c.code === code);
-            alert(`Process complete. Cash Refund value return: ${cust.paid} JOD.`);
-            cust.active = false;
+            alert(`Refund sequence terminal successful. Hand back: ${cust.paid} JOD.`);
+            cust.status = "Refunded";
+            cust.paid = 0; // Balance cleared out instantly from ledgers
             localStorage.setItem('customers', JSON.stringify(customers));
             renderManagerData();
         }
     }
 
-    // --- DATA RENDERING DATA FEED ---
+    // --- DATA DISPLAY PIPELINES ---
     function renderManagerData() {
-        // Build Options Data Matrix
         const opts = JSON.parse(localStorage.getItem('gymOptions'));
         let html = '';
         opts.forEach(o => {
             html += `<tr><td>${o.name}</td><td>${o.price} JOD</td><td>${o.type}</td>
-            <td>${o.type==='time'? o.days+' days': o.entries+' entries (exp: '+o.expiryDays+'d)'}</td>
+            <td>${o.type==='time'? o.days+' Days': o.entries+' Entries (Exp: '+o.expiryDays+'d)'}</td>
             <td><button class="danger" onclick="deleteGymOption(${o.id})">Delete</button></td></tr>`;
         });
         document.getElementById('gymOptionsTable').innerHTML = html;
 
-        // Build Staff Elements
         const staff = JSON.parse(localStorage.getItem('staff'));
         let staffHtml = '';
-        staff.forEach(s => staffHtml += `<li>User: <b>${s.user}</b></li>`);
+        staff.forEach(s => staffHtml += `<li>User Account: <b>${s.user}</b></li>`);
         document.getElementById('staffList').innerHTML = staffHtml;
 
-        // Approvals Stream View Grid
         const quots = JSON.parse(localStorage.getItem('quotations')).filter(q => q.status === "Pending");
         let appHtml = '';
         quots.forEach(q => {
             appHtml += `<tr><td>${q.first} ${q.last}</td><td>${q.opt.name}</td><td>${q.discount}%</td><td>${q.finalPrice} JOD</td>
             <td><input type="number" id="counter-${q.id}" style="width:70px" placeholder="%"></td>
-            <td>—</td>
             <td>
                 <button class="secondary" onclick="processQuotation(${q.id}, 'approve')">Approve</button>
                 <button class="danger" onclick="processQuotation(${q.id}, 'reject')">Reject</button>
-                <button onclick="let val = document.getElementById('counter-${q.id}').value; if(val) processQuotation(${q.id}, 'partial', val); else alert('Type % value first');">Counter</button>
+                <button onclick="let val = document.getElementById('counter-${q.id}').value; if(val) processQuotation(${q.id}, 'partial', val); else alert('Input counter %');">Counter</button>
             </td></tr>`;
         });
         document.getElementById('mgrApprovalsTable').innerHTML = appHtml;
 
-        // Active View list elements for Refund Access Controls
-        const activeCusts = JSON.parse(localStorage.getItem('customers')).filter(c => c.active);
+        // Dynamic Calculation Pipeline for Overall Collected Revenue Pool
+        const allCusts = JSON.parse(localStorage.getItem('customers'));
+        let revenuePool = allCusts.reduce((acc, current) => acc + current.paid, 0);
+        document.getElementById('totalRevenueDisplay').innerText = revenuePool;
+
         let refHtml = '';
-        activeCusts.forEach(c => {
-            let details = c.opt.type === 'time' ? `Expires: ${c.expiryDate}` : `Entries Left: ${c.entriesLeft} (Exp: ${c.expiryDate || 'Not Activated'})`;
-            refHtml += `<tr><td>${c.code}</td><td>${c.first} ${c.last}</td><td>${c.opt.name}</td><td>${details}</td><td>${c.paid} JOD</td>
-            <td><button class="danger" onclick="processRefund('${c.code}')">Refund</button></td></tr>`;
+        allCusts.forEach(c => {
+            let details = c.opt.type === 'time' ? `Expires: ${c.expiryDate}` : `Left: ${c.entriesLeft} (Exp: ${c.expiryDate || 'Un-activated'})`;
+            let logString = c.logs.length > 0 ? c.logs.join("<br>") : "No Scans Recorded";
+            
+            let statusBadge = `<span class="badge badge-${c.status.toLowerCase()}">${c.status}</span>`;
+            let toggleBtnText = c.status === "Suspended" ? "Lift Suspension" : "Suspend Account";
+
+            refHtml += `<tr><td><b>${c.code}</b></td><td>${c.first} ${c.last}</td><td>${statusBadge}</td><td>${details}</td><td>${c.paid} JOD</td>
+            <td style="font-size:11px; max-height: 80px; overflow-y:auto; display:block;"><b>Total: ${c.totalCheckIns}</b><br>${logString}</td>
+            <td>
+                ${(c.status === "Active" || c.status === "Suspended") ? `<button class="warning" onclick="toggleSuspension('${c.code}')">${toggleBtnText}</button>` : ''}
+                ${c.status !== "Refunded" ? `<button class="danger" onclick="processRefund('${c.code}')">Issue Refund</button>` : ''}
+            </td></tr>`;
         });
         document.getElementById('mgrRefundsTable').innerHTML = refHtml;
     }
@@ -503,7 +568,7 @@
         quots.forEach(q => {
             let actionBtn = '';
             if(q.status === 'Counter-Offered') {
-                actionBtn = `<button onclick="acceptCounter(${q.id})">Customer Accepted Price</button>`;
+                actionBtn = `<button onclick="acceptCounter(${q.id})" class="secondary">Client Agrees to Terms</button>`;
             }
             qHtml += `<tr><td>${q.first} ${q.last}</td><td>${q.opt.name}</td><td>${q.opt.price} JOD</td><td>${q.discount}%</td><td>${q.finalPrice} JOD</td>
             <td><span class="badge badge-${q.status.toLowerCase()}">${q.status}</span></td><td>${q.mgrNote}</td><td>${actionBtn}</td></tr>`;
