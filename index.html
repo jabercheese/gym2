@@ -21,7 +21,7 @@
         /* BRANDING LOGO */
         .gym-logo-container { text-align: center; margin-bottom: 25px; padding: 15px; background: var(--primary); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border-bottom: 4px solid var(--accent); }
         .gym-logo { display: inline-flex; align-items: center; gap: 15px; }
-        .gym-icon { background: var(--accent); color: var(--primary); font-size: 28px; font-weight: 900; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 0 10px rgba(243,156,18,0.5); text-transform: uppercase; }
+        .gym-icon { background: var(--accent); color: var(--primary); font-size: 28px; font-weight: 900; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 0 10px rgba(243,156,18,0.5); text-transform: uppercase; font-style: normal; }
         .gym-name { color: white; font-size: 32px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; font-style: italic; }
         .gym-name span { color: var(--accent); }
 
@@ -92,7 +92,6 @@
 
 <div class="container">
     
-    <!-- MUSCLE POWER GYM LOGO -->
     <div class="gym-logo-container">
         <div class="gym-logo">
             <div class="gym-icon">💪</div>
@@ -100,7 +99,6 @@
         </div>
     </div>
 
-    <!-- Auth Status Bar -->
     <div class="navbar">
         <span id="userStatus" style="color: white; font-weight: bold;">Logged Out</span>
         <span>🕒 System Time: <b id="systemLiveClock" style="color: var(--accent);">--/--/---- --:--</b></span>
@@ -111,22 +109,18 @@
         </div>
     </div>
 
-    <!-- GLOBAL IN-SCREEN NOTIFICATION SYSTEM -->
     <div id="globalNotificationBar"></div>
 
-    <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="card screen">
         <h2>System Portal Login</h2>
         <label>Select User Handle Profile</label>
         <select id="loginUserSelect">
-            <!-- Dynamically populated via javascript runtime below -->
-        </select>
+            </select>
         <label>System Security Password</label>
         <input type="password" id="loginPass" placeholder="Enter password">
         <button onclick="handleLogin()" style="background: var(--accent); color: var(--primary);">Secure Login</button>
     </div>
 
-    <!-- CAFETERIA POS DASHBOARD -->
     <div id="cafeteriaDashboard" class="screen hidden">
         <h2>🍔 Cafeteria Management Terminal & POS Workstation</h2>
         
@@ -144,19 +138,15 @@
             <button onclick="showCafSubTab('cafBalancesTab')">💳 Manage Account Balances</button>
         </div>
 
-        <!-- CAFETERIA REGISTER TAB -->
         <div id="cafPosTab" class="cafTab">
             <div class="card">
                 <h3>🛒 Point of Sale Terminal Engine</h3>
                 <div class="pos-grid">
-                    <!-- Left Side: Interactive Items -->
                     <div>
                         <h4>Select Items to Sell</h4>
                         <div id="posMenuGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:12px; max-height:400px; overflow-y:auto; padding:5px;">
-                            <!-- Items rendered dynamic -->
-                        </div>
+                            </div>
                     </div>
-                    <!-- Right Side: Cart Workspace -->
                     <div class="cart-pane">
                         <div>
                             <h4>Active Order Summary Table</h4>
@@ -178,7 +168,6 @@
                             
                             <button onclick="initiatePOSCheckout()" class="secondary" style="margin-top:15px; padding:12px;">Process Payment Receipt</button>
                             
-                            <!-- Cash Handling / Change / Wallet calculator interactive panel -->
                             <div id="posCheckoutPanel" class="hidden" style="margin-top:15px; padding:12px; background:#fff; border:1px solid #ccc; border-radius:4px;">
                                 <div style="background: #eef2f3; padding: 10px; border-radius: 4px; margin-bottom: 12px; border-left: 4px solid var(--secondary);">
                                     <label style="margin: 0; font-weight: bold; font-size: 13px;">🔗 Link Member Wallet (Optional GYM ID):</label>
@@ -203,12 +192,10 @@
                     </div>
                 </div>
                 
-                <!-- SECURED ACCESS WORD EXTENSION LINK -->
                 <span class="modify-link" onclick="challengeModifyAccess()">modify</span>
             </div>
         </div>
 
-        <!-- CAFETERIA MEMBER WALLET BALANCE TAB -->
         <div id="cafBalancesTab" class="cafTab hidden card">
             <h3>💳 Customer Prepaid Cafeteria Wallet System</h3>
             <p>Search a member by their 5-digit Gym ID to load funds or issue corrections. All transactions are added to register totals.</p>
@@ -253,7 +240,6 @@
         </div>
     </div>
 
-    <!-- SEPARATE SECURED CAFETERIA INVENTORY MANAGEMENT PAGE -->
     <div id="cafeteriaInventoryScreen" class="screen hidden">
         <div class="navbar" style="background: var(--dark)">
             <span style="color: white; font-weight: bold;">🔒 Secured Cafeteria Stock Config Portal</span>
@@ -283,15 +269,13 @@
                             </tr>
                         </thead>
                         <tbody id="inventoryConfigTableBody">
-                            <!-- Populated Dynamically -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- EMPLOYEE DASHBOARD -->
     <div id="employeeDashboard" class="screen hidden">
         <h2>Employee Dashboard</h2>
         <div class="navbar" style="background: var(--dark)">
@@ -302,7 +286,6 @@
             <button onclick="showEmpSubTab('empInspectTab')" style="color: var(--accent);">📊 Check-Up Station (Search Pass)</button>
         </div>
 
-        <!-- Check-In Tab -->
         <div id="checkInTab" class="empTab card">
             <h3>Customer Check-In Entry Gate</h3>
             <input type="text" id="checkInCode" placeholder="Enter 5-Digit Customer Gym ID">
@@ -310,7 +293,6 @@
             <div id="checkInVerifyConsole" class="hidden" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 6px; border: 2px solid #ddd;"></div>
         </div>
 
-        <!-- Inspection Tab -->
         <div id="empInspectTab" class="empTab card hidden">
             <h3>📊 Pass Inspector Terminal</h3>
             <p>Input a Gym ID below to check expiry dates, verify remaining entry balances, or view complete logs.</p>
@@ -319,7 +301,6 @@
             <div id="empInspectResult" style="margin-top: 15px;"></div>
         </div>
 
-        <!-- Add/Renew Customer Tab -->
         <div id="newCustTab" class="empTab card hidden">
             <h3>Membership Registration & Renewal Desk</h3>
             <div id="renewalContextBox" class="hidden"></div>
@@ -361,7 +342,6 @@
             </div>
         </div>
 
-        <!-- Quotation Status Tab -->
         <div id="empQuotationsTab" class="empTab card hidden">
             <h3>Submitted Quotations & Notes Tracker</h3>
             <div style="overflow-x: auto;">
@@ -372,7 +352,6 @@
             </div>
         </div>
 
-        <!-- Forgotten Gym ID Lookup Tab -->
         <div id="lookupTab" class="empTab card hidden">
             <h3>🔍 Forgotten Gym ID Emergency Lookup</h3>
             <div class="grid">
@@ -391,7 +370,6 @@
         </div>
     </div>
 
-    <!-- MANAGER DASHBOARD -->
     <div id="managerDashboard" class="screen hidden">
         <h2>Manager Control Panel</h2>
         
@@ -411,7 +389,6 @@
             <button onclick="showMgrSubTab('mgrSystemTab')" style="color: #ff9f9f;">⚙️ System Tools</button>
         </div>
 
-        <!-- Manager Inspection Station -->
         <div id="mgrInspectTab" class="mgrTab card hidden">
             <h3>📊 Manager Pass Inspector</h3>
             <p>Instantly inspect account metrics, validation state, and history logs by inputting a Gym ID.</p>
@@ -420,7 +397,6 @@
             <div id="mgrInspectResult" style="margin-top: 15px;"></div>
         </div>
 
-        <!-- Gym Options Tab -->
         <div id="mgrSubOptionsTab" class="mgrTab card">
             <h3>Gym Subscription Packages</h3>
             <div class="grid">
@@ -454,7 +430,6 @@
             </div>
         </div>
 
-        <!-- Staff Tab -->
         <div id="mgrStaffTab" class="mgrTab card hidden">
             <h3>Staff Deployment Access Keys</h3>
             <div class="grid">
@@ -476,7 +451,6 @@
             </div>
         </div>
 
-        <!-- Approvals Tab -->
         <div id="mgrApprovalsTab" class="mgrTab card hidden">
             <h3>Pending Discount Approvals Queue</h3>
             <div style="overflow-x: auto;">
@@ -487,7 +461,6 @@
             </div>
         </div>
 
-        <!-- Membership Control & Logs Tab -->
         <div id="mgrRefundsTab" class="mgrTab card hidden">
             <h3>Membership Master Control Panel & Access History Logs</h3>
             <p style="font-size:12px; color:var(--accent);">💡 <i>Click anywhere on a row to review the member's complete structural profile and historical log archives.</i></p>
@@ -499,11 +472,9 @@
             </div>
         </div>
 
-        <!-- System Settings Tools Tab -->
         <div id="mgrSystemTab" class="mgrTab card hidden">
             <h3>⚙️ System Administration Tools</h3>
             
-            <!-- MANAGER CONTROL PANEL SYSTEM CLOCK SIMULATOR -->
             <div class="card" style="border-left: 4px solid var(--secondary); margin-bottom: 25px;">
                 <h4>🕒 System Time-Machine Warp Controller</h4>
                 <p style="font-size: 13px; color: #555;">Adjust global dates dynamically to verify membership lifespan terminations or audit records tracking calculations.</p>
@@ -514,7 +485,6 @@
                 </div>
             </div>
 
-            <!-- PASSWORD SETTING MECHANISMS -->
             <div class="card" style="border-left: 4px solid var(--accent); margin-bottom: 25px;">
                 <h4>🔐 Cafeteria Security Configuration Management</h4>
                 <div class="grid">
@@ -541,7 +511,6 @@
     </div>
 </div>
 
-<!-- AUDIT LOG PROFILE MODAL WINDOW -->
 <div id="profileModal" class="modal hidden" onclick="handleModalOutsideClick(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
         <span class="close-modal" onclick="closeProfileModal()">&times;</span>
@@ -1077,7 +1046,7 @@
                 discount: "0%",
                 net: amount
             });
-            printNotification(`Successfully loaded +${amount.toFixed(2)} JOD to customer balance account.`, "success");
+            printNotification(`Successfully loaded +${amount.toFixed(2)} JOD to customer balance account., "success"`);
         } else {
             // Safety deduction check (can drop below zero if correcting major ledger errors manually)
             client.cafeteriaBalance -= amount;
@@ -1101,7 +1070,7 @@
         renderCafeteriaData();
     }
 
-    // --- REGISTERED WORKSTATION POS ENGINE ---
+    // --- INTERACTIVE STOCK TABLES CONFIG ---
     function addFoodItemInventory() {
         const name = document.getElementById('foodItemName').value.trim();
         const price = parseFloat(document.getElementById('foodItemPrice').value);
@@ -1236,6 +1205,7 @@
         calculatePOSChange();
     }
 
+    // --- REVENUE CALCULATION LOGIC PREVENTING CREDIT DOUBLE-COUNTING ---
     function calculatePOSChange() {
         const totalDue = parseFloat(document.getElementById('cartTotalDisplay').innerText);
         let walletDeduction = 0.00;
@@ -1282,8 +1252,8 @@
                 let dbClient = latestCustomers.find(c => c.code === activeCheckoutWalletUser.code);
                 if(dbClient) {
                     dbClient.cafeteriaBalance = (dbClient.cafeteriaBalance || 0) - walletDeduction;
-                    dbClient.logs.push(`[Cafeteria Purchase] Spent ${walletDeduction.toFixed(2)} JOD from balance account balance wallet registry on ${stamp}.`);
-                    activeCheckoutWalletUser = dbClient; // update references
+                    dbClient.logs.push(`[Cafeteria Purchase] Spent ${walletDeduction.toFixed(2)} JOD from balance wallet registry on ${stamp}.`);
+                    activeCheckoutWalletUser = dbClient;
                 }
             }
             
@@ -1295,12 +1265,14 @@
                 paymentMethodSummary = cashRequired > 0 ? `Wallet (-${walletDeduction.toFixed(2)} JOD) + Cash` : `Wallet Deduct [ID: ${activeCheckoutWalletUser.code}]`;
             }
 
+            // --- ZERO-PROFIT EXEMPTION FOR WALLET CREDITS ---
+            // Only cashRequired brings in net-new revenue. Wallet points were tracked during their cash deposit phase.
             salesLedger.push({
                 timestamp: stamp,
                 products: `${itemSummaryString} [Method: ${paymentMethodSummary}]`,
                 gross: parseFloat(posActiveCart.reduce((acc, i) => acc + (i.price * i.qty), 0).toFixed(2)),
                 discount: discountPercentValue + "%",
-                net: parseFloat(totalDue.toFixed(2)) // Order total represents overall collection volume
+                net: parseFloat(cashRequired.toFixed(2)) 
             });
 
             localStorage.setItem('customers', JSON.stringify(latestCustomers));
@@ -1382,7 +1354,6 @@
             `;
         });
         
-        // Hide balance sub-console view frame dynamically on refresh bounds
         document.getElementById('walletConsoleWrapper').classList.add('hidden');
         document.getElementById('walletGymIdSearch').value = "";
     }
@@ -1433,7 +1404,6 @@
         const sales = JSON.parse(localStorage.getItem('foodSales')) || [];
         const totalFoodRev = sales.reduce((acc, curr) => acc + curr.net, 0);
         
-        // Sum combined revenues from subscription fees and cafeteria terminal assets
         document.getElementById('totalRevenueDisplay').innerText = (gymFeesRevenue + totalFoodRev).toFixed(2);
 
         let refHtml = ''; allCusts.forEach(c => {
