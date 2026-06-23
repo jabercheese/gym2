@@ -3,1261 +3,1069 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Integrated PoE Command Terminal & POS Suite</title>
+    <title>Muscle Power Gym - Corporate Management System</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #eef2f5;
-            color: #333;
-            margin: 0;
-            padding: 0;
+        :root {
+            --primary: #1a252f;
+            --accent: #f39c12; 
+            --secondary: #18bc9c;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #f8f9fa;
+            --dark: #2c3e50;
         }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f3; margin: 0; padding: 20px; color: var(--dark); }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1, h2, h3, h4 { color: var(--primary); margin-top: 5px; }
         
-        /* Login Screen CSS */
-        #loginGateWrapper {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%);
-            z-index: 5000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .login-card {
-            background: #fff;
-            padding: 35px;
-            border-radius: 6px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            width: 400px;
-            border-top: 5px solid #c0392b;
-        }
-        .login-card h2 {
-            margin-top: 0;
-            color: #2c3e50;
-            font-size: 1.4rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        .login-group {
-            margin-bottom: 15px;
-        }
-        .login-group label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #7f8c8d;
-            margin-bottom: 5px;
-        }
+        /* BRANDING LOGO */
+        .gym-logo-container { text-align: center; margin-bottom: 25px; padding: 15px; background: var(--primary); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border-bottom: 4px solid var(--accent); }
+        .gym-logo { display: inline-flex; align-items: center; gap: 15px; }
+        .gym-icon { background: var(--accent); color: var(--primary); font-size: 28px; font-weight: 900; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 0 10px rgba(243,156,18,0.5); text-transform: uppercase; }
+        .gym-name { color: white; font-size: 32px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; font-style: italic; }
+        .gym-name span { color: var(--accent); }
 
-        /* Top Header Navigation */
-        header {
-            background-color: #1a252f;
-            color: #fff;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 3px solid #c0392b;
-        }
-        header h1 {
-            margin: 0;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
-        }
-        .header-controls {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        /* Time Machine Controller Widget */
-        .time-machine-pod {
-            background: #2c3e50;
-            padding: 6px 12px;
-            border-radius: 4px;
-            border: 1px solid #34495e;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: monospace;
-            font-size: 0.85rem;
-        }
-        .time-machine-pod input[type="datetime-local"] {
-            background: #1a252f;
-            color: #2ecc71;
-            border: 1px solid #7f8c8d;
-            padding: 3px;
-            border-radius: 3px;
-            font-family: monospace;
-            font-size: 0.85rem;
-        }
-
-        /* Container Workspaces */
-        .workspace { display: none; padding: 20px; max-width: 1600px; margin: auto; }
-        .active-workspace { display: block; }
+        .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        input, select, button, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: var(--primary); color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; display: inline-block; }
+        button:hover { opacity: 0.9; }
+        button.secondary { background: var(--secondary); }
+        button.danger { background: var(--danger); }
+        button.warning { background: var(--warning); }
         
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        .panel {
-            background: #fff;
-            padding: 15px;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        input[type="text"], input[type="password"], input[type="number"], select, textarea {
-            width: 100%;
-            padding: 10px;
-            font-size: 1rem;
-            border: 1px solid #bdc3c7;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .search-box-container { width: 450px; }
+        .navbar { display: flex; justify-content: space-between; background: var(--primary); padding: 10px 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--accent); align-items: center; flex-wrap: wrap; gap: 10px; }
+        .navbar button { width: auto; background: transparent; color: white; margin: 0 5px; }
+        .navbar button:hover { background: rgba(255,255,255,0.1); color: var(--accent); }
+        .hidden { display: none !important; }
         
-        .passport-lookup-panel {
-            border: 2px solid #2c3e50;
-            background: #f8f9f9;
-        }
-        .passport-lookup-panel h2 {
-            margin-top: 0;
-            font-size: 1.1rem;
-            color: #2c3e50;
-            text-transform: uppercase;
-            border-bottom: 2px solid #2c3e50;
-            padding-bottom: 5px;
-        }
-        .passport-lookup-panel .input-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .btn-lookup {
-            background-color: #2c3e50;
-            color: white;
-            white-space: nowrap;
-        }
-
-        /* Tables layout */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        th, td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #ecf0f1;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-        th { background-color: #2c3e50; color: #fff; }
-        tr:hover { background-color: #f9fbfd; }
-
-        /* General UI Buttons */
-        .btn {
-            padding: 8px 14px;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-        }
-        .btn-process { background-color: #2c3e50; color: white; }
-        .btn-approve { background-color: #27ae60; color: white; padding: 10px 20px; font-size: 1rem; margin-right: 5px;}
-        .btn-deny { background-color: #c0392b; color: white; padding: 10px 20px; font-size: 1rem; margin-right: 5px;}
-        .btn-hold { background-color: #f39c12; color: white; padding: 10px 20px; font-size: 1rem; }
-        .btn-submit { background-color: #2e4053; color: white; padding: 10px 20px; font-size: 1rem; }
-        .btn-secondary { background-color: #7f8c8d; color: white; margin-bottom: 5px;}
-        .btn-logout { background-color: #c0392b; color: white; font-size: 0.8rem; padding: 5px 10px; }
-
-        /* Operational Alerts statuses codes */
-        .status-approved { color: #27ae60; font-weight: bold; }
-        .status-denied { color: #c0392b; font-weight: bold; }
-        .status-pending { color: #7f8c8d; font-weight: bold; }
-        .status-questioning { color: #d35400; font-weight: bold; background-color: #fef5e7; padding: 3px 6px; border-radius: 3px; border: 1px solid #fdebd0;}
-        .eval-ok { color: #27ae60; font-weight: bold; }
-        .eval-hold { color: #d35400; font-weight: bold; background-color: #fef5e7; padding: 2px 6px; border-radius: 3px; }
-        .expiry-alert { color: #fff !important; background-color: #c0392b !important; padding: 2px 6px; font-weight: bold; border-radius: 3px; display: inline-block; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; }
+        .badge-active { background: var(--secondary); }
+        .badge-pending { background: var(--warning); }
+        .badge-approved { background: var(--secondary); }
+        .badge-rejected { background: var(--danger); }
+        .badge-suspended { background: #7f8c8d; }
+        .badge-expired { background: #d35400; }
+        .badge-refunded { background: #34495e; }
+        .badge-depleted { background: #7f8c8d; }
         
-        .alert-banner { grid-column: 1 / -1; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 0.95rem; margin-bottom: 10px; }
-        .alert-interpol-banner { background-color: #7a0000; color: #fff; border-left: 8px solid #ff0000; }
-        .alert-state-banner { background-color: #d35400; color: #fff; border-left: 8px solid #e67e22; }
-
-        /* Modal Architecture */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 1000; overflow-y: auto; }
-        .modal-content { background: #fff; width: 1000px; margin: 2% auto; border-radius: 4px; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.4); }
-        .modal-header { background: #1a252f; color: #fff; padding: 15px 20px; font-size: 1.2rem; display: flex; justify-content: space-between; align-items: center; }
-        .close-btn { background: none; border: none; color: white; font-size: 1.6rem; cursor: pointer; }
-        .modal-body { padding: 20px; display: grid; grid-template-columns: 180px 1fr 1fr; gap: 15px; max-height: 70vh; overflow-y: auto; }
-        .photo-frame { grid-row: span 4; width: 160px; height: 200px; border: 2px solid #7f8c8d; background-color: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
-        .data-group { border-bottom: 1px solid #f2f4f4; padding-bottom: 8px; }
-        .data-group label { display: block; font-size: 0.75rem; color: #7f8c8d; text-transform: uppercase; font-weight: bold; margin-bottom: 3px; }
-        .data-group div { font-size: 0.95rem; font-weight: 500; }
-        .span-2 { grid-column: span 2; }
-        .full-width { grid-column: 1 / -1; }
-        .section-heading { grid-column: 2 / -1; font-size: 0.95rem; color: #1a252f; text-transform: uppercase; font-weight: 700; border-bottom: 2px solid #1a252f; margin-top: 10px; padding-bottom: 2px; }
-        .action-area { padding: 20px; background: #f8f9f9; border-top: 1px solid #d5dbdb; text-align: right; }
-        .input-panel { display: none; text-align: left; background: #fff; padding: 15px; border: 1px solid #bdc3c7; border-radius: 4px; margin-top: 10px; }
-        .input-panel h3 { margin-top: 0; color: #2c3e50; border-bottom: 2px solid #bdc3c7; padding-bottom: 5px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .form-grid label { display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 4px; }
-        .auth-panel { background: #fdf2e9; border: 1px solid #f5cba7; padding: 15px; border-radius: 4px; text-align: left; margin-top: 10px; }
-
-        /* Cafeteria POS Layout CSS Elements */
-        .pos-grid {
-            display: grid;
-            grid-template-columns: 1fr 450px;
-            gap: 20px;
-            margin-top: 15px;
-        }
-        .pos-menu-section {
-            background: #fff;
-            padding: 15px;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .pos-cart-section {
-            background: #fff;
-            padding: 15px;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .food-item-creator {
-            background: #f8f9f9;
-            padding: 12px;
-            border-radius: 4px;
-            border: 1px solid #d5dbdb;
-            margin-bottom: 15px;
-            display: flex;
-            gap: 10px;
-            align-items: flex-end;
-        }
-        .food-items-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 12px;
-            max-height: 500px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-        .food-card {
-            background: #f4f6f7;
-            border: 2px solid #bdc3c7;
-            padding: 15px;
-            border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .food-card:hover {
-            background: #eaf2f8;
-            border-color: #3498db;
-            transform: translateY(-2px);
-        }
-        .food-card .title { font-weight: bold; font-size: 1rem; color: #2c3e50; margin-bottom: 5px; }
-        .food-card .price { color: #27ae60; font-weight: bold; font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: var(--primary); color: white; border-bottom: 2px solid var(--accent); }
         
-        .cart-table-wrapper {
-            max-height: 280px;
-            overflow-y: auto;
-            border-bottom: 2px solid #bdc3c7;
-            margin-bottom: 15px;
-        }
-        .cart-totals-box {
-            background: #fcf3cf;
-            padding: 12px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 1rem;
-            margin-bottom: 15px;
-        }
-        .cart-totals-box table { background: none; box-shadow: none; }
-        .cart-totals-box td { padding: 4px 0; border: none; }
-        .checkout-math-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-        .ledger-box {
-            margin-top: 20px;
-            background: #1a252f;
-            color: #2ecc71;
-            font-family: monospace;
-            padding: 15px;
-            border-radius: 4px;
-            max-height: 180px;
-            overflow-y: auto;
-        }
+        .clickable-row { cursor: pointer; transition: background-color 0.2s; }
+        .clickable-row:hover { background-color: #f1f2f6; }
+        
+        .financial-metric { font-size: 24px; font-weight: bold; color: var(--secondary); background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 5px solid var(--secondary); }
+        .reset-box { background: #fce4e4; border: 1px solid #f5c6c6; border-radius: 6px; padding: 15px; margin-top: 30px; }
+        
+        /* IN-SCREEN ALERTS */
+        .ui-notification { padding: 12px 15px; border-radius: 6px; margin: 12px 0; font-weight: bold; border-left: 5px solid transparent; }
+        .ui-success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .ui-error { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .ui-info { background: #e2f0d9; border-color: var(--accent); color: var(--primary); }
+        
+        /* MODAL WINDOW SYSTEM */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(3px); display: flex; justify-content: center; align-items: center; z-index: 99999 !important; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 90%; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-top: 6px solid var(--accent); }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 32px; cursor: pointer; font-weight: bold; color: #7f8c8d; transition: color 0.2s; user-select: none; }
+        .close-modal:hover { color: var(--danger); }
+
+        /* TIME TOOLBAR */
+        .time-control-panel { background: #2c3e50; border: 1px solid #34495e; padding: 10px; border-radius: 6px; color: white; font-size: 13px; display: flex; gap: 10px; align-items: center; }
+        .time-control-panel input { width: auto; padding: 4px; margin: 0; font-size: 12px; }
+
+        /* POS DESIGN LAYOUT */
+        .pos-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 25px; margin-top: 15px; }
+        .pos-menu-item { background: #f8f9fa; border: 2px solid #e2e8f0; padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; text-align: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .pos-menu-item:hover { border-color: var(--secondary); background: #ebfefb; transform: translateY(-2px); }
+        .pos-menu-item .price-tag { color: var(--secondary); font-size: 18px; display: block; margin-top: 5px; }
+        .cart-pane { border-left: 2px solid #e2e8f0; padding-left: 15px; display: flex; flex-direction: column; justify-content: space-between; }
+        .cart-table th { background-color: var(--dark); font-size: 13px; padding: 6px; }
+        .cart-table td { padding: 6px; font-size: 13px; }
     </style>
 </head>
 <body>
 
-    <!-- Access Gateway Security Shield Dropdown Matrix -->
-    <div id="loginGateWrapper">
-        <div class="login-card">
-            <h2>System Authentication Portal</h2>
-            <div class="login-group">
-                <label>Select Login Identity Profile Account:</label>
-                <select id="loginUserDropdown" onchange="handleUserSelectionChange()">
-                    <option value="officer_emp">Border Officer Terminal (Employee Access)</option>
-                    <option value="caf">Cafeteria Services Operator (caf)</option>
-                    <option value="admin">System Administration Desk (Admin)</option>
-                </select>
-            </div>
-            <div class="login-group">
-                <label>Terminal Authorization Password:</label>
-                <input type="password" id="loginPasswordInput" placeholder="••••••••">
-            </div>
-            <button class="btn btn-submit" style="width:100%; margin-top:10px;" onclick="attemptTerminalLogin()">Initialize Workspace Session</button>
+<div class="container">
+    
+    <div class="gym-logo-container">
+        <div class="gym-logo">
+            <div class="gym-icon">💪</div>
+            <div class="gym-name">Muscle Power <span>Gym</span></div>
         </div>
     </div>
 
-    <!-- Application Top Global Header Platform Bar -->
-    <header>
-        <div>
-            <h1 id="headerTitle">IMMIGRATION CONTROL WORKSPACE</h1>
-            <span id="activeUserLabel" style="font-size: 0.8rem; color:#bdc3c7;">Session Profile: Guest Logged</span>
-        </div>
-        <div class="header-controls">
-            <!-- Simulated Core Clock Tool Engine -->
-            <div class="time-machine-pod">
-                <span>⏱️ CORE TIME ENGINE:</span>
-                <input type="datetime-local" id="timeMachineInput" onchange="manuallyAdjustSystemTime()">
-                <span id="liveDisplayClock" style="color:#fff; font-weight:bold; padding-left:5px;">--/--/---- --:--:--</span>
-            </div>
-            <button class="btn btn-logout" onclick="terminateSessionInstance()">Exit Terminal</button>
-        </div>
-    </header>
-
-    <!-- WORKSPACE ALPHA: Border Immigration Desk Manifest -->
-    <div id="immigrationWorkspace" class="workspace">
-        <div class="dashboard-grid">
-            <div class="panel controls">
-                <div class="search-box-container">
-                    <input type="text" id="searchInput" onkeyup="searchDatabase()" placeholder="Type to filter manifest table below (Name, ID)...">
-                </div>
-                <div><strong>Active Dynamic Manifest: 100 Units Online</strong></div>
-            </div>
-            
-            <div class="panel passport-lookup-panel">
-                <h2>Direct Passport Reader Window</h2>
-                <div class="input-group">
-                    <input type="text" id="passportLookupInput" placeholder="Enter exact passport #" onkeydown="if(event.key==='Enter') lookupPassport()">
-                    <button class="btn btn-lookup" onclick="lookupPassport()">PULL DOSSIER</button>
-                </div>
-            </div>
-        </div>
-
-        <table id="dbTable">
-            <thead>
-                <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Nationality</th>
-                    <th>Passport No.</th>
-                    <th>Visa Reference</th>
-                    <th>System Pre-Check Evaluation</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
-
-    <!-- WORKSPACE BETA: Cafeteria Point-of-Sale (POS) Environment -->
-    <div id="cafeteriaWorkspace" class="workspace">
-        <div class="pos-grid">
-            <!-- Left Side Pane: Dynamic Inventory Addition & Menu Display Grid Interface -->
-            <div class="pos-menu-section">
-                <h2 style="margin-top:0; color:#2c3e50; border-bottom:2px solid #34495e; padding-bottom:5px; text-transform:uppercase; font-size:1.1rem;">Menu Inventory Supply Matrix</h2>
-                
-                <div class="food-item-creator">
-                    <div style="flex:2;">
-                        <label style="font-size:0.75rem; font-weight:bold; color:#7f8c8d; text-transform:uppercase;">Item Designation Name</label>
-                        <input type="text" id="newFoodName" placeholder="e.g. Double Beef Cheeseburger">
-                    </div>
-                    <div style="flex:1;">
-                        <label style="font-size:0.75rem; font-weight:bold; color:#7f8c8d; text-transform:uppercase;">Price ($ Dues)</label>
-                        <input type="number" id="newFoodPrice" step="0.01" placeholder="5.99">
-                    </div>
-                    <button class="btn btn-submit" onclick="addNewFoodToInventory()">Register Item</button>
-                </div>
-
-                <p style="font-size:0.85rem; color:#7f8c8d; font-style:italic; margin-bottom:10px;">Select item cards below to add units into active checkout register cart.</p>
-                <div class="food-items-grid" id="foodItemsGridContainer"></div>
-            </div>
-
-            <!-- Right Side Pane: Interactive Basket Receipt, Discount Computation, Ledger Dispatch -->
-            <div class="pos-cart-section">
-                <div>
-                    <h2 style="margin-top:0; color:#2c3e50; border-bottom:2px solid #34495e; padding-bottom:5px; text-transform:uppercase; font-size:1.1rem;">Active Order Invoice Basket</h2>
-                    <div class="cart-table-wrapper">
-                        <table id="cartReceiptTable">
-                            <thead>
-                                <tr>
-                                    <th>Item Summary Description</th>
-                                    <th style="text-align:right;">Qty</th>
-                                    <th style="text-align:right;">Unit $</th>
-                                    <th style="text-align:right;">Sub $</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cartReceiptBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div>
-                    <!-- Instant Discount Deductible System Framework Box -->
-                    <div class="checkout-math-row">
-                        <label style="font-size:0.85rem; font-weight:bold; white-space:nowrap;">Apply Discount Tag:</label>
-                        <input type="text" id="posDiscountInput" onkeyup="recomputePosTotals()" placeholder="Enter value (e.g. 10% or $5.00)">
-                    </div>
-
-                    <div class="cart-totals-box">
-                        <table style="width:100%;">
-                            <tr><td>Gross Basket Subtotal:</td><td style="text-align:right;" id="lblGrossSubtotal">$0.00</td></tr>
-                            <tr><td>Deducted Discount Credit:</td><td style="text-align:right; color:#c0392b;" id="lblDiscountDeduction">-$0.00</td></tr>
-                            <tr style="font-size:1.15rem; font-weight:bold; border-top:1px dashed #333;"><td style="padding-top:8px;">NET ORDER BALANCE DUE:</td><td style="text-align:right; padding-top:8px; color:#27ae60;" id="lblNetOrderTotal">$0.00</td></tr>
-                        </table>
-                    </div>
-
-                    <div style="background:#f2f4f4; padding:12px; border-radius:4px; border:1px solid #bdc3c7; margin-bottom:10px;">
-                        <div class="checkout-math-row">
-                            <label style="font-size:0.85rem; font-weight:bold; white-space:nowrap;">Cash Tender Amount Handed:</label>
-                            <input type="number" id="customerCashTendered" step="0.01" onkeyup="evaluateCashChangeReturn()" placeholder="0.00">
-                        </div>
-                        <div style="margin-top:8px; font-size:1.1rem; font-family:monospace; font-weight:bold;">
-                            Returned Change Due: <span style="color:#2980b9;" id="lblChangeDueBox">$0.00</span>
-                        </div>
-                    </div>
-
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <button class="btn btn-deny" style="background:#7f8c8d;" onclick="clearActivePosCart()">Flush Cart</button>
-                        <button class="btn btn-approve" style="font-size:1.1rem;" id="posPurchaseSubmitBtn" onclick="executeCartPurchaseTransaction()">Finalize Order</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="full-width">
-                <h3 style="margin-bottom:5px; text-transform:uppercase; font-size:0.9rem; color:#2c3e50;">Active Session POS Transaction Journal History Logs</h3>
-                <div class="ledger-box" id="posLedgerJournalContainer">SYSTEM LOG INITIALIZED -- WAITING FOR TRANSACTION COMMITMENT PROTOCOLS...</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- WORKSPACE GAMMA: Simple Admin Placeholder Sandbox -->
-    <div id="adminWorkspace" class="workspace">
-        <div class="panel">
-            <h2 style="color:#c0392b; margin-top:0;">ROOT ADMINISTRATIVE INTERFACE SECURE CONFIGURATION</h2>
-            <p>System configuration panel access is authorized. Terminal status reports normal operations across connected subsystems.</p>
-            <p>You can add users here manually to populate the main login screen dropdown index values inside future iterations.</p>
-        </div>
-    </div>
-
-    <!-- Immigration Master Dossier Review Window Modal Block Element -->
-    <div id="processModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span>PASSPORT DOSSIER & SECURITY SCREENING VERIFICATION</span>
-                <button class="close-btn" onclick="closeModal()">&times;</button>
-            </div>
-            
-            <div id="modalLayoutContainer">
-                <div class="modal-body" id="modalContent"></div>
-            </div>
-            
-            <div class="action-area">
-                <div style="text-align: left; margin-bottom: 10px;" id="optElevateContainer">
-                    <button class="btn btn-secondary" onclick="showOptionalAuthPanel()">🔓 View Supervisor Breakdown</button>
-                </div>
-
-                <div id="managerAuthGate" class="auth-panel" style="display:none;">
-                    <h4 style="color:#e67e22; margin:0 0 10px 0; font-size:1rem;">🔑 SECURE GATEWAY: AUTHORIZED ACCESS PROTOCOLS REQUIRED</h4>
-                    <p style="margin:0 0 10px 0; font-size:0.85rem; color:#7e5109;">Enter Supervisor/Manager credentials to review deep background history logs and hidden credentials.</p>
-                    <div style="display:flex; gap:10px;">
-                        <input type="password" id="mgrPasswordInput" placeholder="Enter terminal override password..." style="max-width:300px;">
-                        <button class="btn btn-submit" onclick="verifyManagerOverride()">VERIFY IDENTITY</button>
-                    </div>
-                </div>
-
-                <div id="decisionButtons" style="display:none;">
-                    <button class="btn btn-deny" id="actionDenyBtn" onclick="initiateDenial()">DENY ENTRY</button>
-                    <button class="btn btn-hold" id="actionHoldBtn" onclick="initiateQuestioning()">EXTENDED QUESTIONING</button>
-                    <button class="btn btn-approve" id="actionApproveBtn" onclick="initiateApproval()">ALLOW ENTRY</button>
-                </div>
-                
-                <div id="allowFormPanel" class="input-panel">
-                    <h3>Record Active Flight & Entry Details</h3>
-                    <div class="form-grid">
-                        <div>
-                            <label>From (Origin City/Country):</label>
-                            <input type="text" id="flightFrom" placeholder="e.g. London Heathrow">
-                        </div>
-                        <div>
-                            <label>Airline & Flight Number:</label>
-                            <input type="text" id="flightAirline" placeholder="e.g. British Airways BA223">
-                        </div>
-                        <div>
-                            <label>Trip Reason:</label>
-                            <select id="flightReason">
-                                <option value="Tourism">Tourism</option>
-                                <option value="Business">Business</option>
-                                <option value="Transit">Transit Only</option>
-                                <option value="Diplomatic">Diplomatic</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label>Planning to Depart:</label>
-                            <input type="date" id="flightDepart">
-                        </div>
-                        <div class="full-width">
-                            <label style="color:#27ae60;">Officer Operational Watchlist Notes:</label>
-                            <textarea id="officerApprovalNotes" style="height:50px; resize:none;" placeholder="Log standard border query notes here..."></textarea>
-                        </div>
-                    </div>
-                    <div style="text-align: right; margin-top: 15px;">
-                        <button class="btn btn-submit" onclick="submitApproval()">SAVE & AUTHORIZE ENTRY</button>
-                    </div>
-                </div>
-
-                <div id="denyFormPanel" class="input-panel">
-                    <h3 style="color:#c0392b;">Refusal of Entry Documentation</h3>
-                    <label style="font-weight:bold; display:block; margin-bottom:5px;">Reason for Denial:</label>
-                    <textarea id="denyReasonText" style="width:100%; height:60px; padding:8px; border:1px solid #ccc; resize:none;" placeholder="Specify clear regulatory basis or system violations..."></textarea>
-                    <div style="text-align: right; margin-top: 15px;">
-                        <button class="btn btn-submit" style="background:#000; color:#fff;" onclick="submitDenial()">REJECT ENTRY</button>
-                    </div>
-                </div>
-
-                <div id="questioningFormPanel" class="input-panel">
-                    <h3 style="color:#e67e22;">Detainment & Investigative Dispatch Transfer</h3>
-                    <div class="form-grid">
-                        <div class="full-width">
-                            <label style="font-weight:bold;">Target Interrogation/Investigating Department:</label>
-                            <select id="questioningDept">
-                                <option value="Department of Customs & Contraband">Department of Customs & Contraband</option>
-                                <option value="Department of Visas & Identity Authentication">Department of Visas & Identity Verification</option>
-                                <option value="Department of Child Support & Minors Security">Department of Child Support & Family Liaison</option>
-                                <option value="INTERPOL Counter-Trafficking Division">INTERPOL Command Counter-Fraud Unit</option>
-                                <option value="National Counter-Terrorism Watch Group">National Security Counter-Terrorism Bureau</option>
-                                <option value="Agricultural Safeguard & Biosecurity Unit">Agricultural Safeguard & Biosecurity Unit</option>
-                            </select>
-                        </div>
-                        <div class="full-width" style="margin-top: 10px;">
-                            <label style="font-weight:bold;">Probable Cause & Interview Focus Details:</label>
-                            <textarea id="questioningDetailsText" style="height:70px; resize:none;" placeholder="Specify exactly why this traveler is flagged for interrogation..."></textarea>
-                        </div>
-                    </div>
-                    <div style="text-align: right; margin-top: 15px;">
-                        <button class="btn btn-submit" style="background:#e67e22; color:white;" onclick="submitQuestioning()">TRANSFER TO HOLDING</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // --- GLOBAL CLOCK ENGINE LOGIC ---
-        let currentSystemEpochTime = new Date('2026-06-21T08:00:00').getTime();
-
-        function startClockEngine() {
-            // Update time arrays metrics every second naturally
-            setInterval(() => {
-                currentSystemEpochTime += 1000;
-                updateClockDisplay();
-            }, 1000);
-            
-            // Sync initial state value inside date input
-            const nativeIso = new Date(currentSystemEpochTime).toISOString().slice(0, 16);
-            document.getElementById("timeMachineInput").value = nativeIso;
-            updateClockDisplay();
-        }
-
-        function updateClockDisplay() {
-            const dateObj = new Date(currentSystemEpochTime);
-            
-            // Standard formatting structure outputs for live header display tracking metrics
-            let dd = String(dateObj.getDate()).padStart(2, '0');
-            let mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-            let yyyy = dateObj.getFullYear();
-            let hh = String(dateObj.getHours()).padStart(2, '0');
-            let min = String(dateObj.getMinutes()).padStart(2, '0');
-            let ss = String(dateObj.getSeconds()).padStart(2, '0');
-            
-            document.getElementById("liveDisplayClock").innerText = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
-        }
-
-        function manuallyAdjustSystemTime() {
-            const chosenValue = document.getElementById("timeMachineInput").value;
-            if (chosenValue) {
-                currentSystemEpochTime = new Date(chosenValue).getTime();
-                updateClockDisplay();
-                // If immigration table view is active, trigger update to catch dynamically newly expired items
-                if(document.getElementById("immigrationWorkspace").classList.contains("active-workspace")) {
-                    renderTable();
-                }
-            }
-        }
-
-
-        // --- SECURITY ACCESS LOGIN AND ROUTING ARCHITECTURE ---
-        let loggedUserRole = null;
-
-        function handleUserSelectionChange() {
-            // Clear passwords input elements cleanly on selection changes
-            document.getElementById("loginPasswordInput").value = "";
-        }
-
-        function attemptTerminalLogin() {
-            const selectedUser = document.getElementById("loginUserDropdown").value;
-            const enteredPass = document.getElementById("loginPasswordInput").value;
-
-            if (selectedUser === "officer_emp") {
-                // Border Officer uses standard quick entry clearance
-                loginSuccess("Border Officer Desk", "immigrationWorkspace", "IMMIGRATION CORE AUDIT MANIFEST");
-            } else if (selectedUser === "caf") {
-                if (enteredPass === "1234") {
-                    loginSuccess("Cafeteria Operator [caf]", "cafeteriaWorkspace", "CAFETERIA SERVICE DESK REGISTER");
-                } else {
-                    alert("ACCESS REFUSED: Invalid credential password matching configuration for 'caf'.");
-                }
-            } else if (selectedUser === "admin") {
-                if (enteredPass === "admin123") {
-                    loginSuccess("System Administrator [Root]", "adminWorkspace", "ADMINISTRATIVE CONFIGURATION NODE");
-                } else {
-                    alert("ACCESS REFUSED: Administrative password combination mismatch error.");
-                }
-            }
-        }
-
-        function loginSuccess(roleLabel, targetWorkspaceId, interfaceTitle) {
-            loggedUserRole = selectedUser = document.getElementById("loginUserDropdown").value;
-            
-            // Update textual elements
-            document.getElementById("activeUserLabel").innerText = `Active Session: ${roleLabel}`;
-            document.getElementById("headerTitle").innerText = interfaceTitle;
-            
-            // Toggle view visibility fields
-            document.getElementById("loginGateWrapper").style.style = "none";
-            document.getElementById("loginGateWrapper").setAttribute("style", "display:none !important");
-            
-            const workspaces = document.getElementsByClassName("workspace");
-            for(let i=0; i<workspaces.length; i++) {
-                workspaces[i].classList.remove("active-workspace");
-            }
-            document.getElementById(targetWorkspaceId).classList.add("active-workspace");
-
-            if(targetWorkspaceId === "immigrationWorkspace") {
-                renderTable();
-            }
-        }
-
-        function terminateSessionInstance() {
-            loggedUserRole = null;
-            document.getElementById("loginPasswordInput").value = "";
-            document.getElementById("loginGateWrapper").setAttribute("style", "display:flex");
-            
-            const workspaces = document.getElementsByClassName("workspace");
-            for(let i=0; i<workspaces.length; i++) {
-                workspaces[i].classList.remove("active-workspace");
-            }
-            document.getElementById("activeUserLabel").innerText = "Session Profile: Guest Logged";
-            document.getElementById("headerTitle").innerText = "SYSTEM WORKSPACE SUSPENDED";
-        }
-
-
-        // --- COHORT IMMIGRATION MANIFEST SYSTEM LOGIC ---
-        const maleFirstNames = ["James", "John", "David", "Liam", "Carlos", "Omar", "Wei", "Ivan", "Kenji", "Ahmed", "Pierre", "Hans"];
-        const femaleFirstNames = ["Maria", "Anna", "Sophia", "Emma", "Fatima", "Yuki", "Chloe", "Elena", "Mei", "Priya", "Olga", "Isabella"];
-        const lastNames = ["Smith", "Garcia", "Kim", "Patel", "Muller", "Singh", "Wang", "Ivanov", "Silva", "Kowalski", "Ali", "Ahmed", "Rossi", "Tanaka"];
-        const countries = ["United Kingdom", "United States", "Canada", "Germany", "Japan", "China", "India", "Brazil", "Australia", "France", "Mexico", "Turkey"];
-        const tripReasons = ["Tourism", "Business", "Transit Only", "Diplomatic Mission", "Family Visit"];
-        const pastActions = ["PASSED", "PASSED", "PASSED", "PASSED", "ENTRY_REFUSED"];
-
-        const interpolOffenses = [
-            "CRITICAL ALERT: INTERPOL RED NOTICE // CASE_REF_9912A: Primary suspect involved in cross-border asset embezzlement schemes.",
-            "CRITICAL ALERT: INTERPOL RED NOTICE // CASE_REF_0041B: Identity document fabrication and high-yield system network exploitation.",
-            "CRITICAL ALERT: INTERPOL RED NOTICE // CASE_REF_7749X: Supply chain contraband logistics supervisor. Detain instantly.",
-            "CRITICAL ALERT: INTERPOL RED NOTICE // CASE_REF_5128F: Corporate database infiltration and unauthorized system extraction.",
-            "CRITICAL ALERT: INTERPOL RED NOTICE // CASE_REF_1102K: High-value maritime port cargo transit tracking warrant.",
-            "CRITICAL ALERT: INTERPOL RED NOTICE // CASE_REF_2281P: Strategic technology blueprint theft and unlawful delivery channels.",
-            "CRITICAL ALERT: INTERPOL RED NOTICE // CASE_REF_6019M: Financial institution system extortion coordinator.",
-            "CRITICAL ALERT: INTERPOL RED NOTICE // CASE_REF_8811Z: International cargo manifest manipulation and transit falsification.",
-            "CRITICAL ALERT: INTERPOL RED NOTICE // CASE_REF_3342D: Extradition warrant regarding complex multi-state corporate liquidation scams.",
-            "CRITICAL ALERT: INTERPOL RED NOTICE // CASE_REF_1092W: Cyber intelligence node exploitation and infrastructure vandalism."
-        ];
-
-        const localOffenses = [
-            "LOCAL STATE WARRANT: Outstanding state-level grand jury evasion & corporate tax avoidance tracking.",
-            "LOCAL STATE WARRANT: Domestic processing check default and multi-district retail fraud validation.",
-            "LOCAL STATE WARRANT: Failure to appear for regional court subpoena regarding asset manipulation fields.",
-            "LOCAL STATE WARRANT: Family court mandate breach and ongoing domestic obligation evasion tracking.",
-            "LOCAL STATE WARRANT: Unresolved municipal tax assessment default and asset freeze directives.",
-            "LOCAL STATE WARRANT: Commercial property lease conversion deception indictments.",
-            "LOCAL STATE WARRANT: Multi-county checks processing deception and identity logging failures.",
-            "LOCAL STATE WARRANT: Regional transport asset safety validation tampering investigation fields.",
-            "LOCAL STATE WARRANT: District labor standards circumvention tracking database match.",
-            "LOCAL STATE WARRANT: Non-payment of domestic support requirements registry alert."
-        ];
-
-        const database = [];
-
-        function getRandomPastLogs() {
-            let logs = [];
-            let iterations = Math.floor(1 + Math.random() * 3);
-            for (let j = 1; j <= iterations; j++) {
-                let year = Math.floor(2021 + Math.random() * 5);
-                let day = Math.floor(1 + Math.random() * 28);
-                let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                let month = months[Math.floor(Math.random() * months.length)];
-                let poe = "POE_0" + Math.floor(1 + Math.random() * 5);
-                let action = pastActions[Math.floor(Math.random() * pastActions.length)];
-                let reason = tripReasons[Math.floor(Math.random() * tripReasons.length)];
-                
-                let indexStr = j < 10 ? "0" + j : j;
-                logs.push(`${indexStr}- ARRIVAL: ${day}/${month}/${year} ${poe} | Action: ${action} | Reason: ${reason}`);
-            }
-            return logs;
-        }
-
-        function generateData() {
-            for (let i = 0; i < 100; i++) {
-                let nationality = countries[Math.floor(Math.random() * countries.length)];
-                let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                
-                let ppNo = letters.charAt(Math.floor(Math.random() * 26)) + letters.charAt(Math.floor(Math.random() * 26)) + letters.charAt(Math.floor(Math.random() * 26)) + Math.floor(10000 + Math.random() * 90000);
-                // 20% are pre-configured near historical boundary to easily evaluate date change modifications logic parameters
-                let ppExp = Math.random() < 0.20 ? "2026-07-15" : "2029-11-12";
-                let ppIssueDate = "2019-11-12";
-                let ppAuthority = "DEPARTMENT OF PASSPORTS OFFICE - " + nationality.substring(0,3).toUpperCase();
-                
-                let visaNo = "V-" + Math.floor(100000 + Math.random() * 899999);
-                let visaClass = Math.random() > 0.4 ? "B1/B2 Temporary Visitor" : "D1 Diplomatic Mission Entry";
-                let visaIssueLoc = "EMBASSY CONSULATE - " + countries[Math.floor(Math.random() * countries.length)].toUpperCase();
-                let visaIssueDate = "2025-01-10";
-                let visaExp = "2027-01-10";
-
-                let gender = Math.random() > 0.5 ? "M" : "F";
-                let age = Math.floor(22 + Math.random() * 45);
-                let dob = (2026 - age) + "-05-12";
-                
-                let firstName = gender === "M" 
-                    ? maleFirstNames[Math.floor(Math.random() * maleFirstNames.length)]
-                    : femaleFirstNames[Math.floor(Math.random() * femaleFirstNames.length)];
-
-                let photoId = Math.floor(Math.random() * 50);
-                let avatarUrl = gender === "M" 
-                    ? `https://xsgames.co/randomusers/assets/avatars/male/${photoId}.jpg`
-                    : `https://xsgames.co/randomusers/assets/avatars/female/${photoId}.jpg`;
-
-                database.push({
-                    id: i,
-                    firstName: firstName,
-                    lastName: lastNames[Math.floor(Math.random() * lastNames.length)],
-                    dob: dob,
-                    age: age,
-                    gender: gender,
-                    nationality: nationality,
-                    passportNum: ppNo,
-                    passportExpiry: ppExp,
-                    passportIssue: ppIssueDate,
-                    passportAuthority: ppAuthority,
-                    visaNum: visaNo,
-                    visaClass: visaClass,
-                    visaIssueLocation: visaIssueLoc,
-                    visaIssueDate: visaIssueDate,
-                    visaExpiry: visaExp,
-                    riskRating: "Clearance Normal",
-                    requiresManager: false,
-                    interpolWanted: false,
-                    localWanted: false,
-                    alertDetails: "",
-                    avatar: avatarUrl,
-                    previousVisits: getRandomPastLogs(),
-                    status: "Pending"
-                });
-            }
-            
-            let interpolIndices = [];
-            while(interpolIndices.length < 10) {
-                let rIdx = Math.floor(Math.random() * 100);
-                if(!interpolIndices.includes(rIdx)) interpolIndices.push(rIdx);
-            }
-            interpolIndices.forEach((dbIdx, i) => {
-                database[dbIdx].riskRating = "INTERPOL RED NOTICE";
-                database[dbIdx].requiresManager = true;
-                database[dbIdx].interpolWanted = true;
-                database[dbIdx].alertDetails = interpolOffenses[i];
-            });
-
-            let localIndices = [];
-            while(localIndices.length < 10) {
-                let rIdx = Math.floor(Math.random() * 100);
-                if(!interpolIndices.includes(rIdx) && !localIndices.includes(rIdx)) localIndices.push(rIdx);
-            }
-            localIndices.forEach((dbIdx, i) => {
-                database[dbIdx].riskRating = "LOCAL STATE WARRANT";
-                database[dbIdx].requiresManager = true;
-                database[dbIdx].localWanted = true;
-                database[dbIdx].alertDetails = localOffenses[i];
-            });
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById("tableBody");
-            tbody.innerHTML = "";
-            
-            const currentSystemDateObj = new Date(currentSystemEpochTime);
-
-            database.forEach(row => {
-                let statusClass = "status-pending";
-                if (row.status === "Approved") statusClass = "status-approved";
-                if (row.status === "Denied") statusClass = "status-denied";
-                if (row.status === "Questioning") statusClass = "status-questioning";
-
-                // Chronological check against the adjustable clock system configuration engine
-                let passportExpiryObj = new Date(row.passportExpiry);
-                let isDocExpired = (passportExpiryObj <= currentSystemDateObj);
-
-                let preCheckStr = "";
-                if (row.requiresManager) {
-                    preCheckStr = `<span class="eval-hold">⚠️ REQUIRES MANAGER CHECK</span>`;
-                } else if (isDocExpired) {
-                    preCheckStr = `<span class="eval-hold" style="background:#fadbd8; color:#78281f;">⚠️ PASSPORT EXPIRED</span>`;
-                } else {
-                    preCheckStr = `<span class="eval-ok">✅ OK TO ENTER</span>`;
-                }
-
-                let tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${row.firstName}</td>
-                    <td>${row.lastName}</td>
-                    <td>${row.nationality}</td>
-                    <td><strong>${row.passportNum}</strong></td>
-                    <td><code>${row.visaNum}</code></td>
-                    <td>${preCheckStr}</td>
-                    <td><span class="${statusClass}">${row.status}</span></td>
-                    <td><button class="btn btn-process" onclick="openModal(${row.id})">Review File</button></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function lookupPassport() {
-            const rawVal = document.getElementById("passportLookupInput").value.trim().toUpperCase();
-            const match = database.find(item => item.passportNum.toUpperCase() === rawVal);
-            if(match) {
-                openModal(match.id);
-                document.getElementById("passportLookupInput").value = ""; 
-            } else {
-                alert("PASSPORT ERROR: Serial ID mismatch or not in ledger database.");
-            }
-        }
-
-        let currentProcessingId = null;
-
-        function openModal(id) {
-            currentProcessingId = id;
-            document.getElementById("mgrPasswordInput").value = "";
-            buildOfficerLayer();
-            document.getElementById("processModal").style.display = "block";
-        }
-
-        // LAYER 1: Standard Border Guard View Workspace Deflector
-        function buildOfficerLayer() {
-            const p = database.find(item => item.id === currentProcessingId);
-            const currentSystemDateObj = new Date(currentSystemEpochTime);
-            let passportExpiryObj = new Date(p.passportExpiry);
-            let isDocExpired = (passportExpiryObj <= currentSystemDateObj);
-
-            document.getElementById("allowFormPanel").style.display = "none";
-            document.getElementById("denyFormPanel").style.display = "none";
-            document.getElementById("questioningFormPanel").style.display = "none";
-
-            // If profile is flagged or passport time matrix expired under current baseline setting, trigger lock protocols
-            if (p.requiresManager || isDocExpired) {
-                document.getElementById("optElevateContainer").style.display = "none";
-                document.getElementById("managerAuthGate").style.display = "block";
-                document.getElementById("decisionButtons").style.display = "none";
-            } else {
-                document.getElementById("optElevateContainer").style.display = "block";
-                document.getElementById("managerAuthGate").style.display = "none";
-                document.getElementById("decisionButtons").style.display = "block";
-                
-                document.getElementById("actionApproveBtn").style.display = "inline-block";
-                document.getElementById("actionDenyBtn").style.display = "none";
-                document.getElementById("actionHoldBtn").style.display = "none";
-            }
-
-            let html = `
-                <div class="photo-frame">
-                    <img src="${p.avatar}" alt="Biometric Photo">
-                </div>
-                <div class="section-heading">Officer Core Verification Deck</div>
-                <div class="data-group"><label>First Name</label><div>${p.firstName}</div></div>
-                <div class="data-group"><label>Last Name</label><div>${p.lastName}</div></div>
-                <div class="data-group"><label>Nationality</label><div>${p.nationality}</div></div>
-                <div class="data-group"><label>Passport Number</label><div><strong>${p.passportNum}</strong></div></div>
-                <div class="data-group"><label>Gender</label><div>${p.gender === 'M' ? 'Male (M)' : 'Female (F)'}</div></div>
-                <div class="data-group span-2"><label>System Routing Instructions</label>
-                    <div style="font-size:1.05rem; font-weight:bold; margin-top:4px;">
-                        ${(p.requiresManager || isDocExpired) ? '❌ ENTRY SUSPENDED — SIGNAL DESK SUPERVISOR FOR SYSTEM TERMINAL OVERRIDE' : '✅ STAND-BY CLEARANCE: AUTHORIZE DISPATCH LOGS'}
-                    </div>
-                </div>
-            `;
-            document.getElementById("modalContent").innerHTML = html;
-        }
-
-        function showOptionalAuthPanel() {
-            document.getElementById("optElevateContainer").style.display = "none";
-            document.getElementById("managerAuthGate").style.display = "block";
-        }
-
-        function verifyManagerOverride() {
-            const entryPass = document.getElementById("mgrPasswordInput").value;
-            if(entryPass === "jab1234jab") {
-                document.getElementById("managerAuthGate").style.display = "none";
-                document.getElementById("optElevateContainer").style.display = "none";
-                buildManagerLayer();
-            } else {
-                alert("ACCESS VIOLATION: Invalid credentials logged.");
-            }
-        }
-
-        // LAYER 2: Manager View Workspace Matrix
-        function buildManagerLayer() {
-            const p = database.find(item => item.id === currentProcessingId);
-            const currentSystemDateObj = new Date(currentSystemEpochTime);
-
-            document.getElementById("decisionButtons").style.display = "block";
-            document.getElementById("actionApproveBtn").style.display = "inline-block";
-            document.getElementById("actionDenyBtn").style.display = "inline-block";
-            document.getElementById("actionHoldBtn").style.display = "inline-block";
-
-            let expDate = new Date(p.passportExpiry);
-            let passportWarningStyle = (expDate <= currentSystemDateObj || (expDate - currentSystemDateObj)/(1000*60*60*24) <= 180) ? "class='expiry-alert'" : "";
-
-            let html = "";
-            if(p.interpolWanted) {
-                html += `
-                <div class="alert-banner alert-interpol-banner">
-                    <strong>🚨 MATCH LOGGED: ${p.alertDetails}</strong><br>
-                    <span>ACTION CRITERIA: OVERRIDE GRANTED. EXECUTE SYSTEM SEGREGATION FOR AUDIT HISTORY.</span>
-                </div>`;
-            } else if (p.localWanted) {
-                html += `
-                <div class="alert-banner alert-state-banner">
-                    <strong>⚠️ DOMESTIC ALERT DETECTED: ${p.alertDetails}</strong><br>
-                    <span>ACTION CRITERIA: MANDATORY LOCAL HOLD IN PLACE. ESCALATE INTERVIEW DISPATCH.</span>
-                </div>`;
-            } else if (expDate <= currentSystemDateObj) {
-                html += `
-                <div class="alert-banner" style="background-color: #78281f; color: #fff; border-left: 8px solid #c0392b;">
-                    <strong>🚨 DOCUMENT VALUE DEVIATION: PASSPORT EXPIRED IN CURRENT SYSTEM TIMELINE</strong><br>
-                    <span>Document Expiration Date: ${p.passportExpiry} | System Adjusted Baseline: ${new Date(currentSystemEpochTime).toLocaleDateString()}</span>
-                </div>`;
-            } else {
-                html += `
-                <div class="alert-banner" style="background:#e8f8f5; color:#117a65; border-left:8px solid #2cc9a0;">
-                    <strong>ℹ️ SUPERVISOR INTERVIEW AUDIT ACCESS ACTIVE</strong><br>
-                    <span>Displaying full historical record sets and visa timeline registries. Profile lacks internal system flags.</span>
-                </div>`;
-            }
-
-            html += `
-                <div class="photo-frame">
-                    <img src="${p.avatar}" alt="Biometric Photo">
-                </div>
-
-                <div class="section-heading">Biometric Personal Information [SUPERVISOR EXTENSION]</div>
-                <div class="data-group"><label>First Name</label><div>${p.firstName}</div></div>
-                <div class="data-group"><label>Last Name</label><div>${p.lastName}</div></div>
-                <div class="data-group"><label>Nationality</label><div>${p.nationality}</div></div>
-                <div class="data-group"><label>Date of Birth / Age</label><div>${p.dob} (Age: ${p.age})</div></div>
-                <div class="data-group"><label>Gender</label><div>${p.gender === 'M' ? 'Male (M)' : 'Female (F)'}</div></div>
-                <div class="data-group"><label>Detailed System Risk Assessment</label><div style="font-weight:bold; color: ${p.requiresManager ? '#cc0000' : '#27ae60'}">${p.riskRating}</div></div>
-
-                <div class="section-heading">Primary Passport Register Logs</div>
-                <div class="data-group"><label>Passport Number</label><div><strong>${p.passportNum}</strong></div></div>
-                <div class="data-group"><label>Date of Issue</label><div>${p.passportIssue}</div></div>
-                <div class="data-group"><label>Date of Expiration</label><div ${passportWarningStyle}>${p.passportExpiry}</div></div>
-                <div class="data-group span-2"><label>Issuing Authority Document Base</label><div>${p.passportAuthority}</div></div>
-
-                <div class="section-heading">Consular Visa Reference Ledger</div>
-                <div class="data-group"><label>Visa Control Number</label><div><code>${p.visaNum}</code></div></div>
-                <div class="data-group"><label>Visa Class Type</label><div>${p.visaClass}</div></div>
-                <div class="data-group"><label>Consular Place of Issue</label><div>${p.visaIssueLocation}</div></div>
-                <div class="data-group"><label>Visa Valid From</label><div>${p.visaIssueDate}</div></div>
-                <div class="data-group"><label>Visa Valid Until</label><div>${p.visaExpiry}</div></div>
-
-                <div class="section-heading" style="grid-column: 1 / -1;">Historic Cross-Border Ledger [Travel History]</div>
-                <div class="data-group full-width">
-                    <div style="background:#fafafa; border:1px solid #ddd; padding:8px; font-size:0.85rem; line-height:1.5; font-family:monospace;">
-                        ${p.previousVisits.length ? p.previousVisits.join("<br>") : "NO PRIOR TRANSIT ENTRIES RECORDED."}
-                    </div>
-                </div>
-            `;
-
-            document.getElementById("modalContent").innerHTML = html;
-        }
-
-        function closeModal() { document.getElementById("processModal").style.display = "none"; }
-        function initiateApproval() { document.getElementById("decisionButtons").style.display = "none"; document.getElementById("allowFormPanel").style.display = "block"; }
-
-        function submitApproval() {
-            const fFrom = document.getElementById("flightFrom").value;
-            const fAirline = document.getElementById("flightAirline").value;
-            const fReason = document.getElementById("flightReason").value;
-            if(!fFrom || !fAirline) { alert("Missing entry metadata parameters."); return; }
-
-            let p = database.find(item => item.id === currentProcessingId);
-            p.status = "Approved";
-            let idx = p.previousVisits.length + 1;
-            let padIdx = idx < 10 ? "0" + idx : idx;
-            p.previousVisits.push(`${padIdx}- ARRIVAL: ${new Date(currentSystemEpochTime).toLocaleDateString()} POE_04 | Action: ALLOWED | Flight: ${fAirline} from ${fFrom}`);
-
-            closeModal();
-            renderTable();
-        }
-
-        function initiateDenial() { document.getElementById("decisionButtons").style.display = "none"; document.getElementById("denyFormPanel").style.display = "block"; }
-
-        function submitDenial() {
-            const reason = document.getElementById("denyReasonText").value;
-            if(!reason.trim()) { alert("An administrative reason field is mandatory."); return; }
-            let p = database.find(item => item.id === currentProcessingId);
-            p.status = "Denied";
-            let idx = p.previousVisits.length + 1;
-            let padIdx = idx < 10 ? "0" + idx : idx;
-            p.previousVisits.push(`${padIdx}- ARRIVAL: ${new Date(currentSystemEpochTime).toLocaleDateString()} POE_04 | Action: ENTRY_REFUSED | Ground Basis: ${reason}`);
-
-            closeModal();
-            renderTable();
-        }
-
-        function initiateQuestioning() { document.getElementById("decisionButtons").style.display = "none"; document.getElementById("questioningFormPanel").style.display = "block"; }
-
-        function submitQuestioning() {
-            const targetDept = document.getElementById("questioningDept").value;
-            const detailsText = document.getElementById("questioningDetailsText").value;
-            if(!detailsText.trim()) { alert("Please provide investigation focus details."); return; }
-
-            let p = database.find(item => item.id === currentProcessingId);
-            p.status = "Questioning";
-            let idx = p.previousVisits.length + 1;
-            let padIdx = idx < 10 ? "0" + idx : idx;
-            p.previousVisits.push(`${padIdx}- ARRIVAL: ${new Date(currentSystemEpochTime).toLocaleDateString()} POE_04 | Action: DETAINED | Unit: ${targetDept}`);
-
-            closeModal();
-            renderTable();
-        }
-
-        function searchDatabase() {
-            let val = document.getElementById("searchInput").value.toUpperCase();
-            let rows = document.getElementById("tableBody").getElementsByTagName("tr");
-            for(let i=0; i<rows.length; i++) {
-                let text = rows[i].textContent || rows[i].innerText;
-                rows[i].style.display = (text.toUpperCase().indexOf(val) > -1) ? "" : "none";
-            }
-        }
-
-
-        // --- CAFETERIA SERVICES POS MODULE BLOCK ---
-        const foodInventory = [
-            { id: 101, name: "PoE Quarter Beef Burger", price: 6.50 },
-            { id: 102, name: "Crinkle Cut Salted Fries", price: 2.75 },
-            { id: 103, name: "Espresso Caffeine Shot", price: 3.00 },
-            { id: 104, name: "Fresh Orchard Apple Juice", price: 2.25 },
-            { id: 105, name: "Toasted Cheese Panini", price: 4.80 }
-        ];
+    <div class="navbar">
+        <span id="userStatus" style="color: white; font-weight: bold;">Logged Out</span>
         
-        let activePosCart = [];
+        <div class="time-control-panel">
+            <span>🕒 System Time: <b id="systemLiveClock" style="color: var(--accent);">--/--/---- --:--</b></span>
+            <input type="datetime-local" id="systemTimeWarpInput">
+            <button onclick="warpSystemTime()" style="background:var(--secondary); font-size:11px; padding:4px 8px; margin:0; width:auto;">Set Time</button>
+        </div>
 
-        function renderFoodInventoryGrid() {
-            const grid = document.getElementById("foodItemsGridContainer");
-            grid.innerHTML = "";
-            foodInventory.forEach(item => {
-                let card = document.createElement("div");
-                card.className = "food-card";
-                card.onclick = () => addItemToPosCart(item.id);
-                card.innerHTML = `
-                    <div class="title">${item.name}</div>
-                    <div class="price">$${item.price.toFixed(2)}</div>
-                `;
-                grid.appendChild(card);
-            });
+        <div>
+            <button onclick="manualRefresh()" style="background: var(--accent); color: #000; font-weight: bold; border-radius: 4px; padding: 5px 12px; margin-right: 15px;">🔄 Refresh Data</button>
+            <button onclick="showScreen('loginScreen')">Login Screen</button>
+            <button onclick="logout()" class="danger">Logout</button>
+        </div>
+    </div>
+
+    <div id="globalNotificationBar"></div>
+
+    <div id="loginScreen" class="card screen">
+        <h2>System Portal Login</h2>
+        <label>Select User Handle Profile</label>
+        <select id="loginUserSelect">
+            </select>
+        <label>System Security Password</label>
+        <input type="password" id="loginPass" placeholder="Enter password">
+        <button onclick="handleLogin()" style="background: var(--accent); color: var(--primary);">Secure Login</button>
+    </div>
+
+    <div id="cafeteriaDashboard" class="screen hidden">
+        <h2>🍔 Cafeteria Management Terminal & POS Workstation</h2>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>📦 Inventory & Product Provisioning</h3>
+                <p>Publish items to make them immediately sellable on the retail register panel.</p>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="foodItemName" placeholder="Product Name (e.g., Protein Shake)">
+                    <input type="number" id="foodItemPrice" step="0.01" placeholder="Price (JOD)">
+                    <button onclick="addFoodItemInventory()" class="secondary" style="width:180px;">Publish Item</button>
+                </div>
+            </div>
+            <div class="card">
+                <h4>📊 Session Revenue Metrics</h4>
+                <div class="financial-metric" style="color:var(--primary); border-left-color:var(--accent);">
+                    Total Food Sales Logged: <span id="totalFoodRevenueDisplay">0.00</span> JOD
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🛒 Point of Sale Terminal Engine</h3>
+            <div class="pos-grid">
+                <div>
+                    <h4>Select Items to Sell</h4>
+                    <div id="posMenuGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:12px; max-height:400px; overflow-y:auto; padding:5px;">
+                        </div>
+                </div>
+                <div class="cart-pane">
+                    <div>
+                        <h4>Active Order Summary Table</h4>
+                        <table class="cart-table">
+                            <thead><tr><th>Item Name</th><th>Qty</th><th>Subtotal</th><th>Action</th></tr></thead>
+                            <tbody id="cartTableBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="background:#f8f9fa; padding:15px; border-radius:6px; margin-top:15px; border-top:3px solid var(--dark)">
+                        <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+                            <label style="margin:0; font-size:13px; white-space:nowrap;"><b>Apply Discount %:</b></label>
+                            <input type="number" id="posDiscountInput" value="0" min="0" max="100" style="margin:0; padding:6px;" oninput="recalculateCartTotals()">
+                        </div>
+                        <div style="font-size:22px; font-weight:bold; justify-content:space-between; display:flex;">
+                            <span>Total Due:</span>
+                            <span id="cartTotalDisplay" style="color:var(--danger);">0.00 JOD</span>
+                        </div>
+                        
+                        <button onclick="initiatePOSCheckout()" class="secondary" style="margin-top:15px; padding:12px;">Process Payment Receipt</button>
+                        
+                        <div id="posCheckoutPanel" class="hidden" style="margin-top:15px; padding:12px; background:#fff; border:1px solid #ccc; border-radius:4px;">
+                            <label><b>Cash Tendered Amount (Amount Handled):</b></label>
+                            <input type="number" id="posCashHandedInput" step="0.01" placeholder="Cash amount input from client..." oninput="calculatePOSChange()">
+                            
+                            <div style="margin:10px 0; font-size:16px; font-weight:bold; color:var(--secondary);">
+                                Change Return Balance: <span id="posChangeReturnDisplay">0.00</span> JOD
+                            </div>
+                            <button id="posFinalConfirmBtn" class="warning">Confirm Order & Log Purchase</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📜 Historical Cafeteria Sales Archive Ledger</h3>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead><tr><th>Timestamp</th><th>Products Purchased</th><th>Gross Total</th><th>Discount Applied</th><th>Net Value Paid</th></tr></thead>
+                    <tbody id="cafeteriaSalesLedgerTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="employeeDashboard" class="screen hidden">
+        <h2>Employee Dashboard</h2>
+        <div class="navbar" style="background: var(--dark)">
+            <button onclick="showEmpSubTab('checkInTab')">⚡ Customer Check-In</button>
+            <button onclick="showEmpSubTab('newCustTab')">➕ Add / Renew Membership</button>
+            <button onclick="showEmpSubTab('empQuotationsTab')">📋 Quotations/Approvals Status</button>
+            <button onclick="showEmpSubTab('lookupTab')">🔍 Gym ID Finder</button>
+            <button onclick="showEmpSubTab('empInspectTab')" style="color: var(--accent);">📊 Check-Up Station (Search Pass)</button>
+        </div>
+
+        <div id="checkInTab" class="empTab card">
+            <h3>Customer Check-In Entry Gate</h3>
+            <input type="text" id="checkInCode" placeholder="Enter 5-Digit Customer Gym ID">
+            <button onclick="loadCheckInIdentity()" class="secondary">Verify Identity & Load Account</button>
+            <div id="checkInVerifyConsole" class="hidden" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 6px; border: 2px solid #ddd;"></div>
+        </div>
+
+        <div id="empInspectTab" class="empTab card hidden">
+            <h3>📊 Pass Inspector Terminal</h3>
+            <p>Input a Gym ID below to check expiry dates, verify remaining entry balances, or view complete logs.</p>
+            <input type="text" id="empInspectInput" placeholder="Enter 5-Digit Gym ID">
+            <button onclick="inspectProfile('emp')" class="secondary">Query Status</button>
+            <div id="empInspectResult" style="margin-top: 15px;"></div>
+        </div>
+
+        <div id="newCustTab" class="empTab card hidden">
+            <h3>Membership Registration & Renewal Desk</h3>
+            <div id="renewalContextBox" class="hidden"></div>
+            <div style="background: #f1f2f6; padding: 15px; margin-bottom: 20px; border-radius: 6px; border-left: 4px solid var(--accent);">
+                <h4>🔍 Member Verification</h4>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="searchMemberInput" placeholder="Enter Gym ID, First Name, or Last Name">
+                    <button onclick="searchMemberProfile()" style="width: 150px; background: var(--dark);">Verify Profile</button>
+                </div>
+                <div id="searchProfileResult" style="margin-top: 10px; font-weight: bold; color: var(--primary);"></div>
+            </div>
+            <div class="grid">
+                <div>
+                    <h4>1. Profile Demographics</h4>
+                    <input type="hidden" id="custExistingCode" value="">
+                    <label>First Name</label>
+                    <input type="text" id="custFirst" placeholder="First Name">
+                    <label>Last Name</label>
+                    <input type="text" id="custLast" placeholder="Last Name">
+                    <label>Date of Birth</label>
+                    <input type="date" id="custDOB">
+                </div>
+                <div>
+                    <h4>2. Subscription Package Configuration</h4>
+                    <select id="custSubChoice" onchange="updatePricePreview()"></select>
+                    <label>Requested Discount %</label>
+                    <input type="number" id="custDiscount" value="0" min="0" max="100" oninput="updatePricePreview()">
+                    <div id="discountReasonWrapper" class="hidden">
+                        <label style="color: var(--danger); font-weight: bold;">Reason for requesting discount *</label>
+                        <textarea id="custDiscountReason" rows="2" placeholder="Explain why this discount is required..."></textarea>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                        <span style="font-weight: normal; color: #555;">Calculated Value to Request:</span>
+                        <div id="pricePreview" style="font-size: 20px; font-weight: bold; color: var(--secondary);">0 JOD</div>
+                    </div>
+                    <button onclick="submitCustomerRegistration()" class="secondary">Send Proposal / Confirm Package</button>
+                    <button onclick="clearRegistrationForm()" style="background:#bdc3c7; color:#333; margin-top:5px;">Clear / Reset Form</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="empQuotationsTab" class="empTab card hidden">
+            <h3>Submitted Quotations & Notes Tracker</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead><tr><th>Gym ID</th><th>Customer</th><th>Option</th><th>Original Price</th><th>Requested Disc %</th><th>Proposed Final</th><th>Your Stated Reason</th><th>Status</th><th>Manager Memo</th><th>Action</th></tr></thead>
+                    <tbody id="empQuotationsTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="lookupTab" class="empTab card hidden">
+            <h3>🔍 Forgotten Gym ID Emergency Lookup</h3>
+            <div class="grid">
+                <div>
+                    <label>Customer First Name</label>
+                    <input type="text" id="lookupFirst" placeholder="Enter customer first name">
+                    <label>Date of Birth</label>
+                    <input type="date" id="lookupDOB">
+                    <button onclick="lookupGymID()" class="warning">Query Database</button>
+                </div>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px dashed #ccc;">
+                    <h4>Lookup Result:</h4>
+                    <div id="lookupResultDisplay" style="font-size: 24px; font-weight: bold; color: var(--primary);">No Query Processed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="managerDashboard" class="screen hidden">
+        <h2>Manager Control Panel</h2>
+        
+        <div class="card">
+            <h4>📈 Financial Integrity Metrics</h4>
+            <div class="financial-metric">
+                Total Net Funds Collected (Gym): <span id="totalRevenueDisplay">0</span> JOD
+            </div>
+        </div>
+
+        <div class="navbar" style="background: var(--dark)">
+            <button onclick="showMgrSubTab('mgrSubOptionsTab')">🏋️ Gym Packages</button>
+            <button onclick="showMgrSubTab('mgrStaffTab')">👥 Manage Staff</button>
+            <button onclick="showMgrSubTab('mgrApprovalsTab')">🔔 Discount Desk</button>
+            <button onclick="showMgrSubTab('mgrRefundsTab')">🛡️ Membership Control & Logs</button>
+            <button onclick="showMgrSubTab('mgrInspectTab')" style="color: var(--accent);">📊 Pass Inspector Terminal</button>
+            <button onclick="showMgrSubTab('mgrSystemTab')" style="color: #ff9f9f;">⚙️ System Tools</button>
+        </div>
+
+        <div id="mgrInspectTab" class="mgrTab card hidden">
+            <h3>📊 Manager Pass Inspector</h3>
+            <p>Instantly inspect account metrics, validation state, and history logs by inputting a Gym ID.</p>
+            <input type="text" id="mgrInspectInput" placeholder="Enter 5-Digit Gym ID">
+            <button onclick="inspectProfile('mgr')" class="secondary">Query Status</button>
+            <div id="mgrInspectResult" style="margin-top: 15px;"></div>
+        </div>
+
+        <div id="mgrSubOptionsTab" class="mgrTab card">
+            <h3>Gym Subscription Packages</h3>
+            <div class="grid">
+                <div>
+                    <h4>Add Package Structure</h4>
+                    <input type="text" id="optName" placeholder="Package Description Name">
+                    <input type="number" id="optPrice" placeholder="Standard Base Price (JOD)">
+                    <label>Tracking Rules Matrix:</label>
+                    <select id="optType" onchange="toggleOptFields()">
+                        <option value="time">Time-Based Range</option>
+                        <option value="entry">Fixed Entries Volume</option>
+                    </select>
+                    <div id="timeFields">
+                        <input type="number" id="optDays" placeholder="Days of Total Active Duration">
+                    </div>
+                    <div id="entryFields" class="hidden">
+                        <input type="number" id="optEntries" placeholder="Quantity of Check-Ins Allowed">
+                        <input type="number" id="optExpiryDays" placeholder="Automatic Expiration Lifespan (Days)">
+                    </div>
+                    <button onclick="addGymOption()">Publish Gym Option</button>
+                </div>
+                <div>
+                    <h4>Available Active Pricing Configs</h4>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead><tr><th>Name</th><th>Base Cost</th><th>Logic Type</th><th>Operational Details</th><th>Action</th></tr></thead>
+                            <tbody id="gymOptionsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mgrStaffTab" class="mgrTab card hidden">
+            <h3>Staff Deployment Access Keys</h3>
+            <div class="grid">
+                <div>
+                    <h4>Create Employee Profile</h4>
+                    <input type="text" id="empUser" placeholder="System Handle / Username">
+                    <input type="password" id="empPass" placeholder="System Security Password">
+                    <button onclick="addEmployee()">Generate Account Credentials</button>
+                </div>
+                <div>
+                    <h4>Authorized Staff Profiles & Security Clearances</h4>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead><tr><th>Operator Username</th><th>Secure Passcode</th><th>Action Access</th></tr></thead>
+                            <tbody id="staffTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mgrApprovalsTab" class="mgrTab card hidden">
+            <h3>Pending Discount Approvals Queue</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead><tr><th>Gym ID Mode</th><th>Customer</th><th>Subscription Target</th><th>Staff Requested %</th><th>Target Price</th><th>Employee Reason</th><th>Counter %</th><th>Action Rules Panel</th></tr></thead>
+                    <tbody id="mgrApprovalsTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="mgrRefundsTab" class="mgrTab card hidden">
+            <h3>Membership Master Control Panel & Access History Logs</h3>
+            <p style="font-size:12px; color:var(--accent);">💡 <i>Click anywhere on a row to review the member's complete structural profile and historical log archives.</i></p>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead><tr><th>Access Code</th><th>Full Name</th><th>Active Status</th><th>Metric Details</th><th>Net Paid Cash</th><th>Check-Ins Count</th><th>Actions Panel</th></tr></thead>
+                    <tbody id="mgrRefundsTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="mgrSystemTab" class="mgrTab card hidden">
+            <h3>⚙️ System Administration Tools</h3>
+            <div id="mgrPromptContainer" style="margin-bottom: 15px;"></div>
+            <div class="reset-box">
+                <h4>⚠️ Destructive Action: Factory System Reset</h4>
+                <p>Performing a system factory reset will permanently erase all data records.</p>
+                <button onclick="promptFactoryReset()" class="danger" style="padding: 15px; font-size: 16px;">🔥 Execute Complete Factory Reset</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="profileModal" class="modal hidden" onclick="handleModalOutsideClick(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-modal" onclick="closeProfileModal()">&times;</span>
+        <h2 id="modalTitle" style="border-bottom: 2px solid var(--accent); padding-bottom: 5px; margin-top:0;">Member Profile File</h2>
+        <div id="modalMeta" style="margin-bottom: 15px; font-size: 14px; line-height: 1.6;"></div>
+        <h3>📜 Historical Subscription Ledger & Security Audits</h3>
+        <div id="modalLogsContainer" style="background: #f1f2f6; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 12px; max-height: 250px; overflow-y: auto; border: 1px solid #ddd;"></div>
+    </div>
+</div>
+
+<script>
+    // --- CONTINUOUS TIME MACHINE SIMULATOR ENGINE ---
+    let systemClockOffsetMilliseconds = 0; 
+    
+    function getSystemSimulatedTime() {
+        return new Date(Date.now() + systemClockOffsetMilliseconds);
+    }
+
+    function runClockEngineTick() {
+        const simulatedDate = getSystemSimulatedTime();
+        const year = simulatedDate.getFullYear();
+        const month = String(simulatedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(simulatedDate.getDate()).padStart(2, '0');
+        const hours = String(simulatedDate.getHours()).padStart(2, '0');
+        const minutes = String(simulatedDate.getMinutes()).padStart(2, '0');
+        
+        document.getElementById('systemLiveClock').innerText = `${day}/${month}/${year} ${hours}:${minutes}`;
+        setTimeout(runClockEngineTick, 1000);
+    }
+
+    function warpSystemTime() {
+        const val = document.getElementById('systemTimeWarpInput').value;
+        if(!val) return printNotification("Select a valid destination date & time value.", "error");
+        
+        const targetDateTime = new Date(val);
+        systemClockOffsetMilliseconds = targetDateTime.getTime() - Date.now();
+        printNotification(`🕒 System clock advanced to customized time structure execution point.`, "success");
+    }
+
+    // --- DATABASE HYDRATION ---
+    function initDatabase(forceReset = false) {
+        if(forceReset) localStorage.clear();
+        if(!localStorage.getItem('gymOptions')) {
+            localStorage.setItem('gymOptions', JSON.stringify([
+                { id: 1, name: "1 Month Unlimited", price: 50, type: "time", days: 30 },
+                { id: 2, name: "12 Entries Standard Pass", price: 40, type: "entry", entries: 12, expiryDays: 45 }
+            ]));
         }
-
-        function addNewFoodToInventory() {
-            const nameInp = document.getElementById("newFoodName").value.trim();
-            const priceInp = parseFloat(document.getElementById("newFoodPrice").value);
-            
-            if (!nameInp || isNaN(priceInp) || priceInp <= 0) {
-                alert("INVENTORY ERROR: Please input valid food identification parameters and non-zero positive prices.");
-                return;
-            }
-
-            const newId = Date.now();
-            foodInventory.push({ id: newId, name: nameInp, price: priceInp });
-            
-            document.getElementById("newFoodName").value = "";
-            document.getElementById("newFoodPrice").value = "";
-            renderFoodInventoryGrid();
+        if(!localStorage.getItem('staff')) {
+            localStorage.setItem('staff', JSON.stringify([{ user: "emp1", pass: "emp1" }]));
         }
+        if(!localStorage.getItem('foodItems')) {
+            localStorage.setItem('foodItems', JSON.stringify([
+                { id: 1, name: "Protein Shake", price: 3.50 },
+                { id: 2, name: "Energy Bar", price: 1.75 },
+                { id: 3, name: "Pre-Workout Scoop", price: 2.00 }
+            ]));
+        }
+        if(!localStorage.getItem('foodSales')) { localStorage.setItem('foodSales', JSON.stringify([])); }
+        if(!localStorage.getItem('customers')) { localStorage.setItem('customers', JSON.stringify([])); }
+        if(!localStorage.getItem('quotations')) { localStorage.setItem('quotations', JSON.stringify([])); }
+        
+        rebuildLoginUserDropdown();
+    }
 
-        function addItemToPosCart(itemId) {
-            const targetItem = foodInventory.find(i => i.id === itemId);
-            if (!targetItem) return;
+    function rebuildLoginUserDropdown() {
+        const select = document.getElementById('loginUserSelect');
+        let html = `
+            <option value="admin">Admin (Executive Control Panel)</option>
+            <option value="caf">Caf (Cafeteria POS Station)</option>
+        `;
+        const staff = JSON.parse(localStorage.getItem('staff')) || [];
+        staff.forEach(s => {
+            html += `<option value="${s.user}">Employee: ${s.user}</option>`;
+        });
+        select.innerHTML = html;
+    }
 
-            const existingCartItem = activePosCart.find(c => c.id === itemId);
-            if (existingCartItem) {
-                existingCartItem.quantity += 1;
+    let currentUser = null, userRole = null;
+    let posActiveCart = [];
+
+    window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeProfileModal();
+    });
+    function handleModalOutsideClick(e) { closeProfileModal(); }
+
+    function printNotification(message, statusType = 'info') {
+        const target = document.getElementById('globalNotificationBar');
+        target.innerHTML = `<div class="ui-notification ui-${statusType}">${message}</div>`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => { target.innerHTML = ""; }, 7000);
+    }
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+        document.getElementById(screenId).classList.remove('hidden');
+        document.getElementById('globalNotificationBar').innerHTML = "";
+    }
+    function showEmpSubTab(tabId) {
+        document.querySelectorAll('.empTab').forEach(t => t.classList.add('hidden'));
+        document.getElementById(tabId).classList.remove('hidden');
+        document.getElementById('checkInVerifyConsole').classList.add('hidden');
+    }
+    function showMgrSubTab(tabId) {
+        document.querySelectorAll('.mgrTab').forEach(t => t.classList.add('hidden'));
+        document.getElementById(tabId).classList.remove('hidden');
+        document.getElementById('mgrPromptContainer').innerHTML = "";
+    }
+    function manualRefresh() {
+        if (userRole === 'manager') renderManagerData();
+        else if (userRole === 'employee') renderEmployeeData();
+        else if (userRole === 'cafeteria') renderCafeteriaData();
+        printNotification("🔄 Real-time database entities synchronized successfully.", "success");
+    }
+
+    // --- AUTH SECURITY CORE ---
+    function handleLogin() {
+        const selectedUser = document.getElementById('loginUserSelect').value;
+        const p = document.getElementById('loginPass').value;
+        
+        if(selectedUser === 'admin' && p === 'admin') {
+            currentUser = 'admin'; userRole = 'manager';
+            document.getElementById('userStatus').innerText = "Logged In: Muscle Power Admin";
+            showScreen('managerDashboard'); renderManagerData();
+        } else if (selectedUser === 'caf' && p === '1234') {
+            currentUser = 'caf'; userRole = 'cafeteria';
+            document.getElementById('userStatus').innerText = "Logged In: Cafeteria Register";
+            showScreen('cafeteriaDashboard'); renderCafeteriaData();
+        } else {
+            const staff = JSON.parse(localStorage.getItem('staff')) || [];
+            const found = staff.find(s => s.user === selectedUser && s.pass === p);
+            if(found) {
+                currentUser = selectedUser; userRole = 'employee';
+                document.getElementById('userStatus').innerText = `Logged In Operator: ${selectedUser}`;
+                showScreen('employeeDashboard'); renderEmployeeData();
+            } else { printNotification("Authorization Denied: Invalid Password Match.", "error"); }
+        }
+        document.getElementById('loginPass').value = "";
+    }
+    
+    function logout() {
+        currentUser = null; userRole = null;
+        document.getElementById('userStatus').innerText = "Logged Out Secured";
+        showScreen('loginScreen');
+    }
+
+    // --- REGISTERED WORKFLOW CALCULATORS ---
+    function updatePricePreview() {
+        const subId = document.getElementById('custSubChoice').value;
+        const discPercent = parseFloat(document.getElementById('custDiscount').value) || 0;
+        document.getElementById('discountReasonWrapper').classList.toggle('hidden', discPercent <= 0);
+        const options = JSON.parse(localStorage.getItem('gymOptions'));
+        const opt = options.find(o => o.id == subId);
+        if(opt) {
+            document.getElementById('pricePreview').innerText = `${Math.round(opt.price * (1 - (discPercent / 100)))} JOD`;
+        }
+    }
+    function toggleOptFields() {
+        const type = document.getElementById('optType').value;
+        document.getElementById('timeFields').classList.toggle('hidden', type !== 'time');
+        document.getElementById('entryFields').classList.toggle('hidden', type !== 'entry');
+    }
+
+    function searchMemberProfile() {
+        const query = document.getElementById('searchMemberInput').value.trim().toLowerCase();
+        if(!query) return printNotification("Please enter lookup parameters.", "error");
+        const customers = JSON.parse(localStorage.getItem('customers'));
+        const matched = customers.find(c => c.code === query || c.first.toLowerCase() === query || c.last.toLowerCase() === query);
+        const resultDiv = document.getElementById('searchProfileResult');
+        if(matched) {
+            resultDiv.innerHTML = `✅ Profile Confirmed: ${matched.first} ${matched.last} (ID: ${matched.code}) - Status: [${matched.status}]`;
+            document.getElementById('custExistingCode').value = matched.code;
+            document.getElementById('custFirst').value = matched.first; document.getElementById('custLast').value = matched.last; document.getElementById('custDOB').value = matched.dob;
+            document.getElementById('custFirst').disabled = true; document.getElementById('custLast').disabled = true; document.getElementById('custDOB').disabled = true;
+        } else {
+            resultDiv.innerHTML = `❌ No profile match. Form values will initialize a brand new system user record profile.`;
+            document.getElementById('custExistingCode').value = "";
+            document.getElementById('custFirst').disabled = false; document.getElementById('custLast').disabled = false; document.getElementById('custDOB').disabled = false;
+        }
+    }
+
+    function clearRegistrationForm() {
+        document.getElementById('custExistingCode').value = "";
+        document.getElementById('custFirst').value = ""; document.getElementById('custLast').value = ""; document.getElementById('custDOB').value = "";
+        document.getElementById('custDiscount').value = "0"; document.getElementById('custDiscountReason').value = "";
+        document.getElementById('searchMemberInput').value = ""; document.getElementById('searchProfileResult').innerHTML = "";
+        document.getElementById('custFirst').disabled = false; document.getElementById('custLast').disabled = false; document.getElementById('custDOB').disabled = false;
+        document.getElementById('renewalContextBox').classList.add('hidden');
+        updatePricePreview();
+    }
+
+    // --- INTERACTIVE RETRIEVAL INSPECTOR HOOKS ---
+    function inspectProfile(role) {
+        const code = document.getElementById(`${role}InspectInput`).value.trim();
+        const dest = document.getElementById(`${role}InspectResult`);
+        if(!code) return printNotification("Input a valid execution query ID.", "error");
+        
+        const customers = JSON.parse(localStorage.getItem('customers'));
+        const cust = customers.find(c => c.code === code);
+        
+        if(!cust) {
+            dest.innerHTML = `<div style="color:var(--danger); font-weight:bold;">❌ Gym ID code lookup returned 0 system records.</div>`;
+            return;
+        }
+        
+        let subMetric = cust.opt.type === 'time' ? `<b>Expiration Date:</b> ${cust.expiryDate || 'Lapsed'}` : `<b>Entries Remaining:</b> ${cust.entriesLeft !== null ? cust.entriesLeft : '0'}`;
+        dest.innerHTML = `
+            <div class="card" style="border-left: 5px solid var(--accent); background: #fafafa;">
+                <h4>👤 Profile Status: ${cust.first} ${cust.last} (ID: ${cust.code})</h4>
+                <p><b>Account Standing:</b> <span class="badge badge-${cust.status.toLowerCase()}">${cust.status}</span></p>
+                <p><b>Package Active:</b> ${cust.opt.name} (${cust.opt.price} JOD Base)</p>
+                <p>${subMetric}</p>
+                <p><b>Total Historical Visits logged:</b> ${cust.totalCheckIns}</p>
+                <button class="warning" onclick="launchProfileModal('${cust.code}')" style="width:auto; padding:5px 15px;">View Detailed Audits</button>
+            </div>`;
+    }
+
+    function lookupGymID() {
+        const first = document.getElementById('lookupFirst').value.trim().toLowerCase();
+        const dob = document.getElementById('lookupDOB').value;
+        if(!first || !dob) return printNotification("Fill out search credentials.", "error");
+        const customers = JSON.parse(localStorage.getItem('customers'));
+        const matched = customers.find(c => c.first.toLowerCase() === first && c.dob === dob);
+        const display = document.getElementById('lookupResultDisplay');
+        if(matched) display.innerHTML = `<span style="color:var(--secondary); font-size:28px;">ID: ${matched.code}</span><br><small>${matched.first} ${matched.last}</small>`;
+        else display.innerHTML = `<span style="color:var(--danger); font-size:18px;">No Profile Match Found</span>`;
+    }
+
+    function launchProfileModal(code) {
+        const customers = JSON.parse(localStorage.getItem('customers'));
+        const cust = customers.find(c => c.code === code);
+        if(!cust) return;
+
+        document.getElementById('modalTitle').innerText = `Member Profile: ${cust.first} ${cust.last}`;
+        document.getElementById('modalMeta').innerHTML = `
+            <b>Gym ID Access Key:</b> ${cust.code}<br>
+            <b>Date of Birth:</b> ${cust.dob}<br>
+            <b>Financial Balance Contributed:</b> ${cust.paid} JOD<br>
+            <b>Current Membership Status:</b> <span class="badge badge-${cust.status.toLowerCase()}">${cust.status}</span>
+        `;
+        
+        let logsHtml = cust.logs.length > 0 ? cust.logs.map(l => `<div>• ${l}</div>`).join('') : '<div>No historical events mapped.</div>';
+        document.getElementById('modalLogsContainer').innerHTML = logsHtml;
+        document.getElementById('profileModal').classList.remove('hidden');
+    }
+    function closeProfileModal() { document.getElementById('profileModal').classList.add('hidden'); }
+
+    // --- PACKAGES & EMPLOYEES CONFIGURATION ---
+    function addGymOption() {
+        const name = document.getElementById('optName').value, price = parseFloat(document.getElementById('optPrice').value), type = document.getElementById('optType').value;
+        if(!name || !price) return printNotification("Validation Failed.", "error");
+        let options = JSON.parse(localStorage.getItem('gymOptions'));
+        let newOpt = { id: Date.now(), name, price, type };
+        if(type === 'time') newOpt.days = parseInt(document.getElementById('optDays').value) || 30;
+        else { newOpt.entries = parseInt(document.getElementById('optEntries').value) || 10; newOpt.expiryDays = parseInt(document.getElementById('optExpiryDays').value) || 30; }
+        options.push(newOpt); localStorage.setItem('gymOptions', JSON.stringify(options)); renderManagerData(); printNotification("Package Config Published.", "success");
+    }
+    function deleteGymOption(id) {
+        let options = JSON.parse(localStorage.getItem('gymOptions'));
+        options = options.filter(o => o.id !== id); localStorage.setItem('gymOptions', JSON.stringify(options)); renderManagerData();
+    }
+    function addEmployee() {
+        const user = document.getElementById('empUser').value, pass = document.getElementById('empPass').value;
+        if(!user || !pass) return printNotification("Missing details.", "error");
+        let staff = JSON.parse(localStorage.getItem('staff')) || [];
+        staff.push({ user, pass }); localStorage.setItem('staff', JSON.stringify(staff)); renderManagerData();
+        document.getElementById('empUser').value = ""; document.getElementById('empPass').value = "";
+        printNotification("Staff Credentials Generated.", "success");
+    }
+    function deleteEmployee(username) {
+        let staff = JSON.parse(localStorage.getItem('staff'));
+        staff = staff.filter(s => s.user !== username); localStorage.setItem('staff', JSON.stringify(staff)); renderManagerData();
+        printNotification("Staff Clearance Revoked.", "info");
+    }
+
+    // --- GYM MEMBERSHIP PIPELINES ---
+    function submitCustomerRegistration() {
+        const first = document.getElementById('custFirst').value, last = document.getElementById('custLast').value, dob = document.getElementById('custDOB').value;
+        const subId = document.getElementById('custSubChoice').value, discount = parseFloat(document.getElementById('custDiscount').value) || 0, reason = document.getElementById('custDiscountReason').value.trim();
+        const existingCode = document.getElementById('custExistingCode').value;
+
+        if(!first || !last || !dob) return printNotification("Fill core parameters.", "error");
+        if(discount > 0 && !reason) return printNotification("A discount justification text statement is mandatory.", "error");
+
+        const options = JSON.parse(localStorage.getItem('gymOptions'));
+        const opt = options.find(o => o.id == subId);
+        let finalPrice = Math.round(opt.price * (1 - (discount / 100)));
+        const code = existingCode ? existingCode : Math.floor(10000 + Math.random() * 90000).toString();
+
+        let q = { id: Date.now(), isRenewal: !!existingCode, code, first, last, dob, opt, discount, finalPrice, status: "Pending", empReason: reason, mgrNote: "" };
+
+        if(discount === 0) {
+            const confirmationDiv = document.getElementById('renewalContextBox');
+            confirmationDiv.className = "ui-notification ui-info";
+            confirmationDiv.classList.remove('hidden');
+            confirmationDiv.innerHTML = `
+                <p>💸 <b>Immediate Direct Payment Checkout Required:</b> Collect <b>${finalPrice} JOD</b> from ${first} ${last}.</p>
+                <button class="secondary" style="width:auto; margin-right:10px;" id="execDirectPayBtn">Confirm Cash Received & Activate</button>
+                <button class="danger" style="width:auto;" onclick="document.getElementById('renewalContextBox').classList.add('hidden')">Cancel Transaction</button>
+            `;
+            confirmationDiv.querySelector('#execDirectPayBtn').onclick = function() {
+                activateCustomer(q);
+                printNotification(`🎉 Active Membership Confirmed! GYM ID for ${first}: ${code}`, "success");
+                clearRegistrationForm();
+            };
+        } else {
+            let quotations = JSON.parse(localStorage.getItem('quotations')); quotations.push(q);
+            localStorage.setItem('quotations', JSON.stringify(quotations)); 
+            printNotification(`Quotation Proposal sent to Manager Vault for Approval.`, "info");
+            clearRegistrationForm(); renderEmployeeData();
+        }
+    }
+
+    function activateCustomer(q) {
+        let customers = JSON.parse(localStorage.getItem('customers'));
+        let targetCust = customers.find(c => c.code === q.code);
+        let timestampStr = getSystemSimulatedTime().toLocaleDateString();
+
+        if(targetCust) {
+            targetCust.opt = q.opt;
+            targetCust.paid += q.finalPrice;
+            targetCust.status = "Active";
+            targetCust.logs.push(`[Renewal] Active Sub: "${q.opt.name}" processed for ${q.finalPrice} JOD on ${timestampStr}.`);
+            if(q.opt.type === 'time') {
+                let exp = getSystemSimulatedTime(); exp.setDate(exp.getDate() + q.opt.days);
+                targetCust.expiryDate = exp.toISOString().split('T')[0]; targetCust.entriesLeft = null;
             } else {
-                activePosCart.push({
-                    id: targetItem.id,
-                    name: targetItem.name,
-                    price: targetItem.price,
-                    quantity: 1
-                });
+                targetCust.entriesLeft = (targetCust.entriesLeft || 0) + q.opt.entries; targetCust.expiryDate = null;
+                targetCust.expiryDaysRule = q.opt.expiryDays;
             }
-            renderActiveCartItems();
+        } else {
+            let newCustomer = {
+                code: q.code, first: q.first, last: q.last, dob: q.dob, opt: q.opt, paid: q.finalPrice, status: "Active", logs: [`Profile Created. Selected Base: "${q.opt.name}" on ${timestampStr}`], totalCheckIns: 0
+            };
+            if(q.opt.type === 'time') {
+                let exp = getSystemSimulatedTime(); exp.setDate(exp.getDate() + q.opt.days); newCustomer.expiryDate = exp.toISOString().split('T')[0];
+            } else { newCustomer.entriesLeft = q.opt.entries; newCustomer.expiryDaysRule = q.opt.expiryDays; newCustomer.expiryDate = null; }
+            customers.push(newCustomer);
+        }
+        localStorage.setItem('customers', JSON.stringify(customers));
+    }
+
+    // --- ALERT-FREE GATE TERMINAL CHECK-IN ---
+    function loadCheckInIdentity() {
+        const code = document.getElementById('checkInCode').value.trim();
+        const consoleDest = document.getElementById('checkInVerifyConsole');
+        consoleDest.innerHTML = ""; consoleDest.classList.add('hidden');
+
+        let customers = JSON.parse(localStorage.getItem('customers'));
+        let cust = customers.find(c => c.code === code);
+
+        if(!cust) {
+            consoleDest.className = "ui-notification ui-error"; consoleDest.innerHTML = "❌ <b>Access Interrupted:</b> Gym ID code not found in active registers.";
+            consoleDest.classList.remove('hidden'); return;
+        }
+        
+        // Evaluate Expirations contextually using Time-Machine simulated values
+        const currentSimulatedTime = getSystemSimulatedTime();
+        if(cust.opt.type === 'time' && cust.expiryDate) {
+            if(new Date(cust.expiryDate + "T23:59:59") < currentSimulatedTime && cust.status === "Active") {
+                cust.status = "Expired";
+                localStorage.setItem('customers', JSON.stringify(customers));
+            }
         }
 
-        function renderActiveCartItems() {
-            const tbody = document.getElementById("cartReceiptBody");
-            tbody.innerHTML = "";
-            
-            activePosCart.forEach(item => {
-                let subTotal = item.price * item.quantity;
-                let tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td><strong>${item.name}</strong></td>
-                    <td style="text-align:right;">x${item.quantity}</td>
-                    <td style="text-align:right;">$${item.price.toFixed(2)}</td>
-                    <td style="text-align:right; font-weight:500;">$${subTotal.toFixed(2)}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            recomputePosTotals();
+        if(cust.status === "Suspended" || cust.status === "Refunded" || cust.status === "Expired" || cust.status === "Depleted") {
+            consoleDest.className = "ui-notification ui-error";
+            consoleDest.innerHTML = `❌ <b>ENTRY DENIED:</b> Membership profile state flagged as [${cust.status}]. Gate Interceptor Locked.`;
+            consoleDest.classList.remove('hidden'); return;
         }
 
-        function recomputePosTotals() {
-            let grossSubtotal = 0;
-            activePosCart.forEach(i => { grossSubtotal += (i.price * i.quantity); });
+        if(cust.opt.type === 'entry' && cust.entriesLeft <= 0) {
+            cust.status = "Depleted"; localStorage.setItem('customers', JSON.stringify(customers));
+            consoleDest.className = "ui-notification ui-error"; consoleDest.innerHTML = "❌ <b>ENTRY DENIED:</b> 0 Entries remaining.";
+            consoleDest.classList.remove('hidden'); return;
+        }
 
-            const discountRaw = document.getElementById("posDiscountInput").value.trim();
-            let calculatedDiscount = 0;
+        consoleDest.className = "card"; consoleDest.classList.remove('hidden');
+        let balanceString = cust.opt.type === 'time' ? `Time Range Pass (Expires: ${cust.expiryDate})` : `${cust.entriesLeft} Entries Left`;
 
-            if (discountRaw) {
-                if (discountRaw.endsWith("%")) {
-                    let percentVal = parseFloat(discountRaw.replace("%", ""));
-                    if (!isNaN(percentVal) && percentVal > 0) {
-                        calculatedDiscount = grossSubtotal * (percentVal / 100);
-                    }
+        consoleDest.innerHTML = `
+            <h4 style="color:var(--secondary); border-bottom:1px solid #ddd; padding-bottom:5px;">👤 Member Profile Verification Match</h4>
+            <table style="margin-bottom:15px; background:white;">
+                <tr><td><b>Full Name:</b></td><td>${cust.first} ${cust.last}</td></tr>
+                <tr><td><b>Gym ID Key:</b></td><td><code>${cust.code}</code></td></tr>
+                <tr><td><b>Current Balance:</b></td><td>${balanceString}</td></tr>
+                <tr><td><b>Total Lifetime Visits:</b></td><td>${cust.totalCheckIns} check-ins</td></tr>
+            </table>
+            <button class="secondary" style="width:auto; margin-right:10px;" id="executeGateCheckInBtn">Confirm & Grant Entry</button>
+            <button class="danger" style="width:auto;" onclick="document.getElementById('checkInVerifyConsole').classList.add('hidden')">Cancel</button>
+        `;
+
+        consoleDest.querySelector('#executeGateCheckInBtn').onclick = function() {
+            let latestCustomers = JSON.parse(localStorage.getItem('customers'));
+            let active = latestCustomers.find(c => c.code === cust.code);
+            let timestamp = getSystemSimulatedTime().toLocaleString();
+
+            if(active.opt.type === 'time') {
+                if(new Date(active.expiryDate + "T23:59:59") < getSystemSimulatedTime()) {
+                    active.status = "Expired";
+                    consoleDest.className = "ui-notification ui-error"; consoleDest.innerHTML = "❌ <b>Access Lapsed:</b> Time window has officially expired.";
                 } else {
-                    let fixedVal = parseFloat(discountRaw.replace("$", ""));
-                    if (!isNaN(fixedVal) && fixedVal > 0) {
-                        calculatedDiscount = fixedVal;
-                    }
+                    active.logs.push(`Check-In Approved: ${timestamp}`); active.totalCheckIns++;
+                    consoleDest.className = "ui-notification ui-success";
+                    consoleDest.innerHTML = `✅ <b>Entry Authorized!</b> Welcome back, ${active.first}. Total visits: ${active.totalCheckIns}.`;
+                    document.getElementById('checkInCode').value = "";
+                }
+            } else {
+                if(active.entriesLeft <= 0) {
+                    active.status = "Depleted";
+                    consoleDest.className = "ui-notification ui-error"; consoleDest.innerHTML = "❌ <b>Access Denied:</b> Entries balance exhausted.";
+                } else {
+                    active.entriesLeft--; active.totalCheckIns++;
+                    active.logs.push(`Check-In Approved (${active.entriesLeft} left): ${timestamp}`);
+                    consoleDest.className = "ui-notification ui-success";
+                    consoleDest.innerHTML = `✅ <b>Access Authorized!</b> Passes Remaining: ${active.entriesLeft}. Enjoy your workout, ${active.first}!`;
+                    if(active.entriesLeft <= 0) active.status = "Depleted";
+                    document.getElementById('checkInCode').value = "";
                 }
             }
+            localStorage.setItem('customers', JSON.stringify(latestCustomers));
+        };
+    }
 
-            if (calculatedDiscount > grossSubtotal) calculatedDiscount = grossSubtotal;
+    function acceptCounter(id) {
+        let quotations = JSON.parse(localStorage.getItem('quotations')), q = quotations.find(x => x.id === id);
+        const confirmationDiv = document.getElementById('globalNotificationBar');
+        confirmationDiv.className = "ui-notification ui-info";
+        confirmationDiv.innerHTML = `
+            <p>🤝 <b>Process Counter-Offer Terms:</b> Confirm client paid exactly <b>${q.finalPrice} JOD</b>?</p>
+            <button class="secondary" style="width:auto; margin-right:10px;" id="confirmCounterBtn">Payment Received</button>
+            <button class="danger" style="width:auto;" onclick="this.parentElement.innerHTML=''">Cancel</button>
+        `;
+        confirmationDiv.querySelector('#confirmCounterBtn').onclick = function() {
+            activateCustomer(q); printNotification(`🎉 Active Membership Confirmed! GYM ID: ${q.code}`, "success");
+            quotations = quotations.filter(x => x.id !== id); localStorage.setItem('quotations', JSON.stringify(quotations));
+            renderEmployeeData();
+        };
+    }
 
-            let netTotal = grossSubtotal - calculatedDiscount;
-            if (netTotal < 0) netTotal = 0;
+    // --- NEW: CAFETERIA MANAGEMENT ENGINE FUNCTIONS ---
+    function addFoodItemInventory() {
+        const name = document.getElementById('foodItemName').value.trim();
+        const price = parseFloat(document.getElementById('foodItemPrice').value);
+        if(!name || isNaN(price) || price <= 0) return printNotification("Provide a valid item profile name and monetary value.", "error");
 
-            // Render to physical receipt totals UI
-            document.getElementById("lblGrossSubtotal").innerText = `$${grossSubtotal.toFixed(2)}`;
-            document.getElementById("lblDiscountDeduction").innerText = `-$${calculatedDiscount.toFixed(2)}`;
-            document.getElementById("lblNetOrderTotal").innerText = `$${netTotal.toFixed(2)}`;
+        let items = JSON.parse(localStorage.getItem('foodItems')) || [];
+        items.push({ id: Date.now(), name, price: parseFloat(price.toFixed(2)) });
+        localStorage.setItem('foodItems', JSON.stringify(items));
+        
+        document.getElementById('foodItemName').value = ""; document.getElementById('foodItemPrice').value = "";
+        printNotification(`Published "${name}" into system active stock inventory listings.`, "success");
+        renderCafeteriaData();
+    }
+
+    function addFoodToCart(itemId) {
+        const items = JSON.parse(localStorage.getItem('foodItems')) || [];
+        const targetedProd = items.find(i => i.id === itemId);
+        if(!targetedProd) return;
+
+        let cartMatch = posActiveCart.find(x => x.id === itemId);
+        if(cartMatch) { cartMatch.qty++; } 
+        else { posActiveCart.push({ id: targetedProd.id, name: targetedProd.name, price: targetedProd.price, qty: 1 }); }
+        
+        document.getElementById('posCheckoutPanel').classList.add('hidden');
+        recalculateCartTotals();
+    }
+
+    function alterCartQty(id, modifier) {
+        let entry = posActiveCart.find(x => x.id === id);
+        if(!entry) return;
+        entry.qty += modifier;
+        if(entry.qty <= 0) { posActiveCart = posActiveCart.filter(x => x.id !== id); }
+        document.getElementById('posCheckoutPanel').classList.add('hidden');
+        recalculateCartTotals();
+    }
+
+    function recalculateCartTotals() {
+        const tbody = document.getElementById('cartTableBody');
+        tbody.innerHTML = "";
+        
+        let subtotalAccumulator = 0;
+        posActiveCart.forEach(item => {
+            let rowCost = item.price * item.qty;
+            subtotalAccumulator += rowCost;
+            tbody.innerHTML += `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>
+                        <button onclick="alterCartQty(${item.id}, -1)" style="width:auto; padding:2px 6px; margin:0;">-</button>
+                        <b>${item.qty}</b>
+                        <button onclick="alterCartQty(${item.id}, 1)" style="width:auto; padding:2px 6px; margin:0;">+</button>
+                    </td>
+                    <td>${rowCost.toFixed(2)} JOD</td>
+                    <td><button onclick="alterCartQty(${item.id}, -${item.qty})" class="danger" style="width:auto; padding:2px 6px; margin:0;">&times;</button></td>
+                </tr>
+            `;
+        });
+
+        const discountPct = parseFloat(document.getElementById('posDiscountInput').value) || 0;
+        const finalizedDue = subtotalAccumulator * (1 - (discountPct / 100));
+        document.getElementById('cartTotalDisplay').innerText = `${finalizedDue.toFixed(2)} JOD`;
+    }
+
+    function initiatePOSCheckout() {
+        if(posActiveCart.length === 0) return printNotification("The customer cart is completely empty.", "error");
+        document.getElementById('posCheckoutPanel').classList.remove('hidden');
+        document.getElementById('posCashHandedInput').value = "";
+        document.getElementById('posChangeReturnDisplay').innerText = "0.00";
+    }
+
+    function calculatePOSChange() {
+        const totalText = document.getElementById('cartTotalDisplay').innerText;
+        const totalDue = parseFloat(totalText);
+        const cashHanded = parseFloat(document.getElementById('posCashHandedInput').value) || 0;
+        
+        const deltaChange = cashHanded - totalDue;
+        const display = document.getElementById('posChangeReturnDisplay');
+        display.innerText = deltaChange >= 0 ? deltaChange.toFixed(2) : "0.00";
+
+        // Dynamic functional validation binding for checkout confirmation click context without alerts
+        document.getElementById('posFinalConfirmBtn').onclick = function() {
+            if(cashHanded < totalDue) return printNotification("Insufficient funds handled to cover receipt net total.", "error");
             
-            // Re-evaluate change array matrix based on updated totals
-            evaluateCashChangeReturn();
-        }
+            let salesLedger = JSON.parse(localStorage.getItem('foodSales')) || [];
+            let itemSummaryString = posActiveCart.map(c => `${c.name} (x${c.qty})`).join(', ');
+            const discountPercentValue = parseFloat(document.getElementById('posDiscountInput').value) || 0;
 
-        function evaluateCashChangeReturn() {
-            const netString = document.getElementById("lblNetOrderTotal").innerText.replace("$", "");
-            const netDues = parseFloat(netString);
-            const tenderVal = parseFloat(document.getElementById("customerCashTendered").value);
+            salesLedger.push({
+                timestamp: getSystemSimulatedTime().toLocaleString(),
+                products: itemSummaryString,
+                gross: parseFloat(posActiveCart.reduce((acc, i) => acc + (i.price * i.qty), 0).toFixed(2)),
+                discount: discountPercentValue + "%",
+                net: parseFloat(totalDue.toFixed(2))
+            });
+
+            localStorage.setItem('foodSales', JSON.stringify(salesLedger));
+            printNotification(`🛒 Retail Purchase Logged Successfully! Return Change: ${deltaChange.toFixed(2)} JOD.`, "success");
             
-            const displayBox = document.getElementById("lblChangeDueBox");
+            posActiveCart = [];
+            document.getElementById('posDiscountInput').value = "0";
+            document.getElementById('posCheckoutPanel').classList.add('hidden');
+            recalculateCartTotals(); renderCafeteriaData();
+        };
+    }
 
-            if (isNaN(tenderVal) || tenderVal < netDues || netDues === 0) {
-                displayBox.innerText = "$0.00";
-                displayBox.style.color = "#c0392b";
-            } else {
-                let outstandingChange = tenderVal - netDues;
-                displayBox.innerText = `$${outstandingChange.toFixed(2)}`;
-                displayBox.style.color = "#27ae60";
-            }
-        }
+    // --- MANAGER COMMAND STRUCTURES ---
+    function processQuotation(id, action, counterVal = null) {
+        let quotations = JSON.parse(localStorage.getItem('quotations')), q = quotations.find(x => x.id === id);
+        let memo = prompt("Send a note to the employee:") || "Processed by Management."; q.mgrNote = memo;
+        if(action === 'approve') { q.status = "Approved"; activateCustomer(q); }
+        else if(action === 'reject') q.status = "Rejected";
+        else if(action === 'partial') { q.status = "Counter-Offered"; q.discount = parseFloat(counterVal); q.finalPrice = Math.round(q.opt.price * (1 - (q.discount / 100))); }
+        localStorage.setItem('quotations', JSON.stringify(quotations)); renderManagerData();
+        printNotification(`Quotation request updated to state: ${q.status}`, "info");
+    }
+    function toggleSuspension(code) {
+        let customers = JSON.parse(localStorage.getItem('customers')), cust = customers.find(c => c.code === code);
+        cust.status = (cust.status === "Active") ? "Suspended" : "Active";
+        cust.logs.push(`[System Audit] Account Status Toggled to: ${cust.status} on ${getSystemSimulatedTime().toLocaleString()}`);
+        localStorage.setItem('customers', JSON.stringify(customers)); renderManagerData();
+    }
+    function processRefund(code) {
+        let customers = JSON.parse(localStorage.getItem('customers')), cust = customers.find(c => c.code === code);
+        cust.logs.push(`[Financial Audit] Processed full refund of ${cust.paid} JOD on ${getSystemSimulatedTime().toLocaleDateString()}.`);
+        cust.status = "Refunded"; cust.paid = 0; localStorage.setItem('customers', JSON.stringify(customers)); renderManagerData();
+        printNotification(`Balance refunded. Account disabled.`, "warning");
+    }
+    function promptFactoryReset() {
+        const container = document.getElementById('mgrPromptContainer');
+        container.innerHTML = `
+            <div class="ui-notification ui-error" style="border:2px solid var(--danger);">
+                <p>🚨 <b>CRITICAL SYSTEM RESET:</b> Are you absolutely sure you want to drop all data structures?</p>
+                <button class="danger" style="width:auto; margin-right:10px;" onclick="triggerFactoryReset()">Yes, Wipe Everything</button>
+                <button class="secondary" style="width:auto;" onclick="document.getElementById('mgrPromptContainer').innerHTML=''">Cancel</button>
+            </div>
+        `;
+    }
+    function triggerFactoryReset() { initDatabase(true); logout(); }
 
-        function clearActivePosCart() {
-            activePosCart = [];
-            document.getElementById("posDiscountInput").value = "";
-            document.getElementById("customerCashTendered").value = "";
-            renderActiveCartItems();
-        }
+    // --- RENDERING INTEGRATION HOOKS ---
+    function renderCafeteriaData() {
+        const items = JSON.parse(localStorage.getItem('foodItems')) || [];
+        const menuGrid = document.getElementById('posMenuGrid');
+        menuGrid.innerHTML = "";
+        items.forEach(i => {
+            menuGrid.innerHTML += `
+                <div class="pos-menu-item" onclick="addFoodToCart(${i.id})">
+                    ${i.name}
+                    <span class="price-tag">${i.price.toFixed(2)} JOD</span>
+                </div>
+            `;
+        });
 
-        function executeCartPurchaseTransaction() {
-            if (activePosCart.length === 0) {
-                alert("POS VOID ERROR: Basket contents empty. Cannot commit transactions.");
-                return;
-            }
+        const sales = JSON.parse(localStorage.getItem('foodSales')) || [];
+        const totalFoodRev = sales.reduce((acc, curr) => acc + curr.net, 0);
+        document.getElementById('totalFoodRevenueDisplay').innerText = totalFoodRev.toFixed(2);
 
-            const netDues = parseFloat(document.getElementById("lblNetOrderTotal").innerText.replace("$", ""));
-            const tenderVal = parseFloat(document.getElementById("customerCashTendered").value);
+        const ledgerBody = document.getElementById('cafeteriaSalesLedgerTable');
+        ledgerBody.innerHTML = "";
+        sales.slice().reverse().forEach(s => {
+            ledgerBody.innerHTML += `
+                <tr>
+                    <td>${s.timestamp}</td>
+                    <td>${s.products}</td>
+                    <td>${s.gross.toFixed(2)} JOD</td>
+                    <td>${s.discount}</td>
+                    <td><b>${s.net.toFixed(2)} JOD</b></td>
+                </tr>
+            `;
+        });
+    }
 
-            if (isNaN(tenderVal) || tenderVal < netDues) {
-                alert("TENDER INSUFFICIENT: Customer cash provided doesn't cover transactional balancing structures.");
-                return;
-            }
+    function renderManagerData() {
+        const opts = JSON.parse(localStorage.getItem('gymOptions'));
+        let html = ''; opts.forEach(o => {
+            html += `<tr><td>${o.name}</td><td>${o.price} JOD</td><td>${o.type}</td><td>${o.type==='time'? o.days+' Days': o.entries+' Entries (Exp: '+o.expiryDays+'d)'}</td><td><button class="danger" onclick="deleteGymOption(${o.id})">Delete</button></td></tr>`;
+        });
+        document.getElementById('gymOptionsTable').innerHTML = html;
 
-            let computedChange = tenderVal - netDues;
-            const currentSystemTimeStr = document.getElementById("liveDisplayClock").innerText;
+        const staff = JSON.parse(localStorage.getItem('staff')) || [];
+        let staffHtml = ''; staff.forEach(s => {
+            staffHtml += `<tr><td><b>${s.user}</b></td><td><code style="color:var(--danger); font-weight:bold;">${s.pass}</code></td><td><button class="danger" onclick="deleteEmployee('${s.user}')">Revoke Access</button></td></tr>`;
+        });
+        document.getElementById('staffTableBody').innerHTML = staffHtml;
 
-            // Format printable text representation string for journal recordkeeping
-            let orderLineSummaries = activePosCart.map(i => `${i.name}(x${i.quantity})`).join(", ");
-            let loggedJournalString = `[${currentSystemTimeStr}] TRANS_APPROVED | Items: [${orderLineSummaries}] | Total Paid: $${netDues.toFixed(2)} | Tendered: $${tenderVal.toFixed(2)} | Returned Change: $${computedChange.toFixed(2)}\n`;
+        const quots = JSON.parse(localStorage.getItem('quotations')).filter(q => q.status === "Pending");
+        let appHtml = ''; quots.forEach(q => {
+            appHtml += `<tr><td>${q.isRenewal?'<span class="badge badge-suspended">Renewal</span>':'<span class="badge badge-active">New</span>'}<br><b>ID: ${q.code}</b></td><td>${q.first} ${q.last}</td><td>${q.opt.name}</td><td>${q.discount}%</td><td>${q.finalPrice} JOD</td><td><i style="color:#e67e22;">"${q.empReason}"</i></td><td><input type="number" id="counter-${q.id}" style="width:60px" placeholder="%"></td><td><button class="secondary" onclick="processQuotation(${q.id}, 'approve')">Approve</button> <button class="danger" onclick="processQuotation(${q.id}, 'reject')">Reject</button> <button onclick="let val=document.getElementById('counter-${q.id}').value; if(val) processQuotation(${q.id}, 'partial', val); else printNotification('Type percentage value for counter offer','error');">Counter</button></td></tr>`;
+        });
+        document.getElementById('mgrApprovalsTable').innerHTML = appHtml;
 
-            const journalBox = document.getElementById("posLedgerJournalContainer");
-            if (journalBox.innerText.includes("WAITING FOR TRANSACTION")) {
-                journalBox.innerText = loggedJournalString;
-            } else {
-                journalBox.innerText = loggedJournalString + journalBox.innerText;
-            }
+        const allCusts = JSON.parse(localStorage.getItem('customers')) || [];
+        document.getElementById('totalRevenueDisplay').innerText = allCusts.reduce((acc, curr) => acc + curr.paid, 0);
 
-            alert(`TRANSACTION RECORDED SUCCESSFULLY.\nChange returned to client: $${computedChange.toFixed(2)}`);
-            clearActivePosCart();
-        }
+        let refHtml = ''; allCusts.forEach(c => {
+            let details = c.opt.type === 'time' ? `Expires: ${c.expiryDate || 'Lapsed'}` : `Entries Remaining: ${c.entriesLeft !== null ? c.entriesLeft : '0'}`;
+            refHtml += `<tr class="clickable-row" onclick="launchProfileModal('${c.code}')"><td><b>${c.code}</b></td><td>${c.first} ${c.last}</td><td><span class="badge badge-${c.status.toLowerCase()}">${c.status}</span></td><td>${details}</td><td>${c.paid} JOD</td><td><b>${c.totalCheckIns} Visits</b></td><td onclick="event.stopPropagation();"> ${(c.status==='Active'||c.status==='Suspended')?`<button class="warning" onclick="toggleSuspension('${c.code}')">${c.status==='Suspended'?'Unsuspend':'Suspend'}</button>`:''} ${c.status!=='Refunded'?`<button class="danger" onclick="processRefund('${c.code}')">Refund</button>`:''}</td></tr>`;
+        });
+        document.getElementById('mgrRefundsTable').innerHTML = refHtml;
+        
+        rebuildLoginUserDropdown();
+    }
 
+    function renderEmployeeData() {
+        const options = JSON.parse(localStorage.getItem('gymOptions'));
+        let selectHtml = ''; options.forEach(o => selectHtml += `<option value="${o.id}">${o.name} (${o.price} JOD)</option>`);
+        document.getElementById('custSubChoice').innerHTML = selectHtml; updatePricePreview();
 
-        // --- APPLICATION INITIALIZATION BOOTSTRAP ---
-        generateData();
-        renderFoodInventoryGrid();
-        startClockEngine();
-    </script>
+        const quots = JSON.parse(localStorage.getItem('quotations')) || [];
+        let qHtml = ''; quots.forEach(q => {
+            let actionBtn = q.status === 'Counter-Offered' ? `<button onclick="acceptCounter(${q.id})" class="secondary">Client Agrees</button>` : (q.status === 'Approved' ? `<span>Live ID: <b>${q.code}</b></span>` : '');
+            qHtml += `<tr><td><b>${q.code}</b></td><td>${q.first} ${q.last}</td><td>${q.opt.name}</td><td>${q.opt.price} JOD</td><td>${q.discount}%</td><td>${q.finalPrice} JOD</td><td><small>"${q.empReason}"</small></td><td><span class="badge badge-${q.status.toLowerCase()}">${q.status}</span></td><td>${q.mgrNote}</td><td>${actionBtn}</td></tr>`;
+        });
+        document.getElementById('empQuotationsTable').innerHTML = qHtml;
+    }
+
+    // Initialize clock loop
+    runClockEngineTick();
+</script>
 </body>
 </html>
