@@ -3,956 +3,1561 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muscle Power Gym - Operations Dashboard</title>
+    <title>Muscle Power Gym - Corporate Management System</title>
     <style>
         :root {
-            --bg-main: #0c0c0e;
-            --bg-card: #141417;
-            --border-color: #26262b;
-            --text-primary: #f4f4f7;
-            --text-secondary: #a1a1aa;
-            --brand-yellow: #facc15;
-            --brand-yellow-hover: #eab308;
-            --system-green: #10b981;
-            --system-red: #ef4444;
-            --system-blue: #3b82f6;
+            --primary: #1a252f;
+            --accent: #f39c12; 
+            --secondary: #18bc9c;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #f8f9fa;
+            --dark: #2c3e50;
         }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f3; margin: 0; padding: 20px; color: var(--dark); }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1, h2, h3, h4 { color: var(--primary); margin-top: 5px; }
+        
+        /* BRANDING LOGO */
+        .gym-logo-container { text-align: center; margin-bottom: 25px; padding: 15px; background: var(--primary); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border-bottom: 4px solid var(--accent); }
+        .gym-logo { display: inline-flex; align-items: center; gap: 15px; }
+        .gym-icon { background: var(--accent); color: var(--primary); font-size: 28px; font-weight: 900; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 0 10px rgba(243,156,18,0.5); text-transform: uppercase; font-style: normal; }
+        .gym-name { color: white; font-size: 32px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; font-style: italic; }
+        .gym-name span { color: var(--accent); }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+        .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        input, select, button, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: var(--primary); color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; display: inline-block; }
+        button:hover { opacity: 0.9; }
+        button.secondary { background: var(--secondary); }
+        button.danger { background: var(--danger); }
+        button.warning { background: var(--warning); }
+        
+        .navbar { display: flex; justify-content: space-between; background: var(--primary); padding: 10px 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--accent); align-items: center; flex-wrap: wrap; gap: 10px; }
+        .navbar button { width: auto; background: transparent; color: white; margin: 0 5px; }
+        .navbar button:hover { background: rgba(255,255,255,0.1); color: var(--accent); }
+        .hidden { display: none !important; }
+        
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; }
+        .badge-active { background: var(--secondary); }
+        .badge-pending { background: var(--warning); }
+        .badge-approved { background: var(--secondary); }
+        .badge-rejected { background: var(--danger); }
+        .badge-suspended { background: #7f8c8d; }
+        .badge-expired { background: #d35400; }
+        .badge-refunded { background: #34495e; }
+        .badge-depleted { background: #7f8c8d; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: var(--primary); color: white; border-bottom: 2px solid var(--accent); }
+        
+        .clickable-row { cursor: pointer; transition: background-color 0.2s; }
+        .clickable-row:hover { background-color: #f1f2f6; }
+        
+        .financial-metric { font-size: 24px; font-weight: bold; color: var(--secondary); background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 5px solid var(--secondary); }
+        .reset-box { background: #fce4e4; border: 1px solid #f5c6c6; border-radius: 6px; padding: 15px; margin-top: 30px; }
+        
+        /* IN-SCREEN ALERTS */
+        .ui-notification { padding: 12px 15px; border-radius: 6px; margin: 12px 0; font-weight: bold; border-left: 5px solid transparent; }
+        .ui-success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .ui-error { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .ui-info { background: #e2f0d9; border-color: var(--accent); color: var(--primary); }
+        
+        /* MODAL WINDOW SYSTEM */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(3px); display: flex; justify-content: center; align-items: center; z-index: 99999 !important; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 90%; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-top: 6px solid var(--accent); }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 32px; cursor: pointer; font-weight: bold; color: #7f8c8d; transition: color 0.2s; user-select: none; }
+        .close-modal:hover { color: var(--danger); }
 
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            min-height: 100vh;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        /* TIME TOOLBAR */
+        .time-control-panel { background: #2c3e50; border: 1px solid #34495e; padding: 10px; border-radius: 6px; color: white; font-size: 13px; display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }
+        .time-control-panel input { width: auto; padding: 4px; margin: 0; font-size: 12px; color: #000; }
 
-        .workspace {
-            width: 100%;
-            max-width: 1300px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* Top Header Brand Design */
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-        }
-
-        .brand-title h1 {
-            font-size: 1.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .brand-title h1 span {
-            color: var(--brand-yellow);
-        }
-
-        .user-badge {
-            background: #1e1e24;
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logout-link {
-            color: var(--system-red);
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* Access Gate Login UI */
-        .login-frame {
-            width: 100%;
-            max-width: 420px;
-            margin: 80px auto;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 32px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-
-        .login-frame h2 {
-            font-size: 1.6rem;
-            margin-bottom: 24px;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Tab-based Workspace Controls */
-        .main-navigation {
-            display: flex;
-            gap: 8px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
-        }
-
-        .nav-tab {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid transparent;
-            padding: 12px 24px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .nav-tab:hover {
-            color: var(--text-primary);
-            background: #1c1c21;
-        }
-
-        .nav-tab.active {
-            color: #000;
-            background: var(--brand-yellow);
-            border-color: var(--brand-yellow);
-        }
-
-        .portal-pane {
-            display: none;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-        }
-
-        /* Form Submissions Components */
-        .input-stack {
-            margin-bottom: 16px;
-        }
-
-        .input-stack label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 16px;
-            background: #1a1a1f;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            transition: border-color 0.2s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--brand-yellow);
-        }
-
-        /* Action Keys and Buttons */
-        .action-btn {
-            background: var(--brand-yellow);
-            color: #000;
-            border: none;
-            padding: 12px 24px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: opacity 0.15s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .action-btn:hover {
-            background: var(--brand-yellow-hover);
-        }
-
-        .btn-green { background: var(--system-green); color: #fff; }
-        .btn-green:hover { background: #0ca672; }
-        .btn-red { background: var(--system-red); color: #fff; }
-        .btn-red:hover { background: #dc2626; }
-        .btn-secondary { background: #27272a; color: var(--text-primary); }
-        .btn-secondary:hover { background: #3f3f46; }
-
-        /* Management Dashboard Sub Navigation layout */
-        .sub-nav-bar {
-            display: flex;
-            gap: 12px;
-            background: #18181c;
-            padding: 6px;
-            border-radius: 8px;
-            margin-bottom: 24px;
-            border: 1px solid var(--border-color);
-            width: fit-content;
-        }
-
-        .sub-tab {
-            background: transparent;
-            color: var(--text-secondary);
-            border: none;
-            padding: 8px 16px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .sub-tab.active {
-            background: #26262b;
-            color: var(--text-primary);
-        }
-
-        .sub-pane {
-            display: none;
-        }
-
-        /* Grid Framework Layouts */
-        .layout-split {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 24px;
-        }
-
-        .grid-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .status-metric-card {
-            background: #1a1a1f;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 16px;
-            border-left: 4px solid var(--brand-yellow);
-        }
-
-        .status-metric-card.alert-card {
-            border-left-color: var(--system-green);
-        }
-
-        .status-metric-card span {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            margin-bottom: 6px;
-        }
-
-        .status-metric-card strong {
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-
-        /* Tabular Metrics Displays */
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-            margin-top: 16px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th, td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.9rem;
-        }
-
-        th {
-            background: #18181c;
-            color: var(--text-secondary);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.5px;
-        }
-
-        tr:hover td {
-            background: #16161a;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .badge-all { background: #1e3a8a; color: #93c5fd; }
-        .badge-emp { background: #312e81; color: #c7d2fe; }
-
-        /* Custom Notification Alerts Modals Engine */
-        .modal-mask {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(5, 5, 6, 0.85);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(4px);
-        }
-
-        .modal-body {
-            background: var(--bg-card);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            padding: 32px;
-            width: 90%;
-            max-width: 480px;
-            text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-        }
-
-        .modal-body h3 {
-            font-size: 1.4rem;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .modal-body p {
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 24px;
-            font-size: 0.95rem;
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-        }
+        /* POS DESIGN LAYOUT */
+        .pos-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 25px; margin-top: 15px; }
+        .pos-menu-item { background: #f8f9fa; border: 2px solid #e2e8f0; padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; text-align: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .pos-menu-item:hover { border-color: var(--secondary); background: #ebfefb; transform: translateY(-2px); }
+        .pos-menu-item .price-tag { color: var(--secondary); font-size: 18px; display: block; margin-top: 5px; }
+        .cart-pane { border-left: 2px solid #e2e8f0; padding-left: 15px; display: flex; flex-direction: column; justify-content: space-between; }
+        .cart-table th { background-color: var(--dark); font-size: 13px; padding: 6px; }
+        .cart-table td { padding: 6px; font-size: 13px; }
+        
+        .modify-link { display: block; text-align: center; margin-top: 20px; font-size: 12px; color: #7f8c8d; cursor: pointer; text-decoration: underline; user-select: none; }
+        .modify-link:hover { color: var(--accent); }
     </style>
 </head>
 <body>
 
-    <div class="workspace">
-        
-        <!-- Top Application Status Banner -->
-        <header id="appHeader" class="app-header" style="display: none;">
-            <div class="brand-title">
-                <h1>MusclePower <span>Gym</span></h1>
-            </div>
-            <div class="user-badge">
-                <span>Active Role: <strong id="roleDisplay" style="color: var(--brand-yellow);">Staff</strong></span>
-                <span class="logout-link" onclick="triggerSystemLogout()">Logout</span>
-            </div>
-        </header>
+<div class="container">
+    
+    <!-- MUSCLE POWER GYM LOGO -->
+    <div class="gym-logo-container">
+        <div class="gym-logo">
+            <div class="gym-icon">💪</div>
+            <div class="gym-name">Muscle Power <span>Gym</span></div>
+        </div>
+    </div>
 
-        <!-- Access Control Portal Login Box -->
-        <div id="loginGate" class="login-frame">
-            <h2>Operations Login</h2>
-            <div class="input-stack">
-                <label for="uid">Security ID</label>
-                <input type="text" id="uid" placeholder="e.g., manager / employee / customer">
+    <!-- Auth Status Bar -->
+    <div class="navbar">
+        <span id="userStatus" style="color: white; font-weight: bold;">Logged Out</span>
+        <span>🕒 System Time: <b id="systemLiveClock" style="color: var(--accent);">--/--/---- --:--</b></span>
+        <div>
+            <button onclick="manualRefresh()" style="background: var(--accent); color: #000; font-weight: bold; border-radius: 4px; padding: 5px 12px; margin-right: 15px;">🔄 Refresh Data</button>
+            <button onclick="showScreen('loginScreen')">Login Screen</button>
+            <button onclick="logout()" class="danger">Logout</button>
+        </div>
+    </div>
+
+    <!-- GLOBAL IN-SCREEN NOTIFICATION SYSTEM -->
+    <div id="globalNotificationBar"></div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="card screen">
+        <h2>System Portal Login</h2>
+        <label>Select User Handle Profile</label>
+        <select id="loginUserSelect">
+            <!-- Dynamically populated via javascript runtime below -->
+        </select>
+        <label>System Security Password</label>
+        <input type="password" id="loginPass" placeholder="Enter password">
+        <button onclick="handleLogin()" style="background: var(--accent); color: var(--primary);">Secure Login</button>
+    </div>
+
+    <!-- CAFETERIA POS DASHBOARD -->
+    <div id="cafeteriaDashboard" class="screen hidden">
+        <h2>🍔 Cafeteria Management Terminal & POS Workstation</h2>
+        
+        <div class="grid">
+            <div class="card" style="grid-column: span 2;">
+                <h4>📊 Session Revenue Metrics</h4>
+                <div class="financial-metric" style="color:var(--primary); border-left-color:var(--accent);">
+                    Total Food & Wallet Sales Logged: <span id="totalFoodRevenueDisplay">0.00</span> JOD
+                </div>
             </div>
-            <div class="input-stack">
-                <label for="pwd">Access Token</label>
-                <input type="password" id="pwd" placeholder="••••••••">
-            </div>
-            <button class="action-btn" style="width: 100%;" onclick="triggerSystemAuthentication()">Verify Credentials</button>
         </div>
 
-        <!-- Master Operations Navigation Control Bar -->
-        <nav id="appNavigation" class="main-navigation" style="display: none;">
-            <button id="tabBtnCustomer" class="nav-tab" onclick="activateMainTab('panelCustomer')">Customer Portal</button>
-            <button id="tabBtnEmployee" class="nav-tab" onclick="activateMainTab('panelEmployee')">Employee Station</button>
-            <button id="tabBtnManager" class="nav-tab" onclick="activateMainTab('panelManager')">Manager Core</button>
-        </nav>
+        <div class="navbar" style="background: var(--dark)">
+            <button onclick="showCafSubTab('cafPosTab')">🛒 POS Sales Register</button>
+            <button onclick="showCafSubTab('cafBalancesTab')">💳 Manage Account Balances</button>
+        </div>
 
-        <!-- PORTAL INTERFACE ONE: CUSTOMER SELF QUERY SYSTEM -->
-        <main id="panelCustomer" class="portal-pane">
-            <h2>Customer Account Check & Renewal</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">Check your live remaining balance counts, verify your expiration records, and request plan upgrades.</p>
-            
-            <div class="input-stack" style="max-width: 420px; display: flex; gap: 10px;">
-                <input type="text" id="custLookupField" placeholder="Enter Member Gym ID (e.g., MP-101)">
-                <button class="action-btn" onclick="executeCustomerBalanceQuery()">Query ID</button>
-            </div>
-
-            <!-- Query Target Card Section -->
-            <div id="customerQueryResponse" style="display: none; margin-top: 20px;">
-                <div style="background: #18181c; border: 1px solid var(--border-color); padding: 24px; border-radius: 10px;">
-                    <h3 id="targetCustCardName" style="color: var(--brand-yellow); margin-bottom: 16px;">Member Account: -</h3>
-                    
-                    <div class="grid-cards" style="margin-top: 0; margin-bottom: 24px;">
-                        <div class="status-metric-card">
-                            <span>Entries Remaining</span>
-                            <strong id="targetCustCardEntries">-</strong>
-                        </div>
-                        <div class="status-metric-card">
-                            <span>Expiration Date</span>
-                            <strong id="targetCustCardExpiry">-</strong>
-                        </div>
-                        <div class="status-metric-card alert-card">
-                            <span>System Messages</span>
-                            <strong id="targetCustCardStatus" style="font-size: 1rem; color: var(--system-green);">-</strong>
+        <!-- CAFETERIA REGISTER TAB -->
+        <div id="cafPosTab" class="cafTab">
+            <div class="card">
+                <h3>🛒 Point of Sale Terminal Engine</h3>
+                <div class="pos-grid">
+                    <!-- Left Side: Interactive Items -->
+                    <div>
+                        <h4>Select Items to Sell</h4>
+                        <div id="posMenuGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:12px; max-height:400px; overflow-y:auto; padding:5px;">
+                            <!-- Items rendered dynamic -->
                         </div>
                     </div>
-
-                    <!-- Customer Self Registration Renewal Action Form Box -->
-                    <div style="border-top: 1px solid var(--border-color); padding-top: 20px;">
-                        <h4>File Extensions Application</h4>
-                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 12px;">Choose a subscription framework package to route to processing gym floor clerks.</p>
-                        <div class="input-stack" style="max-width: 400px;">
-                            <label for="customerPlanSelector">Subscription Framework Package</label>
-                            <select id="customerPlanSelector">
-                                <!-- Populated dynamically based on Manager configuration settings -->
-                            </select>
+                    <!-- Right Side: Cart Workspace -->
+                    <div class="cart-pane">
+                        <div>
+                            <h4>Active Order Summary Table</h4>
+                            <table class="cart-table">
+                                <thead><tr><th>Item Name</th><th>Qty</th><th>Subtotal</th><th>Action</th></tr></thead>
+                                <tbody id="cartTableBody"></tbody>
+                            </table>
                         </div>
-                        <button class="action-btn btn-green" onclick="dispatchCustomerRenewalRequest()">Submit Request To Renew</button>
+                        
+                        <div style="background:#f8f9fa; padding:15px; border-radius:6px; margin-top:15px; border-top:3px solid var(--dark)">
+                            <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+                                <label style="margin:0; font-size:13px; white-space:nowrap;"><b>Apply Discount %:</b></label>
+                                <input type="number" id="posDiscountInput" value="0" min="0" max="100" style="margin:0; padding:6px;" oninput="recalculateCartTotals()">
+                            </div>
+                            <div style="font-size:22px; font-weight:bold; justify-content:space-between; display:flex;">
+                                <span>Total Due:</span>
+                                <span id="cartTotalDisplay" style="color:var(--danger);">0.00 JOD</span>
+                            </div>
+                            
+                            <button onclick="initiatePOSCheckout()" class="secondary" style="margin-top:15px; padding:12px;">Process Payment Receipt</button>
+                            
+                            <!-- Cash Handling / Change / Wallet calculator interactive panel -->
+                            <div id="posCheckoutPanel" class="hidden" style="margin-top:15px; padding:12px; background:#fff; border:1px solid #ccc; border-radius:4px;">
+                                <div style="background: #eef2f3; padding: 10px; border-radius: 4px; margin-bottom: 12px; border-left: 4px solid var(--secondary);">
+                                    <label style="margin: 0; font-weight: bold; font-size: 13px;">🔗 Link Member Wallet (Optional GYM ID):</label>
+                                    <div style="display: flex; gap: 5px; margin-top: 5px;">
+                                        <input type="text" id="posGymIdInput" placeholder="e.g. 54321" style="margin:0; padding:6px;">
+                                        <button onclick="verifyCheckoutWallet()" style="width:auto; margin:0; padding:6px 12px; background:var(--dark);">Apply</button>
+                                    </div>
+                                    <div id="posWalletStatusBox" style="margin-top: 5px; font-size: 12px; font-weight: bold;"></div>
+                                </div>
+
+                                <div id="paymentBreakdownBox" style="font-size:13px; font-weight:bold; background:#fff; margin-bottom:10px; line-height:1.4;"></div>
+
+                                <label><b id="cashTenderedLabel">Cash Tendered Amount:</b></label>
+                                <input type="number" id="posCashHandedInput" step="0.01" placeholder="Cash amount input..." oninput="calculatePOSChange()">
+                                
+                                <div style="margin:10px 0; font-size:16px; font-weight:bold; color:var(--secondary);">
+                                    Change Return Balance: <span id="posChangeReturnDisplay">0.00</span> JOD
+                                </div>
+                                <button id="posFinalConfirmBtn" class="warning">Confirm Order & Log Purchase</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </main>
-
-        <!-- PORTAL INTERFACE TWO: EMPLOYEE UTILITY WORKSTATION -->
-        <main id="panelEmployee" class="portal-pane">
-            <h2>Employee Operations Console</h2>
-            
-            <div class="sub-nav-bar">
-                <button id="subTabBtnCheckin" class="sub-tab active" onclick="activateSubTab('empCheckinPane')">Desk Check-In Engine</button>
-                <button id="subTabBtnRequests" class="sub-tab" onclick="activateSubTab('empRenewalsPane')">Requests to Renew <span id="renewalsBadge" style="background: var(--system-red); color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: 4px; display: none;">0</span></button>
-            </div>
-
-            <!-- WORKSTATION PANE: FRONT DESK ACCESS ACCELERATOR -->
-            <div id="empCheckinPane" class="sub-pane" style="display: block;">
-                <h3>Active Desk Gate Check-In</h3>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">Scan barcode credentials or execute manual entry checks.</p>
-                <div class="input-stack" style="max-width: 420px; display: flex; gap: 10px;">
-                    <input type="text" id="frontDeskCheckInId" placeholder="Scan or Type Gym ID">
-                    <button class="action-btn btn-green" onclick="evaluateDeskGateScan()">Process Entry</button>
-                </div>
-            </div>
-
-            <!-- WORKSTATION PANE: RENEWAL PIPELINES CLEARING OPERATIONS BOARD -->
-            <div id="empRenewalsPane" class="sub-pane">
-                <h3>Subscription Renewal Requests Processing Line</h3>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">Approve or Deny ongoing corporate or individual subscription updates.</p>
                 
-                <div class="table-container">
+                <!-- SECURED ACCESS WORD EXTENSION LINK -->
+                <span class="modify-link" onclick="challengeModifyAccess()">modify</span>
+            </div>
+        </div>
+
+        <!-- CAFETERIA MEMBER WALLET BALANCE TAB -->
+        <div id="cafBalancesTab" class="cafTab hidden card">
+            <h3>💳 Customer Prepaid Cafeteria Wallet System</h3>
+            <p>Search a member by their 5-digit Gym ID to load funds or issue corrections. All transactions are added to register totals.</p>
+            
+            <div style="background: #f1f2f6; padding: 15px; margin-bottom: 20px; border-radius: 6px; border-left: 4px solid var(--secondary);">
+                <h4>🔍 Query Member Wallet</h4>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="walletGymIdSearch" placeholder="Enter 5-Digit Gym ID Access Key">
+                    <button onclick="searchCustomerWallet()" style="width: 160px; background: var(--dark);">Fetch Profile</button>
+                </div>
+            </div>
+
+            <div id="walletConsoleWrapper" class="hidden" style="background:#fafafa; border:1px solid #ddd; padding:20px; border-radius:6px;">
+                <h4 style="margin-top:0; border-bottom:1px solid #ccc; padding-bottom:5px;">👤 Account Wallet: <span id="walletProfileName" style="color:var(--primary);">--</span></h4>
+                <div style="font-size:24px; font-weight:bold; color:var(--secondary); margin:15px 0;">
+                    Current Available Balance: <span id="walletCurrentBalanceDisplay">0.00</span> JOD
+                </div>
+
+                <div class="grid">
+                    <div style="background: #e8f8f5; padding: 15px; border-radius: 6px; border: 1px solid #a3e4d7;">
+                        <h5 style="margin:0 0 10px 0; font-size:14px; color:#117a65;">➕ Top-Up / Add Funds (Counts as Profit)</h5>
+                        <input type="number" id="walletAddAmount" step="0.01" placeholder="Amount to add (JOD)">
+                        <button onclick="adjustCustomerWallet('add')" class="secondary">Deposit Cash into Balance</button>
+                    </div>
+                    <div style="background: #fce4e4; padding: 15px; border-radius: 6px; border: 1px solid #f5c6c6;">
+                        <h5 style="margin:0 0 10px 0; font-size:14px; color:#922b21;">✏️ Balance Correction (Deducts Profit)</h5>
+                        <input type="number" id="walletSubAmount" step="0.01" placeholder="Amount to deduct (JOD)">
+                        <button onclick="adjustCustomerWallet('sub')" class="danger">Deduct / Correct Mistake</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📜 Historical Cafeteria Sales & Deposits Archive Ledger</h3>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead><tr><th>Timestamp</th><th>Products / Activity Summary</th><th>Gross Total</th><th>Discount Applied</th><th>Net Value Paid</th></tr></thead>
+                    <tbody id="cafeteriaSalesLedgerTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEPARATE SECURED CAFETERIA INVENTORY MANAGEMENT PAGE -->
+    <div id="cafeteriaInventoryScreen" class="screen hidden">
+        <div class="navbar" style="background: var(--dark)">
+            <span style="color: white; font-weight: bold;">🔒 Secured Cafeteria Stock Config Portal</span>
+            <button onclick="showScreen('cafeteriaDashboard')" class="secondary" style="width: auto;">⬅️ Back To Register POS</button>
+        </div>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>➕ Add New Product Into Register Catalog</h3>
+                <label>Product Name Description</label>
+                <input type="text" id="foodItemName" placeholder="Product Name (e.g., Whey Protein Shake)">
+                <label>Standard Retail Price (JOD)</label>
+                <input type="number" id="foodItemPrice" step="0.01" placeholder="Price (JOD)">
+                <button onclick="addFoodItemInventory()" class="secondary" style="margin-top: 10px;">Publish New Item Profile</button>
+            </div>
+            
+            <div class="card">
+                <h3>📦 Managed Inventory Records Catalog</h3>
+                <p>Modify basic retail values dynamically or completely drop products from active stock tables.</p>
+                <div style="overflow-x: auto;">
                     <table>
                         <thead>
                             <tr>
-                                <th>Gym ID</th>
-                                <th>Account Name</th>
-                                <th>Requested Plan</th>
-                                <th>Total Units</th>
-                                <th>Actions Control</th>
+                                <th>Item Name</th>
+                                <th>Active Unit Price (JOD)</th>
+                                <th>Control Rule Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="renewalsQueueTablePayload">
-                            <!-- Populated dynamically via state management engine -->
+                        <tbody id="inventoryConfigTableBody">
+                            <!-- Populated Dynamically -->
                         </tbody>
                     </table>
                 </div>
             </div>
-        </main>
-
-        <!-- PORTAL INTERFACE THREE: MANAGER MASTER COMPLIANCE CONFIGURATION -->
-        <main id="panelManager" class="portal-pane">
-            <h2>Manager Governance Console</h2>
-            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px;">Configure structural catalogs, adjust visibility rule scopes, and control registration pipelines.</p>
-
-            <div class="layout-split">
-                <!-- Plan Architecture Injection Card -->
-                <div>
-                    <h3>Create Subscription Plan</h3>
-                    <div class="input-stack" style="margin-top: 16px;">
-                        <label for="mgrPlanName">Identification Title</label>
-                        <input type="text" id="mgrPlanName" placeholder="e.g., Premium Annual Pass">
-                    </div>
-                    <div class="input-stack">
-                        <label for="mgrPlanUnits">Permitted Entries (Visits)</label>
-                        <input type="number" id="mgrPlanUnits" placeholder="e.g., 30">
-                    </div>
-                    <div class="input-stack">
-                        <label for="mgrPlanDuration">Timeline Lifespan (Days)</label>
-                        <input type="number" id="mgrPlanDuration" placeholder="e.g., 365">
-                    </div>
-                    <div class="input-stack">
-                        <label for="mgrPlanVisibility">Role View Access Control Scope Matrix</label>
-                        <select id="mgrPlanVisibility">
-                            <option value="all">Show to both Customers & Employees</option>
-                            <option value="employee">Restrict to Employees Only</option>
-                        </select>
-                    </div>
-                    <button class="action-btn" style="width: 100%; margin-top: 8px;" onclick="executeManagerPlanCreation()">Inject Catalog Tier</button>
-                </div>
-
-                <!-- Existing Configuration Matrix Display Table -->
-                <div>
-                    <h3>Active System Subscription Registry</h3>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Plan Title</th>
-                                    <th>Visits</th>
-                                    <th>Validity Span</th>
-                                    <th>Visibility Tier</th>
-                                </tr>
-                            </thead>
-                            <tbody id="mgrCatalogTablePayload">
-                                <!-- Populated dynamically from internal matrix records -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </main>
-
+        </div>
     </div>
 
-    <!-- REUSABLE HTML SYSTEM OVERLAY DIALOG MODAL -->
-    <div id="systemAlertOverlay" class="modal-mask">
-        <div id="dialogBox" class="modal-body">
-            <h3 id="dialogTitle">System Notification</h3>
-            <p id="dialogMessage">Alert message statement default context text.</p>
-            <div id="dialogActionsContainer" class="modal-actions">
-                <button class="action-btn" onclick="terminateModalOverlay()">Acknowledge</button>
+    <!-- EMPLOYEE DASHBOARD -->
+    <div id="employeeDashboard" class="screen hidden">
+        <h2>Employee Dashboard</h2>
+        <div class="navbar" style="background: var(--dark)">
+            <button onclick="showEmpSubTab('checkInTab')">⚡ Customer Check-In</button>
+            <button onclick="showEmpSubTab('newCustTab')">➕ Add / Renew Membership</button>
+            <button onclick="showEmpSubTab('empQuotationsTab')">📋 Quotations/Approvals Status</button>
+            <button onclick="showEmpSubTab('lookupTab')">🔍 Gym ID Finder</button>
+            <button onclick="showEmpSubTab('empInspectTab')" style="color: var(--accent);">📊 Check-Up Station (Search Pass)</button>
+        </div>
+
+        <!-- Check-In Tab -->
+        <div id="checkInTab" class="empTab card">
+            <h3>Customer Check-In Entry Gate</h3>
+            <input type="text" id="checkInCode" placeholder="Enter 5-Digit Customer Gym ID">
+            <button onclick="loadCheckInIdentity()" class="secondary">Verify Identity & Load Account</button>
+            <div id="checkInVerifyConsole" class="hidden" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 6px; border: 2px solid #ddd;"></div>
+        </div>
+
+        <!-- Inspection Tab -->
+        <div id="empInspectTab" class="empTab card hidden">
+            <h3>📊 Pass Inspector Terminal</h3>
+            <p>Input a Gym ID below to check expiry dates, verify remaining entry balances, or view complete logs.</p>
+            <input type="text" id="empInspectInput" placeholder="Enter 5-Digit Gym ID">
+            <button onclick="inspectProfile('emp')" class="secondary">Query Status</button>
+            <div id="empInspectResult" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- Add/Renew Customer Tab -->
+        <div id="newCustTab" class="empTab card hidden">
+            <h3>Membership Registration & Renewal Desk</h3>
+            <div id="renewalContextBox" class="hidden"></div>
+            <div style="background: #f1f2f6; padding: 15px; margin-bottom: 20px; border-radius: 6px; border-left: 4px solid var(--accent);">
+                <h4>🔍 Member Verification</h4>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="searchMemberInput" placeholder="Enter Gym ID, First Name, or Last Name">
+                    <button onclick="searchMemberProfile()" style="width: 150px; background: var(--dark);">Verify Profile</button>
+                </div>
+                <div id="searchProfileResult" style="margin-top: 10px; font-weight: bold; color: var(--primary);"></div>
+            </div>
+            <div class="grid">
+                <div>
+                    <h4>1. Profile Demographics</h4>
+                    <input type="hidden" id="custExistingCode" value="">
+                    <label>First Name</label>
+                    <input type="text" id="custFirst" placeholder="First Name">
+                    <label>Last Name</label>
+                    <input type="text" id="custLast" placeholder="Last Name">
+                    <label>Date of Birth</label>
+                    <input type="date" id="custDOB">
+                    <label>Future Membership Activation Date (Optional)</label>
+                    <input type="date" id="custStartDate">
+                </div>
+                <div>
+                    <h4>2. Subscription Package Configuration</h4>
+                    <select id="custSubChoice" onchange="updatePricePreview()"></select>
+                    <label>Requested Discount Value (JOD)</label>
+                    <input type="number" id="custDiscountJOD" value="0" min="0" step="0.25" oninput="updatePricePreview()">
+                    <div id="discountReasonWrapper" class="hidden">
+                        <label style="color: var(--danger); font-weight: bold;">Reason for requesting discount *</label>
+                        <textarea id="custDiscountReason" rows="2" placeholder="Explain why this discount is required..."></textarea>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                        <span style="font-weight: normal; color: #555;">Calculated Value to Request:</span>
+                        <div id="pricePreview" style="font-size: 20px; font-weight: bold; color: var(--secondary);">0 JOD</div>
+                    </div>
+                    <button onclick="submitCustomerRegistration()" class="secondary">Send Proposal / Confirm Package</button>
+                    <button onclick="clearRegistrationForm()" style="background:#bdc3c7; color:#333; margin-top:5px;">Clear / Reset Form</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quotation Status Tab -->
+        <div id="empQuotationsTab" class="empTab card hidden">
+            <h3>Submitted Quotations & Notes Tracker</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead><tr><th>Gym ID</th><th>Customer</th><th>Option</th><th>Original Price</th><th>Requested Disc</th><th>Proposed Final</th><th>Your Stated Reason</th><th>Status</th><th>Manager Memo</th><th>Action</th></tr></thead>
+                    <tbody id="empQuotationsTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Forgotten Gym ID Lookup Tab -->
+        <div id="lookupTab" class="empTab card hidden">
+            <h3>🔍 Forgotten Gym ID Emergency Lookup</h3>
+            <div class="grid">
+                <div>
+                    <label>Customer First Name</label>
+                    <input type="text" id="lookupFirst" placeholder="Enter customer first name">
+                    <label>Date of Birth</label>
+                    <input type="date" id="lookupDOB">
+                    <button onclick="lookupGymID()" class="warning">Query Database</button>
+                </div>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px dashed #ccc;">
+                    <h4>Lookup Result:</h4>
+                    <div id="lookupResultDisplay" style="font-size: 24px; font-weight: bold; color: var(--primary);">No Query Processed</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
-        /*----------------------------------------------------------------------------*/
-        /* CORE APPLICATION SYSTEM STORAGE STATES INITIALIZATION MATRIX               */
-        /*----------------------------------------------------------------------------*/
-        let customers = {
-            "MP-101": { id: "MP-101", name: "Alice Smith", entriesLeft: 12, expiryDate: "2026-09-20", pendingCollection: false, pendingPlan: null, message: "Account verified." },
-            "MP-102": { id: "MP-102", name: "Bob Johnson", entriesLeft: 0, expiryDate: "2026-05-15", pendingCollection: false, pendingPlan: null, message: "Subscription expired! Please renew structural credentials." },
-            "MP-103": { id: "MP-103", name: "Jaber Developer", entriesLeft: 60, expiryDate: "2027-01-10", pendingCollection: false, pendingPlan: null, message: "VIP Access Framework Active." }
+    <!-- MANAGER DASHBOARD -->
+    <div id="managerDashboard" class="screen hidden">
+        <h2>Manager Control Panel</h2>
+        
+        <div class="card">
+            <h4>📈 Financial Integrity Metrics</h4>
+            <div class="financial-metric">
+                Total Net Funds Collected (Combined Gym & Cafeteria): <span id="totalRevenueDisplay">0</span> JOD
+            </div>
+        </div>
+
+        <div class="navbar" style="background: var(--dark)">
+            <button onclick="showMgrSubTab('mgrSubOptionsTab')">🏋️ Gym Packages</button>
+            <button onclick="showMgrSubTab('mgrStaffTab')">👥 Manage Staff</button>
+            <button onclick="showMgrSubTab('mgrApprovalsTab')">🔔 Discount Desk</button>
+            <button onclick="showMgrSubTab('mgrRefundsTab')">🛡️ Membership Control & Logs</button>
+            <button onclick="showMgrSubTab('mgrInspectTab')" style="color: var(--accent);">📊 Pass Inspector Terminal</button>
+            <button onclick="showMgrSubTab('mgrSystemTab')" style="color: #ff9f9f;">⚙️ System Tools</button>
+        </div>
+
+        <!-- Manager Inspection Station -->
+        <div id="mgrInspectTab" class="mgrTab card hidden">
+            <h3>📊 Manager Pass Inspector</h3>
+            <p>Instantly inspect account metrics, validation state, and history logs by inputting a Gym ID.</p>
+            <input type="text" id="mgrInspectInput" placeholder="Enter 5-Digit Gym ID">
+            <button onclick="inspectProfile('mgr')" class="secondary">Query Status</button>
+            <div id="mgrInspectResult" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- Gym Options Tab -->
+        <div id="mgrSubOptionsTab" class="mgrTab card">
+            <h3>Gym Subscription Packages</h3>
+            <div class="grid">
+                <div>
+                    <h4>Add Package Structure</h4>
+                    <input type="text" id="optName" placeholder="Package Description Name">
+                    <input type="number" id="optPrice" placeholder="Standard Base Price (JOD)">
+                    <label>Tracking Rules Matrix:</label>
+                    <select id="optType" onchange="toggleOptFields()">
+                        <option value="time">Time-Based Range</option>
+                        <option value="entry">Fixed Entries Volume</option>
+                    </select>
+                    <div id="timeFields">
+                        <input type="number" id="optDays" placeholder="Days of Total Active Duration">
+                    </div>
+                    <div id="entryFields" class="hidden">
+                        <input type="number" id="optEntries" placeholder="Quantity of Check-Ins Allowed">
+                        <input type="number" id="optExpiryDays" placeholder="Automatic Expiration Lifespan (Days)">
+                    </div>
+                    <button onclick="addGymOption()">Publish Gym Option</button>
+                </div>
+                <div>
+                    <h4>Available Active Pricing Configs</h4>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead><tr><th>Name</th><th>Base Cost</th><th>Logic Type</th><th>Operational Details</th><th>Action</th></tr></thead>
+                            <tbody id="gymOptionsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff Tab -->
+        <div id="mgrStaffTab" class="mgrTab card hidden">
+            <h3>Staff Deployment Access Keys</h3>
+            <div class="grid">
+                <div>
+                    <h4>Create Employee Profile</h4>
+                    <input type="text" id="empUser" placeholder="System Handle / Username">
+                    <input type="password" id="empPass" placeholder="System Security Password">
+                    <button onclick="addEmployee()">Generate Account Credentials</button>
+                </div>
+                <div>
+                    <h4>Authorized Staff Profiles & Security Clearances</h4>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead><tr><th>Operator Username</th><th>Secure Passcode</th><th>Action Access</th></tr></thead>
+                            <tbody id="staffTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Approvals Tab -->
+        <div id="mgrApprovalsTab" class="mgrTab card hidden">
+            <h3>Pending Discount Approvals Queue</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead><tr><th>Gym ID Mode</th><th>Customer</th><th>Subscription Target</th><th>Staff Requested Cut</th><th>Target Price</th><th>Employee Reason</th><th>Counter Cut (JOD)</th><th>Action Rules Panel</th></tr></thead>
+                    <tbody id="mgrApprovalsTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Membership Control & Logs Tab -->
+        <div id="mgrRefundsTab" class="mgrTab card hidden">
+            <h3>Membership Master Control Panel & Access History Logs</h3>
+            <p style="font-size:12px; color:var(--accent);">💡 <i>Click anywhere on a row to review the member's complete structural profile and historical log archives.</i></p>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead><tr><th>Access Code</th><th>Full Name</th><th>Active Status</th><th>Cafeteria Wallet</th><th>Net Paid Cash</th><th>Check-Ins Count</th><th>Actions Panel</th></tr></thead>
+                    <tbody id="mgrRefundsTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- System Settings Tools Tab -->
+        <div id="mgrSystemTab" class="mgrTab card hidden">
+            <h3>⚙️ System Administration Tools</h3>
+            
+            <!-- MANAGER CONTROL PANEL SYSTEM CLOCK SIMULATOR -->
+            <div class="card" style="border-left: 4px solid var(--secondary); margin-bottom: 25px;">
+                <h4>🕒 System Time-Machine Warp Controller</h4>
+                <p style="font-size: 13px; color: #555;">Adjust global dates dynamically to verify membership lifespan terminations. Changes instantly apply to all open tabs.</p>
+                <div class="time-control-panel">
+                    <span>Target Date-Time Setting:</span>
+                    <input type="datetime-local" id="systemTimeWarpInput">
+                    <button onclick="warpSystemTime()" style="background:var(--secondary); font-size:13px; padding:6px 12px; width:auto; margin:0;">Commit Time Adjustment</button>
+                    <button onclick="resetWarpedTime()" style="background:var(--danger); font-size:13px; padding:6px 12px; width:auto; margin:0;">Restore Live Time</button>
+                </div>
+            </div>
+
+            <!-- PASSWORD SETTING MECHANISMS -->
+            <div class="card" style="border-left: 4px solid var(--accent); margin-bottom: 25px;">
+                <h4>🔐 Cafeteria Security Configuration Management</h4>
+                <div class="grid">
+                    <div>
+                        <label><b>Cafeteria Login Passcode</b></label>
+                        <input type="password" id="mgrCafLoginPassInput" placeholder="Enter new login pass...">
+                        <button onclick="updateCafLoginPassword()" class="secondary">Save Login Passcode</button>
+                    </div>
+                    <div>
+                        <label><b>Cafeteria Catalog Modify Passcode (Secret Link Pass)</b></label>
+                        <input type="password" id="mgrCafModifyPassInput" placeholder="Enter new configuration pass...">
+                        <button onclick="updateCafModifyPassword()" class="secondary">Save Modify Passcode</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mgrPromptContainer" style="margin-bottom: 15px;"></div>
+            <div class="reset-box">
+                <h4>⚠️ Destructive Action: Factory System Reset</h4>
+                <p>Performing a system factory reset will permanently erase all data records.</p>
+                <button onclick="promptFactoryReset()" class="danger" style="padding: 15px; font-size: 16px;">🔥 Execute Complete Factory Reset</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AUDIT LOG PROFILE MODAL WINDOW -->
+<div id="profileModal" class="modal hidden" onclick="handleModalOutsideClick(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-modal" onclick="closeProfileModal()">&times;</span>
+        <h2 id="modalTitle" style="border-bottom: 2px solid var(--accent); padding-bottom: 5px; margin-top:0;">Member Profile File</h2>
+        <div id="modalMeta" style="margin-bottom: 15px; font-size: 14px; line-height: 1.6;"></div>
+        <h3>📜 Historical Subscription Ledger & Security Audits</h3>
+        <div id="modalLogsContainer" style="background: #f1f2f6; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 12px; max-height: 250px; overflow-y: auto; border: 1px solid #ddd;"></div>
+    </div>
+</div>
+
+<script>
+    // --- CONTINUOUS GLOBAL TAB-SYNCHRONIZED TIME MACHINE ---
+    let systemClockOffsetMilliseconds = 0; 
+    
+    function updateClockOffsetFromStorage() {
+        const storedTarget = localStorage.getItem('simulatedTimeTarget');
+        if (storedTarget) {
+            const targetTimestamp = parseInt(storedTarget, 10);
+            const recordedAnchor = parseInt(localStorage.getItem('simulatedTimeAnchor') || Date.now(), 10);
+            const timePassedSinceAnchor = Date.now() - recordedAnchor;
+            const updatedTargetTime = targetTimestamp + timePassedSinceAnchor;
+            systemClockOffsetMilliseconds = updatedTargetTime - Date.now();
+        } else {
+            systemClockOffsetMilliseconds = 0; 
+        }
+    }
+
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'simulatedTimeTarget' || e.key === 'simulatedTimeAnchor') {
+            updateClockOffsetFromStorage();
+            if (userRole === 'manager') renderManagerData();
+            else if (userRole === 'employee') renderEmployeeData();
+            else if (userRole === 'cafeteria') renderCafeteriaData();
+        }
+    });
+
+    function getSystemSimulatedTime() {
+        return new Date(Date.now() + systemClockOffsetMilliseconds);
+    }
+
+    function runClockEngineTick() {
+        const simulatedDate = getSystemSimulatedTime();
+        const year = simulatedDate.getFullYear();
+        const month = String(simulatedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(simulatedDate.getDate()).padStart(2, '0');
+        const hours = String(simulatedDate.getHours()).padStart(2, '0');
+        const minutes = String(simulatedDate.getMinutes()).padStart(2, '0');
+        
+        document.getElementById('systemLiveClock').innerText = `${day}/${month}/${year} ${hours}:${minutes}`;
+        
+        verifyAllCustomersExpiryStateOnTick();
+        setTimeout(runClockEngineTick, 1000);
+    }
+
+    function warpSystemTime() {
+        const val = document.getElementById('systemTimeWarpInput').value;
+        if(!val) return printNotification("Select a valid destination date & time value.", "error");
+        
+        const targetDateTime = new Date(val);
+        const currentRealTimestamp = Date.now();
+        
+        localStorage.setItem('simulatedTimeTarget', targetDateTime.getTime().toString());
+        localStorage.setItem('simulatedTimeAnchor', currentRealTimestamp.toString());
+        
+        updateClockOffsetFromStorage();
+        printNotification(`🕒 System clock advanced globally across all tabs.`, "success");
+        manualRefresh();
+    }
+
+    function resetWarpedTime() {
+        localStorage.removeItem('simulatedTimeTarget');
+        localStorage.removeItem('simulatedTimeAnchor');
+        updateClockOffsetFromStorage();
+        document.getElementById('systemTimeWarpInput').value = "";
+        printNotification(`🕒 Restored real standard real-world time synchronization.`, "info");
+        manualRefresh();
+    }
+
+    function verifyAllCustomersExpiryStateOnTick() {
+        let customers = JSON.parse(localStorage.getItem('customers')) || [];
+        let updated = false;
+        const currentSimulatedTime = getSystemSimulatedTime();
+
+        customers.forEach(cust => {
+            if (cust.status === "Active" && cust.opt.type === 'time' && cust.expiryDate) {
+                if (new Date(cust.expiryDate + "T23:59:59") < currentSimulatedTime) {
+                    cust.status = "Expired";
+                    cust.logs.push(`[System Lifespan Check] Automated trigger marked subscription as Expired at time point: ${currentSimulatedTime.toLocaleString()}`);
+                    updated = true;
+                }
+            }
+        });
+
+        if (updated) {
+            localStorage.setItem('customers', JSON.stringify(customers));
+            if (userRole === 'manager') renderManagerData();
+        }
+    }
+
+    // --- DATABASE HYDRATION ---
+    function initDatabase(forceReset = false) {
+        if(forceReset) {
+            localStorage.clear();
+            systemClockOffsetMilliseconds = 0;
+        }
+        if(!localStorage.getItem('gymOptions')) {
+            localStorage.setItem('gymOptions', JSON.stringify([
+                { id: 1, name: "1 Month Unlimited", price: 50, type: "time", days: 30 },
+                { id: 2, name: "12 Entries Standard Pass", price: 40, type: "entry", entries: 12, expiryDays: 45 }
+            ]));
+        }
+        if(!localStorage.getItem('staff')) {
+            localStorage.setItem('staff', JSON.stringify([{ user: "emp1", pass: "emp1" }]));
+        }
+        if(!localStorage.getItem('foodItems')) {
+            localStorage.setItem('foodItems', JSON.stringify([
+                { id: 1, name: "Protein Shake", price: 3.50 },
+                { id: 2, name: "Energy Bar", price: 1.75 },
+                { id: 3, name: "Pre-Workout Scoop", price: 2.00 }
+            ]));
+        }
+        
+        if(!localStorage.getItem('cafLoginPassword')) { localStorage.setItem('cafLoginPassword', '1234'); }
+        if(!localStorage.getItem('cafModifyPassword')) { localStorage.setItem('cafModifyPassword', '1234'); }
+        if(!localStorage.getItem('foodSales')) { localStorage.setItem('foodSales', JSON.stringify([])); }
+        if(!localStorage.getItem('customers')) { localStorage.setItem('customers', JSON.stringify([])); }
+        if(!localStorage.getItem('quotations')) { localStorage.setItem('quotations', JSON.stringify([])); }
+        
+        updateClockOffsetFromStorage();
+    }
+
+    function rebuildLoginUserDropdown() {
+        const select = document.getElementById('loginUserSelect');
+        if (!select) return; 
+        
+        let html = `
+            <option value="admin">Admin (Executive Control Panel)</option>
+            <option value="caf">Caf (Cafeteria POS Station)</option>
+        `;
+        const staff = JSON.parse(localStorage.getItem('staff')) || [];
+        staff.forEach(s => {
+            html += `<option value="${s.user}">Employee: ${s.user}</option>`;
+        });
+        select.innerHTML = html;
+    }
+
+    let currentUser = null, userRole = null;
+    let posActiveCart = [];
+    let activeCheckoutWalletUser = null;
+
+    window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeProfileModal();
+    });
+    function handleModalOutsideClick(e) { closeProfileModal(); }
+
+    function printNotification(message, statusType = 'info') {
+        const target = document.getElementById('globalNotificationBar');
+        target.innerHTML = `<div class="ui-notification ui-${statusType}">${message}</div>`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => { target.innerHTML = ""; }, 7000);
+    }
+
+    // --- INTERFACE MANAGEMENT VIEWS ---
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+        document.getElementById(screenId).classList.remove('hidden');
+        document.getElementById('globalNotificationBar').innerHTML = "";
+    }
+    function showEmpSubTab(tabId) {
+        document.querySelectorAll('.empTab').forEach(t => t.classList.add('hidden'));
+        document.getElementById(tabId).classList.remove('hidden');
+        document.getElementById('checkInVerifyConsole').classList.add('hidden');
+    }
+    function showMgrSubTab(tabId) {
+        document.querySelectorAll('.mgrTab').forEach(t => t.classList.add('hidden'));
+        document.getElementById(tabId).classList.remove('hidden');
+        document.getElementById('mgrPromptContainer').innerHTML = "";
+    }
+    function showCafSubTab(tabId) {
+        document.querySelectorAll('.cafTab').forEach(t => t.classList.add('hidden'));
+        document.getElementById(tabId).classList.remove('hidden');
+    }
+    function manualRefresh() {
+        verifyAllCustomersExpiryStateOnTick();
+        if (userRole === 'manager') renderManagerData();
+        else if (userRole === 'employee') renderEmployeeData();
+        else if (userRole === 'cafeteria') renderCafeteriaData();
+        printNotification("🔄 Real-time database entities synchronized successfully.", "success");
+    }
+
+    // --- AUTH SECURITY CORE ---
+    function handleLogin() {
+        const selectedUser = document.getElementById('loginUserSelect').value;
+        const p = document.getElementById('loginPass').value;
+        const runtimeCafLoginPass = localStorage.getItem('cafLoginPassword') || '1234';
+        
+        if(selectedUser === 'admin' && p === 'admin') {
+            currentUser = 'admin'; userRole = 'manager';
+            document.getElementById('userStatus').innerText = "Logged In: Muscle Power Admin";
+            showScreen('managerDashboard'); renderManagerData();
+        } else if (selectedUser === 'caf' && p === runtimeCafLoginPass) {
+            currentUser = 'caf'; userRole = 'cafeteria';
+            document.getElementById('userStatus').innerText = "Logged In: Cafeteria Register";
+            showScreen('cafeteriaDashboard'); renderCafeteriaData();
+        } else {
+            const staff = JSON.parse(localStorage.getItem('staff')) || [];
+            const found = staff.find(s => s.user === selectedUser && s.pass === p);
+            if(found) {
+                currentUser = selectedUser; userRole = 'employee';
+                document.getElementById('userStatus').innerText = `Logged In Operator: ${selectedUser}`;
+                showScreen('employeeDashboard'); renderEmployeeData();
+            } else { printNotification("Authorization Denied: Invalid Password Match.", "error"); }
+        }
+        document.getElementById('loginPass').value = "";
+    }
+    
+    function logout() {
+        currentUser = null; userRole = null;
+        document.getElementById('userStatus').innerText = "Logged Out Secured";
+        showScreen('loginScreen');
+    }
+
+    // --- MGR PASSHRASE SECURITY UPDATERS ---
+    function updateCafLoginPassword() {
+        const newPass = document.getElementById('mgrCafLoginPassInput').value.trim();
+        if(!newPass) return printNotification("Login password cannot be left empty.", "error");
+        localStorage.setItem('cafLoginPassword', newPass);
+        document.getElementById('mgrCafLoginPassInput').value = "";
+        printNotification("Cafeteria system login authentication credential updated successfully.", "success");
+    }
+
+    function updateCafModifyPassword() {
+        const newPass = document.getElementById('mgrCafModifyPassInput').value.trim();
+        if(!newPass) return printNotification("Modification password cannot be left empty.", "error");
+        localStorage.setItem('cafModifyPassword', newPass);
+        document.getElementById('mgrCafModifyPassInput').value = "";
+        printNotification("Cafeteria inline modification guard verification passcode saved.", "success");
+    }
+
+    // --- SECURED INVENTORY ROUTER LINK ---
+    function challengeModifyAccess() {
+        const securityChallenge = prompt("Enter secure item profile authorization token credentials:");
+        const runtimeCafModifyPass = localStorage.getItem('cafModifyPassword') || '1234';
+
+        if (securityChallenge === runtimeCafModifyPass) {
+            showScreen('cafeteriaInventoryScreen');
+            renderInventoryConfigurationView();
+        } else if (securityChallenge !== null) {
+            alert("Security Violation: Invalid Administrative Authorization Token.");
+        }
+    }
+
+    // --- REGISTERED WORKFLOW CALCULATORS ---
+    function updatePricePreview() {
+        const subId = document.getElementById('custSubChoice').value;
+        const discountJOD = parseFloat(document.getElementById('custDiscountJOD').value) || 0;
+        document.getElementById('discountReasonWrapper').classList.toggle('hidden', discountJOD <= 0);
+        const options = JSON.parse(localStorage.getItem('gymOptions'));
+        const opt = options.find(o => o.id == subId);
+        if(opt) {
+            let finalPrice = Math.max(0, opt.price - discountJOD);
+            document.getElementById('pricePreview').innerText = `${Math.round(finalPrice)} JOD`;
+        }
+    }
+    function toggleOptFields() {
+        const type = document.getElementById('optType').value;
+        document.getElementById('timeFields').classList.toggle('hidden', type !== 'time');
+        document.getElementById('entryFields').classList.toggle('hidden', type !== 'entry');
+    }
+
+    function searchMemberProfile() {
+        const query = document.getElementById('searchMemberInput').value.trim().toLowerCase();
+        if(!query) return printNotification("Please enter lookup parameters.", "error");
+        const customers = JSON.parse(localStorage.getItem('customers'));
+        const matched = customers.find(c => c.code === query || c.first.toLowerCase() === query || c.last.toLowerCase() === query);
+        const resultDiv = document.getElementById('searchProfileResult');
+        if(matched) {
+            resultDiv.innerHTML = `✅ Profile Confirmed: ${matched.first} ${matched.last} (ID: ${matched.code}) - Status: [${matched.status}]`;
+            document.getElementById('custExistingCode').value = matched.code;
+            document.getElementById('custFirst').value = matched.first; document.getElementById('custLast').value = matched.last; document.getElementById('custDOB').value = matched.dob;
+            document.getElementById('custFirst').disabled = true; document.getElementById('custLast').disabled = true; document.getElementById('custDOB').disabled = true;
+        } else {
+            resultDiv.innerHTML = `❌ No profile match. Form values will initialize a brand new system user record profile.`;
+            document.getElementById('custExistingCode').value = "";
+            document.getElementById('custFirst').disabled = false; document.getElementById('custLast').disabled = false; document.getElementById('custDOB').disabled = false;
+        }
+    }
+
+    function clearRegistrationForm() {
+        document.getElementById('custExistingCode').value = "";
+        document.getElementById('custFirst').value = ""; document.getElementById('custLast').value = ""; document.getElementById('custDOB').value = "";
+        document.getElementById('custStartDate').value = "";
+        document.getElementById('custDiscountJOD').value = "0"; document.getElementById('custDiscountReason').value = "";
+        document.getElementById('searchMemberInput').value = ""; document.getElementById('searchProfileResult').innerHTML = "";
+        document.getElementById('custFirst').disabled = false; document.getElementById('custLast').disabled = false; document.getElementById('custDOB').disabled = false;
+        document.getElementById('renewalContextBox').classList.add('hidden');
+        updatePricePreview();
+    }
+
+    // --- INTERACTIVE RETRIEVAL INSPECTOR HOOKS ---
+    function inspectProfile(role) {
+        const code = document.getElementById(`${role}InspectInput`).value.trim();
+        const dest = document.getElementById(`${role}InspectResult`);
+        if(!code) return printNotification("Input a valid execution query ID.", "error");
+        
+        verifyAllCustomersExpiryStateOnTick();
+        const customers = JSON.parse(localStorage.getItem('customers'));
+        const cust = customers.find(c => c.code === code);
+        
+        if(!cust) {
+            dest.innerHTML = `<div style="color:var(--danger); font-weight:bold;">❌ Gym ID code lookup returned 0 system records.</div>`;
+            return;
+        }
+        
+        let subMetric = cust.opt.type === 'time' ? `<b>Expiration Date:</b> ${cust.expiryDate || 'Lapsed'}` : `<b>Entries Remaining:</b> ${cust.entriesLeft !== null ? cust.entriesLeft : '0'}`;
+        if (cust.startDate && new Date(cust.startDate) > getSystemSimulatedTime()) {
+            subMetric += ` <span style="color:var(--danger); font-weight:bold;">(Starts: ${cust.startDate})</span>`;
+        }
+        
+        dest.innerHTML = `
+            <div class="card" style="border-left: 5px solid var(--accent); background: #fafafa;">
+                <h4>👤 Profile Status: ${cust.first} ${cust.last} (ID: ${cust.code})</h4>
+                <p><b>Account Standing:</b> <span class="badge badge-${cust.status.toLowerCase()}">${cust.status}</span></p>
+                <p><b>Package Active:</b> ${cust.opt.name} (${cust.opt.price} JOD Base)</p>
+                <p>${subMetric}</p>
+                <p><b>Cafeteria Wallet Balance:</b> ${(cust.cafeteriaBalance || 0).toFixed(2)} JOD</p>
+                <p><b>Total Historical Visits logged:</b> ${cust.totalCheckIns}</p>
+                <button class="warning" onclick="launchProfileModal('${cust.code}')" style="width:auto; padding:5px 15px;">View Detailed Audits</button>
+            </div>`;
+    }
+
+    function lookupGymID() {
+        const first = document.getElementById('lookupFirst').value.trim().toLowerCase();
+        const dob = document.getElementById('lookupDOB').value;
+        if(!first || !dob) return printNotification("Fill out search credentials.", "error");
+        const customers = JSON.parse(localStorage.getItem('customers'));
+        const matched = customers.find(c => c.first.toLowerCase() === first && c.dob === dob);
+        const display = document.getElementById('lookupResultDisplay');
+        if(matched) display.innerHTML = `<span style="color:var(--secondary); font-size:28px;">ID: ${matched.code}</span><br><small>${matched.first} ${matched.last}</small>`;
+        else display.innerHTML = `<span style="color:var(--danger); font-size:18px;">No Profile Match Found</span>`;
+    }
+
+    function launchProfileModal(code) {
+        verifyAllCustomersExpiryStateOnTick();
+        const customers = JSON.parse(localStorage.getItem('customers'));
+        const cust = customers.find(c => c.code === code);
+        if(!cust) return;
+
+        document.getElementById('modalTitle').innerText = `Member Profile: ${cust.first} ${cust.last}`;
+        document.getElementById('modalMeta').innerHTML = `
+            <b>Gym ID Access Key:</b> ${cust.code}<br>
+            <b>Date of Birth:</b> ${cust.dob}<br>
+            <b>Start Date Tracked:</b> ${cust.startDate || 'Immediate'}<br>
+            <b>Cafeteria Prepaid Wallet:</b> ${(cust.cafeteriaBalance || 0).toFixed(2)} JOD<br>
+            <b>Financial Balance Contributed (Gym Package Fees):</b> ${cust.paid} JOD<br>
+            <b>Current Membership Status:</b> <span class="badge badge-${cust.status.toLowerCase()}">${cust.status}</span>
+        `;
+        
+        let logsHtml = cust.logs.length > 0 ? cust.logs.map(l => `<div>• ${l}</div>`).join('') : '<div>No historical events mapped.</div>';
+        document.getElementById('modalLogsContainer').innerHTML = logsHtml;
+        document.getElementById('profileModal').classList.remove('hidden');
+    }
+    function closeProfileModal() { document.getElementById('profileModal').classList.add('hidden'); }
+
+    // --- PACKAGES & EMPLOYEES CONFIGURATION ---
+    function addGymOption() {
+        const name = document.getElementById('optName').value, price = parseFloat(document.getElementById('optPrice').value), type = document.getElementById('optType').value;
+        if(!name || !price) return printNotification("Validation Failed.", "error");
+        let options = JSON.parse(localStorage.getItem('gymOptions'));
+        let newOpt = { id: Date.now(), name, price, type };
+        if(type === 'time') newOpt.days = parseInt(document.getElementById('optDays').value) || 30;
+        else { newOpt.entries = parseInt(document.getElementById('optEntries').value) || 10; newOpt.expiryDays = parseInt(document.getElementById('optExpiryDays').value) || 30; }
+        options.push(newOpt); localStorage.setItem('gymOptions', JSON.stringify(options)); renderManagerData(); printNotification("Package Config Published.", "success");
+    }
+    function deleteGymOption(id) {
+        let options = JSON.parse(localStorage.getItem('gymOptions'));
+        options = options.filter(o => o.id !== id); localStorage.setItem('gymOptions', JSON.stringify(options)); renderManagerData();
+    }
+    function addEmployee() {
+        const user = document.getElementById('empUser').value, pass = document.getElementById('empPass').value;
+        if(!user || !pass) return printNotification("Missing details.", "error");
+        let staff = JSON.parse(localStorage.getItem('staff')) || [];
+        staff.push({ user, pass }); localStorage.setItem('staff', JSON.stringify(staff)); renderManagerData();
+        document.getElementById('empUser').value = ""; document.getElementById('empPass').value = "";
+        printNotification("Staff Credentials Generated.", "success");
+    }
+    function deleteEmployee(username) {
+        let staff = JSON.parse(localStorage.getItem('staff'));
+        staff = staff.filter(s => s.user !== username); localStorage.setItem('staff', JSON.stringify(staff)); renderManagerData();
+        printNotification("Staff Clearance Revoked.", "info");
+    }
+
+    // --- GYM MEMBERSHIP PIPELINES ---
+    function submitCustomerRegistration() {
+        const first = document.getElementById('custFirst').value, last = document.getElementById('custLast').value, dob = document.getElementById('custDOB').value;
+        const subId = document.getElementById('custSubChoice').value, discountJOD = parseFloat(document.getElementById('custDiscountJOD').value) || 0, reason = document.getElementById('custDiscountReason').value.trim();
+        const existingCode = document.getElementById('custExistingCode').value;
+        const startDate = document.getElementById('custStartDate').value;
+
+        if(!first || !last || !dob) return printNotification("Fill core parameters.", "error");
+        if(discountJOD > 0 && !reason) return printNotification("A discount justification text statement is mandatory.", "error");
+
+        const options = JSON.parse(localStorage.getItem('gymOptions'));
+        const opt = options.find(o => o.id == subId);
+        let finalPrice = Math.max(0, opt.price - discountJOD);
+        const code = existingCode ? existingCode : Math.floor(10000 + Math.random() * 90000).toString();
+
+        let q = { id: Date.now(), isRenewal: !!existingCode, code, first, last, dob, startDate, opt, discountJOD, finalPrice, status: "Pending", empReason: reason, mgrNote: "" };
+
+        if(discountJOD === 0) {
+            const confirmationDiv = document.getElementById('renewalContextBox');
+            confirmationDiv.className = "ui-notification ui-info";
+            confirmationDiv.classList.remove('hidden');
+            confirmationDiv.innerHTML = `
+                <p>💸 <b>Immediate Direct Payment Checkout Required:</b> Collect <b>${finalPrice} JOD</b> from ${first} ${last}.</p>
+                <button class="secondary" style="width:auto; margin-right:10px;" id="execDirectPayBtn">Confirm Cash Received & Activate</button>
+                <button class="danger" style="width:auto;" onclick="document.getElementById('renewalContextBox').classList.add('hidden')">Cancel Transaction</button>
+            `;
+            confirmationDiv.querySelector('#execDirectPayBtn').onclick = function() {
+                activateCustomer(q);
+                printNotification(`🎉 Active Membership Confirmed! GYM ID for ${first}: ${code}`, "success");
+                clearRegistrationForm();
+            };
+        } else {
+            let quotations = JSON.parse(localStorage.getItem('quotations')); quotations.push(q);
+            localStorage.setItem('quotations', JSON.stringify(quotations)); 
+            printNotification("Quotation Proposal sent to Manager Vault for Approval.", "info");
+            clearRegistrationForm(); renderEmployeeData();
+        }
+    }
+
+    function activateCustomer(q) {
+        let customers = JSON.parse(localStorage.getItem('customers'));
+        let targetCust = customers.find(c => c.code === q.code);
+        
+        let baseDate = q.startDate ? new Date(q.startDate) : getSystemSimulatedTime();
+        if (isNaN(baseDate.getTime())) baseDate = getSystemSimulatedTime();
+
+        if(targetCust) {
+            targetCust.opt = q.opt;
+            targetCust.paid += q.finalPrice;
+            targetCust.lastSubscriptionAmount = q.finalPrice; // track for potential clean targeted return processing
+            targetCust.status = "Active";
+            targetCust.startDate = q.startDate || "";
+            targetCust.logs.push(`[Renewal] Active Sub: "${q.opt.name}" processed for ${q.finalPrice} JOD on ${getSystemSimulatedTime().toLocaleString()}.`);
+            if(q.opt.type === 'time') {
+                let exp = new Date(baseDate.getTime()); exp.setDate(exp.getDate() + q.opt.days);
+                targetCust.expiryDate = exp.toISOString().split('T')[0]; targetCust.entriesLeft = null;
+            } else {
+                targetCust.entriesLeft = (targetCust.entriesLeft || 0) + q.opt.entries; targetCust.expiryDate = null;
+                targetCust.expiryDaysRule = q.opt.expiryDays;
+            }
+        } else {
+            let newCustomer = {
+                code: q.code, first: q.first, last: q.last, dob: q.dob, opt: q.opt, paid: q.finalPrice, lastSubscriptionAmount: q.finalPrice, status: "Active", startDate: q.startDate || "", cafeteriaBalance: 0.00, logs: [`Profile Created. Selected Base: "${q.opt.name}" on ${getSystemSimulatedTime().toLocaleString()}`], totalCheckIns: 0
+            };
+            if(q.opt.type === 'time') {
+                let exp = new Date(baseDate.getTime()); exp.setDate(exp.getDate() + q.opt.days); newCustomer.expiryDate = exp.toISOString().split('T')[0];
+            } else { newCustomer.entriesLeft = q.opt.entries; newCustomer.expiryDaysRule = q.opt.expiryDays; newCustomer.expiryDate = null; }
+            customers.push(newCustomer);
+        }
+        localStorage.setItem('customers', JSON.stringify(customers));
+    }
+
+    // --- GATE TERMINAL CHECK-IN ---
+    function loadCheckInIdentity() {
+        const code = document.getElementById('checkInCode').value.trim();
+        const consoleDest = document.getElementById('checkInVerifyConsole');
+        consoleDest.innerHTML = ""; consoleDest.classList.add('hidden');
+
+        let customers = JSON.parse(localStorage.getItem('customers'));
+        let cust = customers.find(c => c.code === code);
+
+        if(!cust) {
+            consoleDest.className = "ui-notification ui-error"; consoleDest.innerHTML = "❌ <b>Access Interrupted:</b> Gym ID code not found in active registers.";
+            consoleDest.classList.remove('hidden'); return;
+        }
+        
+        const currentSimulatedTime = getSystemSimulatedTime();
+        
+        // FUTURE START DATE GATE LOCK VERIFICATION
+        if (cust.startDate) {
+            const parsedStart = new Date(cust.startDate + "T00:00:00");
+            if (parsedStart > currentSimulatedTime) {
+                consoleDest.className = "ui-notification ui-error";
+                consoleDest.innerHTML = `❌ <b>ENTRY DENIED:</b> Subscription didn't start yet. <br><b>Start Date:</b> ${cust.startDate}`;
+                consoleDest.classList.remove('hidden'); return;
+            }
+        }
+
+        if(cust.opt.type === 'time' && cust.expiryDate) {
+            if(new Date(cust.expiryDate + "T23:59:59") < currentSimulatedTime && cust.status === "Active") {
+                cust.status = "Expired";
+                cust.logs.push(`[Lifespan Check] Flagged Expired upon Gate Query scan: ${currentSimulatedTime.toLocaleString()}`);
+                localStorage.setItem('customers', JSON.stringify(customers));
+            }
+        }
+
+        if(cust.status === "Suspended" || cust.status === "Refunded" || cust.status === "Expired" || cust.status === "Depleted") {
+            consoleDest.className = "ui-notification ui-error";
+            consoleDest.innerHTML = `❌ <b>ENTRY DENIED:</b> Membership profile state flagged as [${cust.status}]. Gate Interceptor Locked.`;
+            consoleDest.classList.remove('hidden'); return;
+        }
+
+        if(cust.opt.type === 'entry' && cust.entriesLeft <= 0) {
+            cust.status = "Depleted"; localStorage.setItem('customers', JSON.stringify(customers));
+            consoleDest.className = "ui-notification ui-error"; consoleDest.innerHTML = "❌ <b>ENTRY DENIED:</b> 0 Entries remaining.";
+            consoleDest.classList.remove('hidden'); return;
+        }
+
+        consoleDest.className = "card"; consoleDest.classList.remove('hidden');
+        let balanceString = cust.opt.type === 'time' ? `Time Range Pass (Expires: ${cust.expiryDate})` : `${cust.entriesLeft} Entries Left`;
+
+        consoleDest.innerHTML = `
+            <h4 style="color:var(--secondary); border-bottom:1px solid #ddd; padding-bottom:5px;">👤 Member Profile Verification Match</h4>
+            <table style="margin-bottom:15px; background:white;">
+                <tr><td><b>Full Name:</b></td><td>${cust.first} ${cust.last}</td></tr>
+                <tr><td><b>Gym ID Key:</b></td><td><code>${cust.code}</code></td></tr>
+                <tr><td><b>Current Balance:</b></td><td>${balanceString}</td></tr>
+                <tr><td><b>Total Lifetime Visits:</b></td><td>${cust.totalCheckIns} check-ins</td></tr>
+            </table>
+            <button class="secondary" style="width:auto; margin-right:10px;" id="executeGateCheckInBtn">Confirm & Grant Entry</button>
+            <button class="danger" style="width:auto;" onclick="document.getElementById('checkInVerifyConsole').classList.add('hidden')">Cancel</button>
+        `;
+
+        consoleDest.querySelector('#executeGateCheckInBtn').onclick = function() {
+            let latestCustomers = JSON.parse(localStorage.getItem('customers'));
+            let active = latestCustomers.find(c => c.code === cust.code);
+            let timestamp = getSystemSimulatedTime().toLocaleString();
+
+            if(active.opt.type === 'time') {
+                if(new Date(active.expiryDate + "T23:59:59") < getSystemSimulatedTime()) {
+                    active.status = "Expired";
+                    consoleDest.className = "ui-notification ui-error"; consoleDest.innerHTML = "❌ <b>Access Lapsed:</b> Time window has officially expired.";
+                } else {
+                    active.logs.push(`Check-In Approved: ${timestamp}`); active.totalCheckIns++;
+                    consoleDest.className = "ui-notification ui-success";
+                    consoleDest.innerHTML = `✅ <b>Entry Authorized!</b> Welcome back, ${active.first}. Total visits: ${active.totalCheckIns}.`;
+                    document.getElementById('checkInCode').value = "";
+                }
+            } else {
+                if(active.entriesLeft <= 0) {
+                    active.status = "Depleted";
+                    consoleDest.className = "ui-notification ui-error"; consoleDest.innerHTML = "❌ <b>Access Denied:</b> Entries balance exhausted.";
+                } else {
+                    active.entriesLeft--; active.totalCheckIns++;
+                    active.logs.push(`Check-In Approved (${active.entriesLeft} left): ${timestamp}`);
+                    consoleDest.className = "ui-notification ui-success";
+                    consoleDest.innerHTML = `✅ <b>Access Authorized!</b> Passes Remaining: ${active.entriesLeft}. Enjoy your workout, ${active.first}!`;
+                    if(active.entriesLeft <= 0) active.status = "Depleted";
+                    document.getElementById('checkInCode').value = "";
+                }
+            }
+            localStorage.setItem('customers', JSON.stringify(latestCustomers));
         };
+    }
 
-        let subscriptionPlans = [
-            { id: "tier-1", name: "Standard 10 Sessions Pass", entries: 10, durationDays: 30, visibility: "all" },
-            { id: "tier-2", name: "Premium Unlimited Annual VIP", entries: 999, durationDays: 365, visibility: "all" },
-            { id: "tier-3", name: "Corporate Staff Framework", entries: 120, durationDays: 180, visibility: "employee" },
-            { id: "tier-4", name: "Under-The-Table Match Promo", entries: 15, durationDays: 45, visibility: "employee" }
-        ];
+    function acceptCounter(id) {
+        let quotations = JSON.parse(localStorage.getItem('quotations')), q = quotations.find(x => x.id === id);
+        const confirmationDiv = document.getElementById('globalNotificationBar');
+        confirmationDiv.className = "ui-notification ui-info";
+        confirmationDiv.innerHTML = `
+            <p>🤝 <b>Process Counter-Offer Terms:</b> Confirm client paid exactly <b>${q.finalPrice} JOD</b>?</p>
+            <button class="secondary" style="width:auto; margin-right:10px;" id="confirmCounterBtn">Payment Received</button>
+            <button class="danger" style="width:auto;" onclick="this.parentElement.innerHTML=''">Cancel</button>
+        `;
+        confirmationDiv.querySelector('#confirmCounterBtn').onclick = function() {
+            activateCustomer(q); printNotification(`🎉 Active Membership Confirmed! GYM ID: ${q.code}`, "success");
+            quotations = quotations.filter(x => x.id !== id); localStorage.setItem('quotations', JSON.stringify(quotations));
+            renderEmployeeData();
+        };
+    }
 
-        let pendingRenewalsQueue = [
-            { requestId: "req-mock-1", gymId: "MP-102", planId: "tier-2" }
-        ];
-
-        let activeSessionUserRole = null;
-
-        /*----------------------------------------------------------------------------*/
-        /* APPLICATION CREDENTIAL PROCESSING LOGIC INTERFACES                         */
-        /*----------------------------------------------------------------------------*/
-        function triggerSystemAuthentication() {
-            const userIn = document.getElementById('uid').value.trim().toLowerCase();
-            const passIn = document.getElementById('pwd').value.trim();
-
-            if (passIn !== "1234") {
-                renderSystemModalAlert("Security Error", "The access token provided does not match our compliance checks.", true);
-                return;
-            }
-
-            if (userIn === "manager" || userIn === "employee" || userIn === "customer") {
-                activeSessionUserRole = userIn;
-                
-                document.getElementById('loginGate').style.display = 'none';
-                document.getElementById('appHeader').style.display = 'flex';
-                document.getElementById('roleDisplay').innerText = activeSessionUserRole.toUpperCase();
-                
-                configureWorkspaceAccessTabs();
-            } else {
-                renderSystemModalAlert("Access Denied", "No matching security credentials map to this username.", true);
-            }
+    // --- CAFETERIA REVENUE & PREPAID WALLET OPERATIONS ---
+    function searchCustomerWallet() {
+        const id = document.getElementById('walletGymIdSearch').value.trim();
+        if(!id) return alert("Enter a valid lookup ID code.");
+        
+        verifyAllCustomersExpiryStateOnTick();
+        const customers = JSON.parse(localStorage.getItem('customers')) || [];
+        const client = customers.find(c => c.code === id);
+        const wrapper = document.getElementById('walletConsoleWrapper');
+        
+        if(!client) {
+            wrapper.classList.add('hidden');
+            return alert("Gym ID code lookup returned 0 matching records.");
         }
+        
+        document.getElementById('walletProfileName').innerText = `${client.first} ${client.last} (${client.code})`;
+        document.getElementById('walletCurrentBalanceDisplay').innerText = (client.cafeteriaBalance || 0).toFixed(2);
+        
+        document.getElementById('walletAddAmount').value = "";
+        document.getElementById('walletSubAmount').value = "";
+        wrapper.classList.remove('hidden');
+    }
 
-        function triggerSystemLogout() {
-            activeSessionUserRole = null;
-            document.getElementById('uid').value = '';
-            document.getElementById('pwd').value = '';
+    function adjustCustomerWallet(direction) {
+        const id = document.getElementById('walletGymIdSearch').value.trim();
+        let amount = parseFloat(document.getElementById(`wallet${direction==='add'?'Add':'Sub'}Amount`).value);
+        
+        if(isNaN(amount) || amount <= 0) return alert("Please specify a valid numeric currency amount.");
+        
+        let customers = JSON.parse(localStorage.getItem('customers')) || [];
+        let client = customers.find(c => c.code === id);
+        if(!client) return;
+        
+        if(client.cafeteriaBalance === undefined) client.cafeteriaBalance = 0.00;
+        let ledger = JSON.parse(localStorage.getItem('foodSales')) || [];
+        let stamp = getSystemSimulatedTime().toLocaleString();
+        
+        if(direction === 'add') {
+            client.cafeteriaBalance += amount;
+            client.logs.push(`[Cafeteria Wallet] Deposited +${amount.toFixed(2)} JOD on ${stamp}.`);
             
-            document.getElementById('loginGate').style.display = 'block';
-            document.getElementById('appHeader').style.display = 'none';
-            document.getElementById('appNavigation').style.display = 'none';
-            
-            document.querySelectorAll('.portal-pane').forEach(p => p.style.display = 'none');
-        }
-
-        function configureWorkspaceAccessTabs() {
-            const navBar = document.getElementById('appNavigation');
-            navBar.style.display = 'flex';
-
-            // Reset tab triggers visibility profile map
-            document.getElementById('tabBtnCustomer').style.display = 'none';
-            document.getElementById('tabBtnEmployee').style.display = 'none';
-            document.getElementById('tabBtnManager').style.display = 'none';
-
-            if (activeSessionUserRole === "manager") {
-                document.getElementById('tabBtnCustomer').style.display = 'inline-block';
-                document.getElementById('tabBtnEmployee').style.display = 'inline-block';
-                document.getElementById('tabBtnManager').style.display = 'inline-block';
-                activateMainTab('panelManager');
-            } else if (activeSessionUserRole === "employee") {
-                document.getElementById('tabBtnCustomer').style.display = 'inline-block';
-                document.getElementById('tabBtnEmployee').style.display = 'inline-block';
-                activateMainTab('panelEmployee');
-            } else if (activeSessionUserRole === "customer") {
-                document.getElementById('tabBtnCustomer').style.display = 'inline-block';
-                activateMainTab('panelCustomer');
-            }
-
-            synchronizeGlobalInterfaceViews();
-        }
-
-        function activateMainTab(paneId) {
-            document.querySelectorAll('.portal-pane').forEach(p => p.style.display = 'none');
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-
-            document.getElementById(paneId).style.display = 'block';
-            if(paneId === 'panelCustomer') document.getElementById('tabBtnCustomer').classList.add('active');
-            if(paneId === 'panelEmployee') document.getElementById('tabBtnEmployee').classList.add('active');
-            if(paneId === 'panelManager') document.getElementById('tabBtnManager').classList.add('active');
-        }
-
-        function activateSubTab(subPaneId) {
-            document.querySelectorAll('.sub-pane').forEach(p => p.style.display = 'none');
-            document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
-
-            document.getElementById(subPaneId).style.display = 'block';
-            if(subPaneId === 'empCheckinPane') document.getElementById('subTabBtnCheckin').classList.add('active');
-            if(subPaneId === 'empRenewalsPane') document.getElementById('subTabBtnRequests').classList.add('active');
-        }
-
-        /*----------------------------------------------------------------------------*/
-        /* DATA AND INTERFACE RENDERING ENGINE CHANNELS                               */
-        /*----------------------------------------------------------------------------*/
-        function synchronizeGlobalInterfaceViews() {
-            // Compute structural pipeline metrics counters 
-            const badge = document.getElementById('renewalsBadge');
-            if (pendingRenewalsQueue.length > 0) {
-                badge.innerText = pendingRenewalsQueue.length;
-                badge.style.display = 'inline-block';
-            } else {
-                badge.style.display = 'none';
-            }
-
-            // Populate Customer View Dynamic Plan Selection Box elements based on visibility rules matrix
-            const selectEl = document.getElementById('customerPlanSelector');
-            selectEl.innerHTML = '';
-            
-            subscriptionPlans.forEach(plan => {
-                // If it is a manager or employee reading the file, show everything.
-                // If it is a self-service customer portal user session, filter out non-public tags.
-                if (activeSessionUserRole === 'manager' || activeSessionUserRole === 'employee' || plan.visibility === 'all') {
-                    let option = document.createElement('option');
-                    option.value = plan.id;
-                    option.innerText = `${plan.name} [${plan.entries} visits - ${plan.durationDays} Days]`;
-                    selectEl.appendChild(option);
-                }
+            ledger.push({
+                timestamp: stamp,
+                products: `Prepaid Balance Deposit [Gym ID: ${client.code}]`,
+                gross: amount,
+                discount: "0%",
+                net: amount
             });
-
-            renderManagerCatalogTable();
-            renderEmployeeRenewalsQueueTable();
-        }
-
-        function renderManagerCatalogTable() {
-            const tbody = document.getElementById('mgrCatalogTablePayload');
-            tbody.innerHTML = '';
+            printNotification(`Successfully loaded +${amount.toFixed(2)} JOD to customer balance account.`, "success");
+        } else {
+            client.cafeteriaBalance -= amount;
+            client.logs.push(`[Cafeteria Wallet] Correction/Deduction of -${amount.toFixed(2)} JOD on ${stamp}.`);
             
-            subscriptionPlans.forEach(plan => {
-                let row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><strong>${plan.name}</strong></td>
-                    <td>${plan.entries}</td>
-                    <td>${plan.durationDays} Days</td>
-                    <td><span class="badge ${plan.visibility === 'all' ? 'badge-all' : 'badge-emp'}">${plan.visibility}</span></td>
-                `;
-                tbody.appendChild(row);
+            ledger.push({
+                timestamp: stamp,
+                products: `Balance Correction Entry [Gym ID: ${client.code}]`,
+                gross: -amount,
+                discount: "0%",
+                net: -amount
             });
+            printNotification(`Balance correction processed. -${amount.toFixed(2)} JOD deducted from client wallet.`, "warning");
+        }
+        
+        localStorage.setItem('customers', JSON.stringify(customers));
+        localStorage.setItem('foodSales', JSON.stringify(ledger));
+        
+        searchCustomerWallet();
+        renderCafeteriaData();
+    }
+
+    // --- INTERACTIVE STOCK TABLES CONFIG ---
+    function addFoodItemInventory() {
+        const name = document.getElementById('foodItemName').value.trim();
+        const price = parseFloat(document.getElementById('foodItemPrice').value);
+        if(!name || isNaN(price) || price <= 0) return alert("Provide a valid item profile name and monetary value.");
+
+        let items = JSON.parse(localStorage.getItem('foodItems')) || [];
+        items.push({ id: Date.now(), name, price: parseFloat(price.toFixed(2)) });
+        localStorage.setItem('foodItems', JSON.stringify(items));
+        
+        document.getElementById('foodItemName').value = ""; document.getElementById('foodItemPrice').value = "";
+        renderInventoryConfigurationView();
+    }
+
+    function changeFoodItemPrice(itemId) {
+        const inputField = document.getElementById(`invPriceInput-${itemId}`);
+        const updatedPriceValue = parseFloat(inputField.value);
+        
+        if (isNaN(updatedPriceValue) || updatedPriceValue <= 0) {
+            alert("Please input a valid price configuration amount.");
+            return;
         }
 
-        function renderEmployeeRenewalsQueueTable() {
-            const tbody = document.getElementById('renewalsQueueTablePayload');
-            tbody.innerHTML = '';
+        let items = JSON.parse(localStorage.getItem('foodItems')) || [];
+        const targetedIndex = items.findIndex(i => i.id === itemId);
+        if (targetedIndex !== -1) {
+            items[targetedIndex].price = parseFloat(updatedPriceValue.toFixed(2));
+            localStorage.setItem('foodItems', JSON.stringify(items));
+            renderInventoryConfigurationView();
+        }
+    }
 
-            if (pendingRenewalsQueue.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">No dynamic system renewal actions are pending verification in this scope.</td></tr>`;
-                return;
-            }
+    function deleteFoodItemFromInventory(itemId) {
+        if (!confirm("Are you sure you want to completely erase this item from active menu listings?")) return;
+        
+        let items = JSON.parse(localStorage.getItem('foodItems')) || [];
+        items = items.filter(i => i.id !== itemId);
+        localStorage.setItem('foodItems', JSON.stringify(items));
+        
+        posActiveCart = posActiveCart.filter(cartItem => cartItem.id !== itemId);
+        recalculateCartTotals();
+        renderInventoryConfigurationView();
+    }
 
-            pendingRenewalsQueue.forEach(req => {
-                const targetMember = customers[req.gymId] || { name: "Corrupted Account Data Record" };
-                const targetPlan = subscriptionPlans.find(p => p.id === req.planId) || { name: "Unknown System Package Model", entries: 0 };
+    function addFoodToCart(itemId) {
+        const items = JSON.parse(localStorage.getItem('foodItems')) || [];
+        const targetedProd = items.find(i => i.id === itemId);
+        if(!targetedProd) return;
 
-                let row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><code>${req.gymId}</code></td>
-                    <td>${targetMember.name}</td>
-                    <td>${targetPlan.name}</td>
-                    <td>${targetPlan.entries} Visits</td>
+        let cartMatch = posActiveCart.find(x => x.id === itemId);
+        if(cartMatch) { cartMatch.qty++; } 
+        else { posActiveCart.push({ id: targetedProd.id, name: targetedProd.name, price: targetedProd.price, qty: 1 }); }
+        
+        resetPOSCheckoutInterface();
+        recalculateCartTotals();
+    }
+
+    function alterCartQty(id, modifier) {
+        let entry = posActiveCart.find(x => x.id === id);
+        if(!entry) return;
+        entry.qty += modifier;
+        if(entry.qty <= 0) { posActiveCart = posActiveCart.filter(x => x.id !== id); }
+        resetPOSCheckoutInterface();
+        recalculateCartTotals();
+    }
+
+    function resetPOSCheckoutInterface() {
+        document.getElementById('posCheckoutPanel').classList.add('hidden');
+        document.getElementById('posGymIdInput').value = "";
+        document.getElementById('posWalletStatusBox').innerHTML = "";
+        document.getElementById('paymentBreakdownBox').innerHTML = "";
+        activeCheckoutWalletUser = null;
+    }
+
+    function recalculateCartTotals() {
+        const tbody = document.getElementById('cartTableBody');
+        tbody.innerHTML = "";
+        
+        let subtotalAccumulator = 0;
+        posActiveCart.forEach(item => {
+            let rowCost = item.price * item.qty;
+            subtotalAccumulator += rowCost;
+            tbody.innerHTML += `
+                <tr>
+                    <td>${item.name}</td>
                     <td>
-                        <button class="action-btn btn-green" style="padding: 6px 12px; font-size: 0.8rem;" onclick="executeEmployeeQueueAction('${req.requestId}', true)">Approve</button>
-                        <button class="action-btn btn-red" style="padding: 6px 12px; font-size: 0.8rem;" onclick="executeEmployeeQueueAction('${req.requestId}', false)">Deny</button>
+                        <button onclick="alterCartQty(${item.id}, -1)" style="width:auto; padding:2px 6px; margin:0;">-</button>
+                        <b>${item.qty}</b>
+                        <button onclick="alterCartQty(${item.id}, 1)" style="width:auto; padding:2px 6px; margin:0;">+</button>
                     </td>
-                `;
-                tbody.appendChild(row);
-            });
+                    <td>${rowCost.toFixed(2)} JOD</td>
+                    <td><button onclick="alterCartQty(${item.id}, -${item.qty})" class="danger" style="width:auto; padding:2px 6px; margin:0;">&times;</button></td>
+                </tr>
+            `;
+        });
+
+        const discountPct = parseFloat(document.getElementById('posDiscountInput').value) || 0;
+        const finalizedDue = subtotalAccumulator * (1 - (discountPct / 100));
+        document.getElementById('cartTotalDisplay').innerText = `${finalizedDue.toFixed(2)} JOD`;
+    }
+
+    function initiatePOSCheckout() {
+        if(posActiveCart.length === 0) return printNotification("The customer cart is completely empty.", "error");
+        document.getElementById('posCheckoutPanel').classList.remove('hidden');
+        document.getElementById('posCashHandedInput').value = "";
+        document.getElementById('posChangeReturnDisplay').innerText = "0.00";
+        calculatePOSChange();
+    }
+
+    function verifyCheckoutWallet() {
+        const id = document.getElementById('posGymIdInput').value.trim();
+        const box = document.getElementById('posWalletStatusBox');
+        
+        if(!id) {
+            activeCheckoutWalletUser = null;
+            box.innerHTML = "";
+            calculatePOSChange();
+            return;
         }
-
-        /*----------------------------------------------------------------------------*/
-        /* CUSTOMER MANAGEMENT SYSTEM WORKFLOW CHANNEL MODULES                        */
-        /*----------------------------------------------------------------------------*/
-        function executeCustomerBalanceQuery() {
-            const lookupId = document.getElementById('custLookupField').value.trim();
-            const record = customers[lookupId];
-
-            if (!record) {
-                renderSystemModalAlert("Query Error", "The profile identification string requested does not map to any active subscription.", true);
-                document.getElementById('customerQueryResponse').style.display = 'none';
-                return;
-            }
-
-            document.getElementById('targetCustCardName').innerText = `Member Account: ${record.name} (${record.id})`;
-            document.getElementById('targetCustCardEntries').innerText = record.entriesLeft;
-            document.getElementById('targetCustCardExpiry').innerText = record.expiryDate;
-            document.getElementById('targetCustCardStatus').innerText = record.message;
-
-            document.getElementById('customerQueryResponse').style.display = 'block';
+        
+        verifyAllCustomersExpiryStateOnTick();
+        const customers = JSON.parse(localStorage.getItem('customers')) || [];
+        const match = customers.find(c => c.code === id);
+        
+        if(!match) {
+            activeCheckoutWalletUser = null;
+            box.innerHTML = `<span style="color:var(--danger)">❌ Invalid Gym ID Code</span>`;
+            calculatePOSChange();
+            return;
         }
+        
+        activeCheckoutWalletUser = match;
+        box.innerHTML = `<span style="color:var(--secondary)">✅ Linked: ${match.first} (Wallet Bal: ${(match.cafeteriaBalance || 0).toFixed(2)} JOD)</span>`;
+        calculatePOSChange();
+    }
 
-        function dispatchCustomerRenewalRequest() {
-            const lookupId = document.getElementById('custLookupField').value.trim();
-            const targetPlanId = document.getElementById('customerPlanSelector').value;
-            const record = customers[lookupId];
-
-            if (!record) {
-                renderSystemModalAlert("Processing Fault", "Please query and authenticate individual profile parameters before selecting packages.", true);
-                return;
-            }
-
-            // Prevent stacking identical duplicate operations logs
-            const duplicateCheck = pendingRenewalsQueue.find(r => r.gymId === lookupId && r.planId === targetPlanId);
-            if (duplicateCheck) {
-                renderSystemModalAlert("Pipeline Overflow Alert", "A request with matching plan criteria is already logged overhead space inside processing queues.", false);
-                return;
-            }
-
-            pendingRenewalsQueue.push({
-                requestId: "req-" + Date.now(),
-                gymId: lookupId,
-                planId: targetPlanId
-            });
-
-            renderSystemModalAlert("Success", "Your subscription modification request has been logged and sent to front-desk queue matrix.", false);
-            synchronizeGlobalInterfaceViews();
-        }
-
-        /*----------------------------------------------------------------------------*/
-        /* FRONT-DESK LOGISTICS TRACKING GATE AND SCAN CHANNELS                       */
-        /*----------------------------------------------------------------------------*/
-        function evaluateDeskGateScan() {
-            const scanId = document.getElementById('frontDeskCheckInId').value.trim();
-            const member = customers[scanId];
-
-            if (!member) {
-                renderSystemModalAlert("Access Refused", "Invalid system scanning code tracking matrix link.", true);
-                return;
-            }
-
-            // INTERCEPT BLOCK STEP: Check if there is a pending financial cash collection due on approved upgrades
-            if (member.pendingCollection && member.pendingPlan) {
-                const plan = member.pendingPlan;
-                
-                const overlay = document.getElementById('systemAlertOverlay');
-                const dBox = document.getElementById('dialogBox');
-                dBox.style.borderColor = "var(--brand-yellow)";
-                
-                document.getElementById('dialogTitle').innerText = "💳 BALANCE OWED / ACTION REQUIRED";
-                document.getElementById('dialogTitle').style.color = "var(--brand-yellow)";
-                document.getElementById('dialogMessage').innerHTML = `
-                    Member <strong>${member.name}</strong> holds an approved pending renewal request for <strong>${plan.name}</strong>.<br><br>
-                    <strong>Please process and collect system subscription payment fees now.</strong>
-                `;
-
-                const actionArea = document.getElementById('dialogActionsContainer');
-                actionArea.innerHTML = `
-                    <button class="action-btn btn-green" onclick="finalizeCashBalanceCollection('${scanId}')">Payment Collected</button>
-                    <button class="action-btn btn-secondary" onclick="terminateModalOverlay()">Decline Entry</button>
-                `;
-                
-                overlay.style.display = 'flex';
-                return;
-            }
-
-            // Standard access verification checks processing line
-            const today = new Date();
-            const parsedExpDate = new Date(member.expiryDate);
-
-            if (member.entriesLeft <= 0 || parsedExpDate < today) {
-                renderSystemModalAlert("ACCESS REJECTED", `Profile registration metrics expired. Visits count: ${member.entriesLeft}. Date threshold: ${member.expiryDate}`, true);
+    function calculatePOSChange() {
+        const totalDue = parseFloat(document.getElementById('cartTotalDisplay').innerText);
+        let walletDeduction = 0.00;
+        let cashRequired = totalDue;
+        
+        if(activeCheckoutWalletUser) {
+            let availableBal = activeCheckoutWalletUser.cafeteriaBalance || 0;
+            if(availableBal >= totalDue) {
+                walletDeduction = totalDue;
+                cashRequired = 0.00;
             } else {
-                member.entriesLeft -= 1;
-                renderSystemModalAlert("ACCESS GRANTED", `Welcome back, ${member.name}. One unit deducted. Remaining visits: ${member.entriesLeft}`, false);
-                
-                // If checking active profile card display matrix update simultaneously
-                if (document.getElementById('customerQueryResponse').style.display === 'block' && document.getElementById('custLookupField').value.trim() === scanId) {
-                    executeCustomerBalanceQuery();
+                walletDeduction = availableBal;
+                cashRequired = totalDue - availableBal;
+            }
+        }
+        
+        const breakdown = document.getElementById('paymentBreakdownBox');
+        if(walletDeduction > 0) {
+            breakdown.innerHTML = `
+                <div>Subtotal Order: ${totalDue.toFixed(2)} JOD</div>
+                <div style="color:var(--secondary);">Prepaid Wallet Coverage: -${walletDeduction.toFixed(2)} JOD</div>
+                <div style="border-top:1px dashed #ccc; margin-top:5px; padding-top:5px;">Net Cash Remaining Due: <b>${cashRequired.toFixed(2)} JOD</b></div>
+            `;
+        } else {
+            breakdown.innerHTML = "";
+        }
+        
+        document.getElementById('cashTenderedLabel').innerText = walletDeduction > 0 ? `Remaining Cash Handled (${cashRequired.toFixed(2)} JOD Due):` : "Cash Tendered Amount:";
+        
+        const cashHanded = parseFloat(document.getElementById('posCashHandedInput').value) || 0;
+        const deltaChange = cashHanded - cashRequired;
+        
+        const display = document.getElementById('posChangeReturnDisplay');
+        display.innerText = (deltaChange >= 0 && cashRequired > 0) ? deltaChange.toFixed(2) : "0.00";
+
+        document.getElementById('posFinalConfirmBtn').onclick = function() {
+            if(cashHanded < cashRequired) return printNotification("Insufficient cash handed to cover the order statement balance.", "error");
+            
+            let latestCustomers = JSON.parse(localStorage.getItem('customers')) || [];
+            let stamp = getSystemSimulatedTime().toLocaleString();
+            let itemSummaryString = posActiveCart.map(c => `${c.name} (x${c.qty})`).join(', ');
+            
+            if(activeCheckoutWalletUser) {
+                let dbClient = latestCustomers.find(c => c.code === activeCheckoutWalletUser.code);
+                if(dbClient) {
+                    dbClient.cafeteriaBalance = (dbClient.cafeteriaBalance || 0) - walletDeduction;
+                    dbClient.logs.push(`[Cafeteria Purchase] Spent ${walletDeduction.toFixed(2)} JOD from balance wallet registry on ${stamp}.`);
+                    activeCheckoutWalletUser = dbClient;
                 }
             }
-        }
+            
+            let salesLedger = JSON.parse(localStorage.getItem('foodSales')) || [];
+            const discountPercentValue = parseFloat(document.getElementById('posDiscountInput').value) || 0;
 
-        function executeEmployeeQueueAction(requestId, isApproved) {
-            const positionIdx = pendingRenewalsQueue.findIndex(r => r.requestId === requestId);
-            if (positionIdx === -1) return;
-
-            const element = pendingRenewalsQueue[positionIdx];
-            const member = customers[element.gymId];
-            const plan = subscriptionPlans.find(p => p.id === element.planId);
-
-            if (isApproved && member && plan) {
-                member.pendingCollection = true;
-                member.pendingPlan = plan;
-                member.message = `Renewal contract authorized. Balance cash processing lock active at terminal entrance gate scanning points.`;
-                renderSystemModalAlert("Authorized Successfully", `Extension accepted. Accounting system balance prompt locks will trigger at the next desk gate check-in for member: ${member.name}.`, false);
-            } else {
-                if (member) member.message = "Your previous registration application parameters were rejected by clerical operations teams.";
-                renderSystemModalAlert("Application Rejected", "The renewal request has been deleted from the systems tracking line pipeline.", true);
+            let paymentMethodSummary = "Cash Out";
+            if(walletDeduction > 0) {
+                paymentMethodSummary = cashRequired > 0 ? `Wallet (-${walletDeduction.toFixed(2)} JOD) + Cash` : `Wallet Deduct [ID: ${activeCheckoutWalletUser.code}]`;
             }
 
-            pendingRenewalsQueue.splice(positionIdx, 1);
-            synchronizeGlobalInterfaceViews();
-
-            if (member && document.getElementById('customerQueryResponse').style.display === 'block' && document.getElementById('custLookupField').value.trim() === member.id) {
-                executeCustomerBalanceQuery();
-            }
-        }
-
-        function finalizeCashBalanceCollection(gymId) {
-            const member = customers[gymId];
-            if (member && member.pendingPlan) {
-                const plan = member.pendingPlan;
-                
-                member.entriesLeft += parseInt(plan.entries);
-                
-                let calculationBaselineDate = new Date();
-                let currentExpirationTrack = new Date(member.expiryDate);
-                if (currentExpirationTrack > calculationBaselineDate) {
-                    calculationBaselineDate = currentExpirationTrack;
-                }
-                calculationBaselineDate.setDate(calculationBaselineDate.getDate() + parseInt(plan.durationDays));
-                
-                member.expiryDate = calculationBaselineDate.toISOString().split('T')[0];
-                member.pendingCollection = false;
-                member.pendingPlan = null;
-                member.message = "Account subscription parameters successfully upgraded and funded.";
-                
-                terminateModalOverlay();
-                renderSystemModalAlert("Account Finalized", `Payment verified. System credits structural log upgraded successfully. Available Units: ${member.entriesLeft}. Lifespan: ${member.expiryDate}`, false);
-                
-                if (document.getElementById('customerQueryResponse').style.display === 'block' && document.getElementById('custLookupField').value.trim() === gymId) {
-                    executeCustomerBalanceQuery();
-                }
-            }
-        }
-
-        /*----------------------------------------------------------------------------*/
-        /* GOVERNANCE MANAGER LOG MATRIX CONFIGURATION PIPELINES                      */
-        /*----------------------------------------------------------------------------*/
-        function executeManagerPlanCreation() {
-            const name = document.getElementById('mgrPlanName').value.trim();
-            const units = parseInt(document.getElementById('mgrPlanUnits').value);
-            const span = parseInt(document.getElementById('mgrPlanDuration').value);
-            const viewScope = document.getElementById('mgrPlanVisibility').value;
-
-            if (!name || isNaN(units) || isNaN(span)) {
-                renderSystemModalAlert("Input Error", "Please verify structural plan criteria inputs before saving modifications.", true);
-                return;
-            }
-
-            subscriptionPlans.push({
-                id: "tier-" + Date.now(),
-                name: name,
-                entries: units,
-                durationDays: span,
-                visibility: viewScope
+            salesLedger.push({
+                timestamp: stamp,
+                products: `${itemSummaryString} [Method: ${paymentMethodSummary}]`,
+                gross: parseFloat(posActiveCart.reduce((acc, i) => acc + (i.price * i.qty), 0).toFixed(2)),
+                discount: discountPercentValue + "%",
+                net: parseFloat(cashRequired.toFixed(2)) 
             });
 
-            renderSystemModalAlert("Configuration Saved", `Plan blueprint tier "${name}" successfully written to core databases registries.`, false);
+            localStorage.setItem('customers', JSON.stringify(latestCustomers));
+            localStorage.setItem('foodSales', JSON.stringify(salesLedger));
             
-            document.getElementById('mgrPlanName').value = '';
-            document.getElementById('mgrPlanUnits').value = '';
-            document.getElementById('mgrPlanDuration').value = '';
+            printNotification(`🛒 Retail Purchase Logged Successfully! Return Change: ${(deltaChange > 0 ? deltaChange : 0).toFixed(2)} JOD.`, "success");
             
-            synchronizeGlobalInterfaceViews();
+            posActiveCart = [];
+            document.getElementById('posDiscountInput').value = "0";
+            resetPOSCheckoutInterface();
+            recalculateCartTotals(); 
+            renderCafeteriaData();
+        };
+    }
+
+    // --- MANAGER COMMAND STRUCTURES ---
+    function processQuotation(id, action, counterValJOD = null) {
+        let quotations = JSON.parse(localStorage.getItem('quotations')), q = quotations.find(x => x.id === id);
+        let memo = prompt("Send a note to the employee:") || "Processed by Management."; q.mgrNote = memo;
+        if(action === 'approve') { q.status = "Approved"; activateCustomer(q); }
+        else if(action === 'reject') q.status = "Rejected";
+        else if(action === 'partial') { 
+            q.status = "Counter-Offered"; 
+            q.discountJOD = parseFloat(counterValJOD); 
+            q.finalPrice = Math.max(0, q.opt.price - q.discountJOD); 
         }
+        localStorage.setItem('quotations', JSON.stringify(quotations)); renderManagerData();
+        printNotification(`Quotation request updated to state: ${q.status}`, "info");
+    }
+    function toggleSuspension(code) {
+        let customers = JSON.parse(localStorage.getItem('customers')), cust = customers.find(c => c.code === code);
+        cust.status = (cust.status === "Active") ? "Suspended" : "Active";
+        cust.logs.push(`[System Audit] Account Status Toggled to: ${cust.status} on ${getSystemSimulatedTime().toLocaleString()}`);
+        localStorage.setItem('customers', JSON.stringify(customers)); renderManagerData();
+    }
+    function processRefund(code) {
+        let customers = JSON.parse(localStorage.getItem('customers')), cust = customers.find(c => c.code === code);
+        let returnValue = cust.lastSubscriptionAmount !== undefined ? cust.lastSubscriptionAmount : cust.paid;
+        
+        cust.paid = Math.max(0, cust.paid - returnValue);
+        cust.logs.push(`[Financial Audit] Targeted refund of most recent package subscription (${returnValue} JOD) issued on ${getSystemSimulatedTime().toLocaleString()}.`);
+        cust.status = "Refunded"; 
+        cust.lastSubscriptionAmount = 0;
+        
+        localStorage.setItem('customers', JSON.stringify(customers)); renderManagerData();
+        printNotification(`Most recent subscription checkout statement of ${returnValue} JOD safely reversed.`, "warning");
+    }
+    function promptFactoryReset() {
+        const container = document.getElementById('mgrPromptContainer');
+        container.innerHTML = `
+            <div class="ui-notification ui-error" style="border:2px solid var(--danger);">
+                <p>🚨 <b>CRITICAL SYSTEM RESET:</b> Are you absolutely sure you want to drop all data structures?</p>
+                <button class="danger" style="width:auto; margin-right:10px;" onclick="triggerFactoryReset()">Yes, Wipe Everything</button>
+                <button class="secondary" style="width:auto;" onclick="document.getElementById('mgrPromptContainer').innerHTML=''">Cancel</button>
+            </div>
+        `;
+    }
+    function triggerFactoryReset() { initDatabase(true); logout(); }
 
-        /*----------------------------------------------------------------------------*/
-        /* SYSTEM ALERTS AND INTERFACE DIALOG TOOLKITS INTERACTION LAYERS             */
-        /*----------------------------------------------------------------------------*/
-        function renderSystemModalAlert(title, text, isCriticalError = false) {
-            const targetMask = document.getElementById('systemAlertOverlay');
-            const innerBox = document.getElementById('dialogBox');
-            
-            innerBox.className = "modal-body";
-            if (isCriticalError) {
-                innerBox.style.borderColor = "var(--system-red)";
-                document.getElementById('dialogTitle').style.color = "var(--system-red)";
-            } else {
-                innerBox.style.borderColor = "var(--brand-yellow)";
-                document.getElementById('dialogTitle').style.color = "var(--brand-yellow)";
-            }
+    // --- RENDERING INTEGRATION HOOKS ---
+    function renderCafeteriaData() {
+        const items = JSON.parse(localStorage.getItem('foodItems')) || [];
+        const menuGrid = document.getElementById('posMenuGrid');
+        menuGrid.innerHTML = "";
+        items.forEach(i => {
+            menuGrid.innerHTML += `
+                <div class="pos-menu-item" onclick="addFoodToCart(${i.id})">
+                    ${i.name}
+                    <span class="price-tag">${i.price.toFixed(2)} JOD</span>
+                </div>
+            `;
+        });
 
-            document.getElementById('dialogTitle').innerText = title;
-            document.getElementById('dialogMessage').innerText = text;
-            
-            const actionsArea = document.getElementById('dialogActionsContainer');
-            actionsArea.innerHTML = `<button class="action-btn" onclick="terminateModalOverlay()">Acknowledge</button>`;
+        const sales = JSON.parse(localStorage.getItem('foodSales')) || [];
+        const totalFoodRev = sales.reduce((acc, curr) => acc + curr.net, 0);
+        document.getElementById('totalFoodRevenueDisplay').innerText = totalFoodRev.toFixed(2);
 
-            targetMask.style.display = 'flex';
-        }
+        const ledgerBody = document.getElementById('cafeteriaSalesLedgerTable');
+        ledgerBody.innerHTML = "";
+        sales.slice().reverse().forEach(s => {
+            ledgerBody.innerHTML += `
+                <tr>
+                    <td>${s.timestamp}</td>
+                    <td>${s.products}</td>
+                    <td>${s.gross.toFixed(2)} JOD</td>
+                    <td>${s.discount}</td>
+                    <td><b>${s.net.toFixed(2)} JOD</b></td>
+                </tr>
+            `;
+        });
+        
+        document.getElementById('walletConsoleWrapper').classList.add('hidden');
+        document.getElementById('walletGymIdSearch').value = "";
+    }
 
-        function terminateModalOverlay() {
-            document.getElementById('systemAlertOverlay').style.display = 'none';
-        }
-    </script>
+    function renderInventoryConfigurationView() {
+        const items = JSON.parse(localStorage.getItem('foodItems')) || [];
+        const targetConfigContainer = document.getElementById('inventoryConfigTableBody');
+        targetConfigContainer.innerHTML = "";
+
+        items.forEach(i => {
+            targetConfigContainer.innerHTML += `
+                <tr>
+                    <td><b>${i.name}</b></td>
+                    <td>
+                        <input type="number" id="invPriceInput-${i.id}" value="${i.price.toFixed(2)}" step="0.01" style="width:110px; margin:0; padding:5px;">
+                    </td>
+                    <td>
+                        <button onclick="changeFoodItemPrice(${i.id})" class="secondary" style="width:auto; padding:5px 12px; margin:0 5px 0 0;">Update Price</button>
+                        <button onclick="deleteFoodItemFromInventory(${i.id})" class="danger" style="width:auto; padding:5px 12px; margin:0;">Delete</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function renderManagerData() {
+        const opts = JSON.parse(localStorage.getItem('gymOptions'));
+        let html = ''; opts.forEach(o => {
+            html += `<tr><td>${o.name}</td><td>${o.price} JOD</td><td>${o.type}</td><td>${o.type==='time'? o.days+' Days': o.entries+' Entries (Exp: '+o.expiryDays+'d)'}</td><td><button class="danger" onclick="deleteGymOption(${o.id})">Delete</button></td></tr>`;
+        });
+        document.getElementById('gymOptionsTable').innerHTML = html;
+
+        const staff = JSON.parse(localStorage.getItem('staff')) || [];
+        let staffHtml = ''; staff.forEach(s => {
+            staffHtml += `<tr><td><b>${s.user}</b></td><td><code style="color:var(--danger); font-weight:bold;">${s.pass}</code></td><td><button class="danger" onclick="deleteEmployee('${s.user}')">Revoke Access</button></td></tr>`;
+        });
+        document.getElementById('staffTableBody').innerHTML = staffHtml;
+
+        const quots = JSON.parse(localStorage.getItem('quotations')).filter(q => q.status === "Pending");
+        let appHtml = ''; quots.forEach(q => {
+            appHtml += `<tr><td>${q.isRenewal?'<span class="badge badge-suspended">Renewal</span>':'<span class="badge badge-active">New</span>'}<br><b>ID: ${q.code}</b></td><td>${q.first} ${q.last}</td><td>${q.opt.name}</td><td>${q.discountJOD} JOD</td><td>${q.finalPrice} JOD</td><td><i style="color:#e67e22;">"${q.empReason}"</i></td><td><input type="number" id="counter-${q.id}" style="width:70px" placeholder="JOD"></td><td><button class="secondary" onclick="processQuotation(${q.id}, 'approve')">Approve</button> <button class="danger" onclick="processQuotation(${q.id}, 'reject')">Reject</button> <button onclick="let val=document.getElementById('counter-${q.id}').value; if(val) processQuotation(${q.id}, 'partial', val); else printNotification('Type JOD value for counter offer','error');">Counter</button></td></tr>`;
+        });
+        document.getElementById('mgrApprovalsTable').innerHTML = appHtml;
+
+        verifyAllCustomersExpiryStateOnTick();
+        const allCusts = JSON.parse(localStorage.getItem('customers')) || [];
+        const gymFeesRevenue = allCusts.reduce((acc, curr) => acc + curr.paid, 0);
+        const sales = JSON.parse(localStorage.getItem('foodSales')) || [];
+        const totalFoodRev = sales.reduce((acc, curr) => acc + curr.net, 0);
+        
+        document.getElementById('totalRevenueDisplay').innerText = (gymFeesRevenue + totalFoodRev).toFixed(2);
+
+        let refHtml = ''; allCusts.forEach(c => {
+            let details = c.opt.type === 'time' ? `Expires: ${c.expiryDate || 'Lapsed'}` : `Entries Remaining: ${c.entriesLeft !== null ? c.entriesLeft : '0'}`;
+            refHtml += `<tr class="clickable-row" onclick="launchProfileModal('${c.code}')"><td><b>${c.code}</b></td><td>${c.first} ${c.last}</td><td><span class="badge badge-${c.status.toLowerCase()}">${c.status}</span></td><td><b>${(c.cafeteriaBalance || 0).toFixed(2)} JOD</b></td><td>${c.paid} JOD</td><td><b>${c.totalCheckIns} Visits</b></td><td onclick="event.stopPropagation();"> ${(c.status==='Active'||c.status==='Suspended')?`<button class="warning" onclick="toggleSuspension('${c.code}')">${c.status==='Suspended'?'Unsuspend':'Suspend'}</button>`:''} ${c.status!=='Refunded'?`<button class="danger" onclick="processRefund('${c.code}')">Refund</button>`:''}</td></tr>`;
+        });
+        document.getElementById('mgrRefundsTable').innerHTML = refHtml;
+        
+        rebuildLoginUserDropdown();
+    }
+
+    function renderEmployeeData() {
+        const options = JSON.parse(localStorage.getItem('gymOptions'));
+        let selectHtml = ''; options.forEach(o => selectHtml += `<option value="${o.id}">${o.name} (${o.price} JOD)</option>`);
+        document.getElementById('custSubChoice').innerHTML = selectHtml; updatePricePreview();
+
+        const quots = JSON.parse(localStorage.getItem('quotations')) || [];
+        let qHtml = ''; quots.forEach(q => {
+            let actionBtn = q.status === 'Counter-Offered' ? `<button onclick="acceptCounter(${q.id})" class="secondary">Client Agrees</button>` : (q.status === 'Approved' ? `<span>Live ID: <b>${q.code}</b></span>` : '');
+            qHtml += `<tr><td><b>${q.code}</b></td><td>${q.first} ${q.last}</td><td>${q.opt.name}</td><td>${q.opt.price} JOD</td><td>${q.discountJOD} JOD</td><td>${q.finalPrice} JOD</td><td><small>"${q.empReason}"</small></td><td><span class="badge badge-${q.status.toLowerCase()}">${q.status}</span></td><td>${q.mgrNote}</td><td>${actionBtn}</td></tr>`;
+        });
+        document.getElementById('empQuotationsTable').innerHTML = qHtml;
+    }
+
+    // --- RUN INITIAL APPLICATION ENGINE PIPELINES ---
+    initDatabase();
+    rebuildLoginUserDropdown(); 
+    runClockEngineTick();
+</script>
 </body>
 </html>
